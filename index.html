@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="0;url=login.html">
+    <title>DME TREINO | Redirecionando...</title>
+    <script>
+        const username = localStorage.getItem('dme_username');
+        if (username) {
+            window.location.href = "home.html";
+        } else {
+            window.location.href = "login.html";
+        }
+    </script>
+</head>
+
+<body>
+    <p>Se você não for redirecionado automaticamente, <a href="login.html">clique aqui</a>.</p>
+</body>
+
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Admin - DME TREINO</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a1f0f 0%, #1a3a24 50%, #0d2817 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(46,204,113,0.3);
+            max-width: 500px;
+            text-align: center;
+        }
+        h1 { color: #2ecc71; margin-bottom: 20px; }
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 1px solid rgba(46,204,113,0.5);
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 16px;
+        }
+        input::placeholder { color: rgba(255,255,255,0.5); }
+        button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover { background: #27ae60; transform: translateY(-2px); }
+        .info { margin-top: 20px; font-size: 14px; color: rgba(255,255,255,0.7); }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🔐 Setup Admin - DME TREINO</h1>
+        <p style="margin-bottom: 20px;">Configure seu acesso de administrador</p>
+        
+        <input type="text" id="username" placeholder="Seu nickname do Habbo">
+        <input type="email" id="email" placeholder="Seu e-mail (opcional)">
+        <input type="password" id="password" placeholder="Senha (mínimo 6 caracteres)">
+        
+        <button onclick="setupAdmin()">✅ Configurar e Entrar</button>
+        
+        <div class="info">
+            Este setup criará uma conta de admin e fará login automaticamente.
+        </div>
+    </div>
+
+    <script>
+        function setupAdmin() {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!username) {
+                alert('❌ Digite seu nickname!');
+                return;
+            }
+
+            if (!password || password.length < 6) {
+                alert('❌ A senha precisa ter pelo menos 6 caracteres!');
+                return;
+            }
+
+            // Cria ou atualiza a lista de usuários
+            let users = JSON.parse(localStorage.getItem('dme_users')) || [];
+            
+            // Remove usuário existente se houver
+            users = users.filter(u => u.username !== username);
+
+            // Adiciona novo usuário como admin ativo
+            users.push({
+                username: username,
+                email: email || 'admin@dmetreino.com',
+                password: password,
+                status: 'ativo',
+                registradoEm: new Date().toLocaleString('pt-BR')
+            });
+
+            localStorage.setItem('dme_users', JSON.stringify(users));
+
+            // Adiciona aos admins
+            let admins = JSON.parse(localStorage.getItem('dme_admins')) || [];
+            if (!admins.includes(username)) {
+                admins.push(username);
+                localStorage.setItem('dme_admins', JSON.stringify(admins));
+            }
+
+            // Faz login
+            localStorage.setItem('dme_username', username);
+
+            alert(`✅ Conta de ${username} configurada como ADMIN!\n\nRedirecionando para o painel...`);
+            
+            setTimeout(() => {
+                window.location.href = 'painel.html';
+            }, 500);
+        }
+
+        // Debug info
+        window.addEventListener('DOMContentLoaded', () => {
+            const currentUser = localStorage.getItem('dme_username');
+            if (currentUser) {
+                console.log('✅ Já existe um usuário logado:', currentUser);
+                console.log('localStorage.dme_users:', localStorage.getItem('dme_users'));
+                console.log('localStorage.dme_admins:', localStorage.getItem('dme_admins'));
+            } else {
+                console.log('⚠️ Nenhum usuário logado');
+            }
+        });
+    </script>
+</body>
+</html>

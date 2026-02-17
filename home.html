@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DME TREINO | Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script>
+        (function () {
+            const theme = localStorage.getItem('dme_theme') || 'dark';
+            if (theme === 'light') document.documentElement.classList.add('light-mode');
+        })();
+    </script>
+    <style>
+        :root {
+            --bg-dark: #000000;
+            --bg-card: #0a0f0a;
+            --primary-green: #2ecc71;
+            --accent-green: #27ae60;
+            --text-white: #ffffff;
+            --text-gray: #8c9c8c;
+            --border-color: #1a2a1a;
+            --hover-bg: #0f1a0f;
+        }
+
+        body.light-mode {
+            --bg-dark: #fdfdfd;
+            --bg-card: #ffffff;
+            --text-white: #2c3e50;
+            --text-gray: #6c757d;
+            --border-color: #2ecc71;
+            --hover-bg: #f8f9fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-white);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger:hover {
+            background: var(--hover-bg);
+        }
+
+        .hamburger span {
+            width: 24px;
+            height: 3px;
+            background: var(--primary-green);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        /* LOGO SECTION */
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 35px;
+            height: 35px;
+            background: url('https://www.habbo.com.br/habbo-imaging/badge/b09134s43114s41194f1035061689.gif') no-repeat center;
+            background-size: contain;
+            filter: drop-shadow(0 0 5px var(--primary-glow));
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-white);
+        }
+
+        .logo-text span {
+            color: var(--primary-green);
+        }
+
+        .nav-links {
+            display: none;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-profile {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 12px;
+            background: var(--hover-bg);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-profile:hover {
+            background: var(--bg-card);
+        }
+
+        /* LOGO SECTION */
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-profile {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 14px;
+            background: var(--hover-bg);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .user-profile:hover {
+            border-color: var(--primary-green);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar img {
+            width: auto;
+            height: 140%;
+            object-fit: contain;
+            transform: scale(1.1) translateY(3px);
+        }
+
+        .user-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            min-width: 220px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .user-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-header {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .dropdown-user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dropdown-avatar {
+            width: 65px;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+
+        .dropdown-avatar img {
+            width: auto;
+            height: 140%;
+            object-fit: contain;
+            transform: translateY(5px);
+        }
+
+        .dropdown-user-details h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .dropdown-user-details p {
+            font-size: 0.7rem;
+            color: var(--text-gray);
+        }
+
+        .dropdown-menu {
+            padding: 8px;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            color: var(--text-white);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: var(--hover-bg);
+            color: var(--primary-green);
+        }
+
+        .dropdown-item.danger {
+            color: #e74c3c;
+        }
+
+        .dropdown-item.danger:hover {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 8px 0;
+        }
+
+        .btn-logout {
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-gray);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: none;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-logout:hover {
+            background: var(--hover-bg);
+            color: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        /* SIDEBAR */
+        .mobile-sidebar {
+            position: fixed;
+            left: -300px;
+            top: 0;
+            width: 300px;
+            height: 100vh;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            z-index: 3000;
+            transition: left 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .mobile-sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        .sidebar-close {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 1.5rem;
+            color: var(--text-gray);
+        }
+
+        .sidebar-close:hover {
+            background: var(--hover-bg);
+            color: var(--primary-green);
+        }
+
+        .sidebar-menu {
+            padding: 20px;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            color: var(--text-white);
+            text-decoration: none;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .sidebar-item:hover {
+            background: var(--hover-bg);
+            color: var(--primary-green);
+            transform: translateX(5px);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .main-container {
+            padding: 40px 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* BUSCA RÁPIDA */
+        .search-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .search-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 20px;
+        }
+
+        .search-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            background: var(--hover-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-white);
+            font-size: 0.9rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+        }
+
+        .btn-search {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary-green), var(--accent-green));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .search-result {
+            display: none;
+            background: var(--hover-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .result-avatar {
+            width: 80px;
+            height: 100px;
+            background: rgba(46, 204, 113, 0.1);
+            border: 2px solid var(--primary-green);
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .result-info h3 {
+            font-size: 1.4rem;
+            color: var(--primary-green);
+            margin-bottom: 5px;
+        }
+
+        .result-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(46, 204, 113, 0.2);
+            border: 1px solid var(--primary-green);
+            border-radius: 5px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .detail-label {
+            font-size: 0.7rem;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            font-size: 0.9rem;
+            color: var(--text-white);
+            font-weight: 600;
+        }
+
+        /* HOME SECTION */
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .welcome-avatar {
+            width: 200px;
+            height: 250px;
+            margin: 0 auto 25px;
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(39, 174, 96, 0.05));
+            border: 3px solid var(--primary-green);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 40px rgba(46, 204, 113, 0.3);
+        }
+
+        .welcome-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.5));
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary-green), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .welcome-subtitle {
+            font-size: 1rem;
+            color: var(--text-gray);
+            font-weight: 500;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .menu-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(46, 204, 113, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .menu-card:hover::before {
+            left: 100%;
+        }
+
+        .menu-card:hover {
+            border-color: var(--primary-green);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(46, 204, 113, 0.3);
+        }
+
+        .menu-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .menu-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-white);
+            margin-bottom: 10px;
+        }
+
+        .menu-description {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            line-height: 1.6;
+        }
+
+        /* PAINEL ADMINISTRATIVO */
+        .admin-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .panel-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        .panel-search {
+            flex: 1;
+            max-width: 300px;
+            padding: 10px 15px;
+            background: var(--hover-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-white);
+            font-size: 0.85rem;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .admin-table thead th {
+            padding: 15px;
+            text-align: left;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-gray);
+            background: var(--hover-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .admin-table tbody td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        .admin-table tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+        .admin-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
+            color: #ffc107;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .btn-action {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 5px;
+        }
+
+        .btn-edit {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--primary-green);
+            border: 1px solid var(--primary-green);
+        }
+
+        .btn-edit:hover {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .btn-delete {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+        }
+
+        .btn-delete:hover {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-admin {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid #ffc107;
+        }
+
+        .btn-admin:hover {
+            background: #ffc107;
+            color: #000;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- MOBILE SIDEBAR -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="mobile-sidebar" id="mobileSidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Menu</div>
+            <div class="sidebar-close" id="sidebarClose">×</div>
+        </div>
+        <div class="sidebar-menu">
+            <a href="home.html" class="sidebar-item">
+                <span style="color:var(--primary-green);">Página Inicial</span>
+            </a>
+            <a href="listagens.html" class="sidebar-item">
+                <span>Listagens</span>
+            </a>
+            <a href="requerimentos.html" class="sidebar-item">
+                <span>Requerimentos</span>
+            </a>
+            <a href="sabatina.html" class="sidebar-item">
+                <span>Sabatina</span>
+            </a>
+            <a href="consulta_promocao.html" class="sidebar-item">
+                <span>Consultar Promoção</span>
+            </a>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <div class="logo-section">
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="logo-icon"></div>
+            <div class="logo-text">DME<span>Treino</span></div>
+        </div>
+
+        <div class="nav-actions">
+            <div class="user-profile" id="userProfileBtn">
+                <div class="user-avatar" id="navUserAvatar">
+                    <img id="navUserImage" src="" alt="Avatar">
+                </div>
+                <span class="user-name" id="navUserName">Usuário</span>
+
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-info">
+                            <div class="dropdown-avatar" id="dropdownAvatar">
+                                <img id="dropdownUserImage" src="" alt="Avatar">
+                            </div>
+                            <div class="dropdown-user-details">
+                                <h4 id="dropdownName">Usuário</h4>
+                                <p>Militar DME</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="painel.html" class="dropdown-item" id="dropdownPainel" style="display: none;">
+                            <span>Painel</span>
+                        </a>
+                        <a href="configuracao.html" class="dropdown-item">🔧 Configurações</a>
+                        <a onclick="toggleTheme()" class="dropdown-item">
+                            <span id="themeText">Modo Claro</span>
+                        </a>
+                        <div class="dropdown-divider" id="dropdownDivider" style="display: none;"></div>
+                        <a onclick="logout()" class="dropdown-item danger">
+                            <span>Sair</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-container">
+        <!-- BUSCA RÁPIDA -->
+        <section class="search-section">
+            <h2 class="search-title">Busca Rápida de Militar</h2>
+
+            <div class="search-input-group">
+                <input type="text" class="search-input" id="searchInput" placeholder="Digite o nickname do militar...">
+                <button class="btn-search" id="btnSearch">Buscar</button>
+            </div>
+
+            <div class="search-result" id="searchResult">
+                <div class="result-header">
+                    <div class="result-avatar">
+                        <img id="resultAvatar" src="" alt="Avatar">
+                    </div>
+                    <div class="result-info">
+                        <h3 id="resultNick">-</h3>
+                        <span class="result-badge" id="resultCorpo">-</span>
+                    </div>
+                </div>
+                <div class="result-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Patente/Cargo</span>
+                        <span class="detail-value" id="resultPatente">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Status</span>
+                        <span class="detail-value" id="resultStatus">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Corpo</span>
+                        <span class="detail-value" id="resultCorpoFull">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Ações</span>
+                        <span class="detail-value" id="resultAcoes">-</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOME -->
+        <section class="welcome-section">
+            <div class="welcome-avatar">
+                <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Xandelicado&direction=4&head_direction=4&size=l&action=wav"
+                    alt="Avatar" id="userAvatarImg">
+            </div>
+            <h1 class="welcome-title">Bem-vindo, <span id="welcomeUser">Usuário</span>!</h1>
+            <p class="welcome-subtitle">Sistema de Gestão DME TREINO</p>
+        </section>
+
+
+
+
+    </main>
+
+    <script>
+        // Auth Guard
+        const username = localStorage.getItem('dme_username');
+        if (!username) {
+            window.location.href = 'login.html';
+        }
+
+        function logout() {
+            localStorage.removeItem('dme_username');
+            window.location.href = 'login.html';
+        }
+
+        // Theme Management
+        function applyTheme(theme) {
+            const body = document.body;
+            const themeText = document.getElementById('themeText');
+
+            if (theme === 'light') {
+                body.classList.add('light-mode');
+                if (themeText) themeText.textContent = 'Modo Escuro';
+            } else {
+                body.classList.remove('light-mode');
+                if (themeText) themeText.textContent = 'Modo Claro';
+            }
+        }
+
+        function toggleTheme() {
+            const currentTheme = localStorage.getItem('dme_theme') || 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('dme_theme', newTheme);
+            applyTheme(newTheme);
+        }
+
+        // Initialize theme
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('dme_theme') || 'dark';
+            applyTheme(savedTheme);
+        });
+
+        document.getElementById('navUserName').textContent = username;
+        document.getElementById('welcomeUser').textContent = username;
+
+        const avatarUrl = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${username}&headonly=1&size=m&gesture=std&head_direction=2`;
+        const dropdownAvatarUrl = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${username}&size=m&direction=2&head_direction=2&gesture=std`;
+        document.getElementById('navUserImage').src = avatarUrl;
+        document.getElementById('dropdownUserImage').src = dropdownAvatarUrl;
+        document.getElementById('dropdownName').textContent = username;
+        document.getElementById('userAvatarImg').src = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${username}&direction=4&head_direction=4&size=l&action=wav`;
+
+        // Sistema de Admins
+        let admins = JSON.parse(localStorage.getItem('dme_admins')) || [username];
+        const isAdmin = admins.includes(username);
+
+        if (isAdmin) {
+            document.getElementById('dropdownPainel').style.display = 'flex';
+            document.getElementById('dropdownDivider').style.display = 'block';
+        }
+
+        // Sidebar Toggle
+        const hamburger = document.getElementById('hamburger');
+        const mobileSidebar = document.getElementById('mobileSidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarClose = document.getElementById('sidebarClose');
+
+        function toggleSidebar() {
+            mobileSidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+        }
+
+        hamburger.addEventListener('click', toggleSidebar);
+        sidebarClose.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        // Dropdown Toggle
+        const userProfileBtn = document.getElementById('userProfileBtn');
+        const userDropdown = document.getElementById('userDropdown');
+
+        userProfileBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            userDropdown.classList.toggle('active');
+        });
+
+        // Fechar dropdown ao clicar fora
+        document.addEventListener('click', function (e) {
+            if (!userProfileBtn.contains(e.target)) {
+                userDropdown.classList.remove('active');
+            }
+        });
+
+        // Prevenir que cliques dentro do dropdown o fechem
+        userDropdown.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+
+        // BUSCA RÁPIDA
+        document.getElementById('btnSearch').addEventListener('click', buscarMilitar);
+        document.getElementById('searchInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') buscarMilitar();
+        });
+
+        function buscarMilitar() {
+            const nick = document.getElementById('searchInput').value.trim();
+
+            if (nick.length < 3) {
+                alert('Digite pelo menos 3 caracteres');
+                return;
+            }
+
+            const dadosMilitar = JSON.parse(localStorage.getItem('dme_militar')) || [];
+            const dadosEmpresarial = JSON.parse(localStorage.getItem('dme_empresarial')) || [];
+            const historico = JSON.parse(localStorage.getItem('dme_historico_req')) || [];
+
+            const encontradoMilitar = dadosMilitar.find(m => m.nick.toLowerCase() === nick.toLowerCase());
+            const encontradoEmpresarial = dadosEmpresarial.find(m => m.nick.toLowerCase() === nick.toLowerCase());
+
+            const resultado = document.getElementById('searchResult');
+
+            if (encontradoMilitar || encontradoEmpresarial) {
+                const dados = encontradoMilitar || encontradoEmpresarial;
+                const corpo = encontradoMilitar ? 'militar' : 'empresarial';
+
+                const acoesUsuario = historico.filter(h =>
+                    h.militar && h.militar.toLowerCase() === nick.toLowerCase()
+                ).length;
+
+                document.getElementById('resultAvatar').src = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${dados.nick}&size=m&direction=2&head_direction=2`;
+                document.getElementById('resultNick').textContent = dados.nick;
+                document.getElementById('resultCorpo').textContent = corpo === 'militar' ? 'Corpo Militar' : 'Corpo Empresarial';
+                document.getElementById('resultPatente').textContent = dados.patente;
+                document.getElementById('resultStatus').textContent = 'Ativo';
+                document.getElementById('resultCorpoFull').textContent = corpo === 'militar' ? 'Militar' : 'Empresarial';
+                document.getElementById('resultAcoes').textContent = acoesUsuario + ' registros';
+
+                resultado.style.display = 'block';
+            } else {
+                alert('Militar não encontrado nas listas!');
+                resultado.style.display = 'none';
+            }
+        }
+
+
+    </script>
+</body>
+
+</html>

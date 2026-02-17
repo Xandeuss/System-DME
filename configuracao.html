@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DME TREINO | Configurações</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        (function () {
+            const theme = localStorage.getItem('dme_theme') || 'dark';
+            if (theme === 'light') document.documentElement.classList.add('light-mode');
+        })();
+    </script>
+    <style>
+        :root {
+            --bg-dark: #000000;
+            --bg-card: #0a0f0a;
+            --primary-green: #2ecc71;
+            --accent-green: #27ae60;
+            --text-white: #ffffff;
+            --text-gray: #8c9c8c;
+            --border-color: #1a2a1a;
+            --hover-bg: #0f1a0f;
+        }
+        html.light-mode body, body.light-mode {
+            --bg-dark: #f0f4f0; --bg-card: #ffffff; --text-white: #2c3e50;
+            --text-gray: #6c757d; --border-color: #c8e6c9; --hover-bg: #f8fdf8;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg-dark); color: var(--text-white); min-height: 100vh; }
+
+        /* NAVBAR */
+        .navbar { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 12px 25px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
+        .logo-section { display: flex; align-items: center; gap: 12px; }
+        .hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; border-radius: 8px; transition: 0.3s; }
+        .hamburger:hover { background: var(--hover-bg); }
+        .hamburger span { width: 22px; height: 3px; background: var(--primary-green); border-radius: 2px; }
+        .logo-icon { width: 35px; height: 35px; background: url('https://www.habbo.com.br/habbo-imaging/badge/b09134s43114s41194f1035061689.gif') no-repeat center; background-size: contain; filter: drop-shadow(0 0 8px rgba(46,204,113,0.5)); }
+        .logo-text { font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; }
+        .logo-text span { color: var(--primary-green); }
+
+        /* DROPDOWN */
+        .nav-actions { display: flex; align-items: center; }
+        .user-profile { position: relative; display: flex; align-items: center; gap: 10px; padding: 6px 14px; background: var(--hover-bg); border-radius: 20px; cursor: pointer; border: 1px solid transparent; transition: 0.3s; }
+        .user-profile:hover { border-color: var(--primary-green); }
+        .user-avatar { width: 35px; height: 35px; border-radius: 50%; background: var(--bg-dark); border: 2px solid var(--primary-green); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .user-avatar img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.2) translateY(6px); }
+        .user-name { font-size: 0.85rem; font-weight: 600; }
+        .user-dropdown { position: absolute; top: calc(100% + 10px); right: 0; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; min-width: 235px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: 0.3s; z-index: 2000; }
+        .user-dropdown.active { opacity: 1; visibility: visible; transform: translateY(0); }
+        .dropdown-header { padding: 15px; border-bottom: 1px solid var(--border-color); }
+        .dropdown-user-info { display: flex; align-items: center; gap: 12px; }
+        .dropdown-avatar { width: 60px; height: 60px; overflow: visible; }
+        .dropdown-avatar img { width: auto; height: 140%; object-fit: contain; transform: translateY(5px); }
+        .dropdown-user-details h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 3px; }
+        .dropdown-user-details p { font-size: 0.7rem; color: var(--text-gray); }
+        .dropdown-menu { padding: 8px; }
+        .dropdown-item { display: flex; align-items: center; gap: 10px; padding: 11px 14px; color: var(--text-white); text-decoration: none; border-radius: 8px; font-size: 0.85rem; cursor: pointer; transition: 0.2s; }
+        .dropdown-item:hover { background: var(--hover-bg); color: var(--primary-green); }
+        .dropdown-item.current-page { background: rgba(46,204,113,0.1); color: var(--primary-green); font-weight: 600; cursor: default; }
+        .dropdown-item.danger:hover { background: rgba(231,76,60,0.1); color: #e74c3c; }
+        .dropdown-divider { height: 1px; background: var(--border-color); margin: 5px 0; }
+
+        /* SIDEBAR MOBILE */
+        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 2999; opacity: 0; visibility: hidden; transition: 0.3s; }
+        .sidebar-overlay.active { opacity: 1; visibility: visible; }
+        .sidebar { position: fixed; left: -300px; top: 0; width: 280px; height: 100vh; background: var(--bg-card); border-right: 1px solid var(--border-color); z-index: 3000; transition: 0.3s; overflow-y: auto; }
+        .sidebar.active { left: 0; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+        .sidebar-title { font-size: 1.1rem; font-weight: 700; color: var(--primary-green); }
+        .sidebar-close { font-size: 1.5rem; cursor: pointer; color: var(--text-gray); padding: 5px; border-radius: 6px; }
+        .sidebar-close:hover { background: var(--hover-bg); color: var(--primary-green); }
+        .sidebar-menu { padding: 15px; }
+        .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 13px 15px; color: var(--text-white); text-decoration: none; border-radius: 10px; margin-bottom: 5px; font-size: 0.9rem; font-weight: 500; transition: 0.3s; }
+        .sidebar-item:hover { background: var(--hover-bg); color: var(--primary-green); transform: translateX(5px); }
+
+        /* LAYOUT */
+        .page-container { max-width: 1100px; margin: 0 auto; padding: 35px 25px; display: flex; gap: 25px; align-items: flex-start; }
+
+        /* MENU LATERAL CONFIG */
+        .config-sidebar { width: 215px; flex-shrink: 0; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; position: sticky; top: 80px; }
+        .config-sidebar-title { padding: 16px 20px; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-gray); border-bottom: 1px solid var(--border-color); }
+        .config-nav-item { display: flex; align-items: center; gap: 12px; padding: 14px 20px; cursor: pointer; font-size: 0.88rem; font-weight: 500; color: var(--text-gray); border-left: 3px solid transparent; transition: all 0.25s; text-decoration: none; }
+        .config-nav-item:hover { background: var(--hover-bg); color: var(--text-white); }
+        .config-nav-item.active { background: var(--hover-bg); color: var(--primary-green); border-left-color: var(--primary-green); font-weight: 600; }
+
+        /* PAINÉIS */
+        .config-content { flex: 1; min-width: 0; }
+        .config-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; display: none; animation: fadeIn 0.3s ease; }
+        .config-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .config-panel-header { padding: 22px 28px; border-bottom: 1px solid var(--border-color); }
+        .config-panel-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 4px; }
+        .config-panel-sub { font-size: 0.82rem; color: var(--text-gray); }
+        .config-panel-body { padding: 28px; }
+
+        /* FORMULÁRIOS */
+        .form-group { margin-bottom: 22px; }
+        .form-label { display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-gray); margin-bottom: 8px; }
+        .form-hint { font-size: 0.74rem; color: var(--text-gray); margin-top: 6px; opacity: 0.75; line-height: 1.5; }
+        .form-input { width: 100%; padding: 12px 15px; background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-white); font-family: 'Poppins', sans-serif; font-size: 0.9rem; transition: 0.3s; }
+        .form-input:focus { outline: none; border-color: var(--primary-green); box-shadow: 0 0 0 3px rgba(46,204,113,0.1); }
+        .form-input:disabled { opacity: 0.45; cursor: not-allowed; }
+        .form-input::placeholder { color: var(--text-gray); opacity: 0.45; }
+
+        /* TAG */
+        .tag-wrap { display: flex; align-items: center; gap: 12px; }
+        .tag-input { max-width: 100px; text-transform: uppercase; letter-spacing: 5px; font-weight: 700; font-size: 1.05rem; text-align: center; }
+        .tag-badge { display: inline-flex; align-items: center; padding: 7px 16px; background: rgba(46,204,113,0.12); border: 1px solid var(--primary-green); border-radius: 8px; font-size: 0.88rem; font-weight: 700; color: var(--primary-green); letter-spacing: 2px; transition: 0.3s; }
+
+        /* SENHA */
+        .password-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        /* DIVIDER */
+        .divider { height: 1px; background: var(--border-color); margin: 24px 0; }
+
+        /* BOTÃO SALVAR */
+        .btn-save { padding: 12px 28px; background: linear-gradient(135deg, var(--primary-green), var(--accent-green)); color: white; border: none; border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(46,204,113,0.35); }
+
+        /* EMBLEMAS */
+        .emblemas-toolbar { display: flex; gap: 10px; margin-bottom: 10px; }
+        .emblema-code-input { flex: 1; }
+        .btn-add-emblema { padding: 12px 18px; background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-white); font-family: 'Poppins', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: 0.3s; white-space: nowrap; }
+        .btn-add-emblema:hover { border-color: var(--primary-green); color: var(--primary-green); }
+        .emblemas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 12px; margin: 18px 0; }
+        .emblema-slot { aspect-ratio: 1; background: var(--hover-bg); border: 2px dashed var(--border-color); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; }
+        .emblema-slot:hover { border-color: var(--primary-green); }
+        .emblema-slot.filled { border-style: solid; border-color: var(--primary-green); }
+        .emblema-slot img { width: 80%; height: 80%; object-fit: contain; }
+        .emblema-slot .slot-num { font-size: 0.6rem; color: var(--border-color); position: absolute; bottom: 5px; }
+        .emblema-slot .slot-plus { font-size: 1.4rem; color: var(--border-color); transition: 0.2s; }
+        .emblema-slot:hover .slot-plus { color: var(--primary-green); }
+        .emblema-remove { position: absolute; top: 3px; right: 3px; width: 18px; height: 18px; background: #e74c3c; color: white; border-radius: 50%; border: none; font-size: 0.6rem; cursor: pointer; display: none; align-items: center; justify-content: center; font-weight: 700; }
+        .emblema-slot.filled:hover .emblema-remove { display: flex; }
+
+        /* BBCODE EDITOR */
+        .bbcode-editor { border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; }
+        .bbcode-toolbar { background: var(--hover-bg); padding: 10px 12px; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; border-bottom: 1px solid var(--border-color); }
+        .bb-btn { padding: 5px 9px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 5px; color: var(--text-white); font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Poppins', sans-serif; min-width: 30px; text-align: center; line-height: 1.4; }
+        .bb-btn:hover { background: var(--primary-green); border-color: var(--primary-green); color: white; }
+        .bb-sep { width: 1px; height: 20px; background: var(--border-color); margin: 0 3px; flex-shrink: 0; }
+        .bb-textarea { width: 100%; min-height: 180px; padding: 15px; background: var(--hover-bg); border: none; color: var(--text-white); font-family: 'Poppins', sans-serif; font-size: 0.88rem; resize: vertical; line-height: 1.6; display: block; }
+        .bb-textarea:focus { outline: none; }
+        .bb-preview-header { padding: 10px 15px; background: var(--bg-card); border-top: 1px solid var(--border-color); font-size: 0.72rem; font-weight: 700; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; }
+        .bb-preview-body { padding: 18px; background: var(--hover-bg); min-height: 70px; font-size: 0.88rem; line-height: 1.8; }
+
+        /* REFERÊNCIA */
+        .bb-reference { background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 18px; margin-top: 18px; }
+        .bb-ref-title { font-size: 0.75rem; font-weight: 700; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+        .bb-ref-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(195px, 1fr)); gap: 6px; }
+        .bb-ref-item { padding: 8px 12px; background: var(--bg-card); border-radius: 6px; font-size: 0.76rem; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+        .bb-ref-tag { font-family: monospace; color: var(--primary-green); font-size: 0.8rem; }
+        .bb-ref-desc { color: var(--text-gray); font-size: 0.7rem; }
+
+        /* TOAST */
+        .toast { position: fixed; bottom: 28px; right: 28px; padding: 13px 22px; border-radius: 10px; font-weight: 600; font-size: 0.85rem; box-shadow: 0 8px 25px rgba(0,0,0,0.3); transform: translateY(80px); opacity: 0; transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1); z-index: 9999; color: white; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.ok { background: var(--primary-green); box-shadow: 0 8px 25px rgba(46,204,113,0.4); }
+        .toast.err { background: #e74c3c; box-shadow: 0 8px 25px rgba(231,76,60,0.4); }
+
+        @media (max-width: 768px) {
+            .page-container { flex-direction: column; }
+            .config-sidebar { width: 100%; position: static; }
+            .password-row { grid-template-columns: 1fr; }
+            .emblemas-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-title">Menu</div>
+        <div class="sidebar-close" id="sidebarClose">×</div>
+    </div>
+    <div class="sidebar-menu">
+        <a href="home.html" class="sidebar-item">🏠 Página Inicial</a>
+        <a href="listagens.html" class="sidebar-item">📋 Listagens</a>
+        <a href="requerimentos.html" class="sidebar-item">📄 Requerimentos</a>
+        <a href="sabatina.html" class="sidebar-item">⚙️ Sabatina</a>
+        <a href="consulta_promocao.html" class="sidebar-item">🔍 Consultar Promoção</a>
+    </div>
+</div>
+
+<nav class="navbar">
+    <div class="logo-section">
+        <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+        <div class="logo-icon"></div>
+        <div class="logo-text">DME<span>Treino</span></div>
+    </div>
+    <div class="nav-actions">
+        <div class="user-profile" id="userProfileBtn">
+            <div class="user-avatar"><img id="navUserImage" src="" alt=""></div>
+            <span class="user-name" id="navUserName">Usuário</span>
+            <div class="user-dropdown" id="userDropdown">
+                <div class="dropdown-header">
+                    <div class="dropdown-user-info">
+                        <div class="dropdown-avatar"><img id="dropdownUserImage" src="" alt=""></div>
+                        <div class="dropdown-user-details">
+                            <h4 id="dropdownName">Usuário</h4>
+                            <p id="dropdownTag">Militar DME</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown-menu">
+                    <a href="painel.html" class="dropdown-item" id="dropdownPainel" style="display:none;">⚙️ Painel</a>
+                    <a href="configuracao.html" class="dropdown-item current-page">🔧 Configurações</a>
+                    <a class="dropdown-item" onclick="toggleTheme()"><span id="themeText">☀️ Modo Claro</span></a>
+                    <div class="dropdown-divider" id="dropdownDivider" style="display:none;"></div>
+                    <a class="dropdown-item danger" onclick="logout()">🚪 Sair</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="page-container">
+
+    <aside class="config-sidebar">
+        <div class="config-sidebar-title">Configuração</div>
+        <a class="config-nav-item active" data-section="conta">👤 Conta</a>
+        <a class="config-nav-item" data-section="emblemas">⭐ Emblemas</a>
+        <a class="config-nav-item" data-section="assinatura">✏️ Assinatura</a>
+    </aside>
+
+    <div class="config-content">
+
+        <!-- CONTA -->
+        <div class="config-panel active" id="panel-conta">
+            <div class="config-panel-header">
+                <div class="config-panel-title">Configuração da Conta</div>
+                <div class="config-panel-sub">Gerencie suas informações pessoais e credenciais de acesso</div>
+            </div>
+            <div class="config-panel-body">
+                <div class="form-group">
+                    <label class="form-label">Nickname</label>
+                    <input type="text" class="form-input" id="inputNick" disabled>
+                    <div class="form-hint">O nickname não pode ser alterado diretamente. Abra um requerimento se necessário.</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">E-mail</label>
+                    <input type="email" class="form-input" id="inputEmail" placeholder="Seu e-mail de contato">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">TAG <span style="font-size:0.72rem;font-weight:400;color:var(--text-gray);">— exatamente 3 letras, identifica você nos relatórios</span></label>
+                    <div class="tag-wrap">
+                        <input type="text" class="form-input tag-input" id="inputTag" maxlength="3" placeholder="DME" autocomplete="off">
+                        <span class="tag-badge" id="tagBadge">???</span>
+                    </div>
+                    <div class="form-hint" id="tagHint">Após salvar pela primeira vez, a TAG fica permanente e não pode ser alterada.</div>
+                </div>
+                <div class="divider"></div>
+                <div class="password-row">
+                    <div class="form-group" style="margin-bottom:0">
+                        <label class="form-label">Nova Senha</label>
+                        <input type="password" class="form-input" id="inputNovaSenha" placeholder="Deixe em branco para manter">
+                    </div>
+                    <div class="form-group" style="margin-bottom:0">
+                        <label class="form-label">Confirmar Senha</label>
+                        <input type="password" class="form-input" id="inputConfirmarSenha" placeholder="Repita a nova senha">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top:18px;">
+                    <label class="form-label">Senha Atual <span style="color:#e74c3c;">*</span></label>
+                    <input type="password" class="form-input" id="inputSenhaAtual" placeholder="Obrigatório para confirmar alterações">
+                </div>
+                <button class="btn-save" onclick="salvarConta()">💾 Salvar Alterações</button>
+            </div>
+        </div>
+
+        <!-- EMBLEMAS -->
+        <div class="config-panel" id="panel-emblemas">
+            <div class="config-panel-header">
+                <div class="config-panel-title">Emblemas</div>
+                <div class="config-panel-sub">Adicione até 12 emblemas do Habbo para exibir no seu perfil</div>
+            </div>
+            <div class="config-panel-body">
+                <div class="emblemas-toolbar">
+                    <input type="text" class="form-input emblema-code-input" id="inputEmblema" placeholder="Cole o código do emblema (ex: b09134s43114...)">
+                    <button class="btn-add-emblema" onclick="adicionarEmblema()">+ Adicionar</button>
+                </div>
+                <div class="form-hint" style="margin-bottom:4px;">Acesse seu perfil no Habbo → clique num emblema → copie o código da URL da imagem (sem .gif)</div>
+                <div class="emblemas-grid" id="emblemasGrid"></div>
+                <button class="btn-save" onclick="salvarEmblemas()" style="margin-top:8px;">💾 Salvar Emblemas</button>
+            </div>
+        </div>
+
+        <!-- ASSINATURA -->
+        <div class="config-panel" id="panel-assinatura">
+            <div class="config-panel-header">
+                <div class="config-panel-title">Assinatura</div>
+                <div class="config-panel-sub">Crie sua assinatura com BBCode — aparecerá nos seus relatórios e postagens</div>
+            </div>
+            <div class="config-panel-body">
+
+                <div class="bbcode-editor">
+                    <div class="bbcode-toolbar">
+                        <button class="bb-btn" onclick="bbWrap('b')" title="Negrito"><strong>B</strong></button>
+                        <button class="bb-btn" onclick="bbWrap('i')" title="Itálico"><em>I</em></button>
+                        <button class="bb-btn" onclick="bbWrap('u')" title="Sublinhado"><u>U</u></button>
+                        <button class="bb-btn" onclick="bbWrap('s')" title="Tachado"><s>S</s></button>
+                        <div class="bb-sep"></div>
+                        <button class="bb-btn" onclick="bbColor()" title="Cor do texto">🎨</button>
+                        <button class="bb-btn" onclick="bbSize()" title="Tamanho">Aa</button>
+                        <div class="bb-sep"></div>
+                        <button class="bb-btn" onclick="bbWrap('center')" title="Centralizar">⌶</button>
+                        <button class="bb-btn" onclick="bbWrap('left')" title="Esquerda">◁</button>
+                        <button class="bb-btn" onclick="bbWrap('right')" title="Direita">▷</button>
+                        <div class="bb-sep"></div>
+                        <button class="bb-btn" onclick="bbUrl()" title="Link">🔗</button>
+                        <button class="bb-btn" onclick="bbImg()" title="Imagem">🖼️</button>
+                        <button class="bb-btn" onclick="bbWrap('quote')" title="Citação">❝</button>
+                        <button class="bb-btn" onclick="bbList()" title="Lista">☰</button>
+                        <div class="bb-sep"></div>
+                        <button class="bb-btn" onclick="bbInsert(username)" title="Inserir nickname" style="font-size:0.68rem;padding:5px 7px;">Nick</button>
+                        <button class="bb-btn" onclick="bbInsertTag()" title="Inserir TAG" style="font-size:0.68rem;padding:5px 7px;">TAG</button>
+                        <button class="bb-btn" onclick="bbInsert(new Date().toLocaleDateString('pt-BR'))" title="Data atual" style="font-size:0.68rem;padding:5px 7px;">Data</button>
+                        <div class="bb-sep"></div>
+                        <button class="bb-btn" onclick="limparBB()" title="Limpar tudo" style="color:#e74c3c;">✕</button>
+                    </div>
+                    <textarea class="bb-textarea" id="bbTextarea" placeholder="Digite sua assinatura aqui usando BBCode ou os botões acima..." oninput="bbPreview()"></textarea>
+                    <div class="bb-preview-header">👁️ Pré-visualização em tempo real</div>
+                    <div class="bb-preview-body" id="bbPreviewBody">
+                        <span style="color:var(--text-gray);font-size:0.82rem;">A pré-visualização aparecerá aqui...</span>
+                    </div>
+                </div>
+
+                <div class="bb-reference">
+                    <div class="bb-ref-title">📖 Referência rápida BBCode</div>
+                    <div class="bb-ref-grid">
+                        <div class="bb-ref-item"><span class="bb-ref-tag">[b]texto[/b]</span><span class="bb-ref-desc">Negrito</span></div>
+                        <div class="bb-ref-item"><span class="bb-ref-tag">[i]texto[/i]</span><span class="bb-ref-desc">Itálico</span></div>
+                        <div class="bb-ref-item"><span class="bb-ref-tag">[u]texto[/u]</span><span class="bb-ref-desc">Sublinhado</span></div>
+                        <div class="bb-ref-item"><span class="bb-ref-tag">[s]texto[/s]</span><span class="bb-ref-desc">Tachado</span></div>
+                        <div class="bb-ref-item"><span class="bb-ref-tag">[color=#2ecc71]…[/color]</span><span class="bb-ref-desc">Cor</span></div>
+                        <div class="bb-ref-item"><span class="bb-ref-tag">[size=14]…[/size]</span><span class="bb-ref-desc">Tamanho px</span></div>
+                        <div class="bb-ref-item"><span class="bb-ref-tag">[center]…[/center]</span><span class="bb-ref-desc">Centralizar</span></div>
+                        <div class="bb-ref-item"><span class="bb-ref-tag">[url=link]texto[/url]</span><span class="bb-ref-desc">Hyperlink</span></div>
+                        <div class="bb-ref-item"><span class="bb-ref-tag">[img]url[/img]</span><span class="bb-ref-desc">Imagem</span></div>
+                        <div class="bb-ref-item"><span class="bb-ref-tag">[quote]…[/quote]</span><span class="bb-ref-desc">Citação</span></div>
+                        <div class="bb-ref-item"><span class="bb-ref-tag">[list][*]item[/list]</span><span class="bb-ref-desc">Lista</span></div>
+                        <div class="bb-ref-item"><span class="bb-ref-tag">[left]/[right]</span><span class="bb-ref-desc">Alinhamento</span></div>
+                    </div>
+                </div>
+
+                <div style="margin-top:20px;">
+                    <button class="btn-save" onclick="salvarAssinatura()">💾 Salvar Assinatura</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    const username = localStorage.getItem('dme_username');
+    if (!username) window.location.href = 'login.html';
+
+    function logout() { localStorage.removeItem('dme_username'); window.location.href = 'login.html'; }
+
+    function applyTheme(theme) {
+        const t = document.getElementById('themeText');
+        if (theme === 'light') { document.body.classList.add('light-mode'); if (t) t.textContent = '🌙 Modo Escuro'; }
+        else { document.body.classList.remove('light-mode'); if (t) t.textContent = '☀️ Modo Claro'; }
+    }
+    function toggleTheme() {
+        const c = localStorage.getItem('dme_theme') || 'dark';
+        const n = c === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('dme_theme', n);
+        applyTheme(n);
+    }
+
+    function toast(msg, type) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.className = 'toast ' + (type || 'ok');
+        setTimeout(() => el.classList.add('show'), 10);
+        setTimeout(() => el.classList.remove('show'), 3200);
+    }
+
+    // ── NAV LATERAL ──
+    function mudarSecao(s) {
+        document.querySelectorAll('.config-nav-item').forEach(i => i.classList.remove('active'));
+        document.querySelectorAll('.config-panel').forEach(p => p.classList.remove('active'));
+        document.querySelector('[data-section="' + s + '"]').classList.add('active');
+        document.getElementById('panel-' + s).classList.add('active');
+        if (s === 'emblemas') renderEmblemas();
+    }
+
+    // ── CONTA ──
+    function getUser() {
+        const users = JSON.parse(localStorage.getItem('dme_users')) || [];
+        return users.find(u => u.username === username);
+    }
+
+    function carregarConta() {
+        document.getElementById('inputNick').value = username;
+        const user = getUser();
+        if (!user) return;
+        if (user.email) document.getElementById('inputEmail').value = user.email;
+        if (user.tag) {
+            document.getElementById('inputTag').value = user.tag;
+            document.getElementById('tagBadge').textContent = '[' + user.tag + ']';
+            document.getElementById('inputTag').disabled = true;
+            document.getElementById('tagHint').textContent = 'TAG já definida — permanente e não pode ser alterada.';
+        }
+    }
+
+    function salvarConta() {
+        const email = document.getElementById('inputEmail').value.trim();
+        const tagEl = document.getElementById('inputTag');
+        const tag = tagEl.disabled ? null : tagEl.value.trim().toUpperCase();
+        const nova = document.getElementById('inputNovaSenha').value;
+        const conf = document.getElementById('inputConfirmarSenha').value;
+        const atual = document.getElementById('inputSenhaAtual').value;
+
+        if (!atual) { toast('❌ Informe sua senha atual para confirmar.', 'err'); return; }
+        if (tag !== null && tag.length > 0 && tag.length !== 3) { toast('❌ A TAG deve ter exatamente 3 letras.', 'err'); return; }
+        if (nova && nova !== conf) { toast('❌ As senhas não coincidem.', 'err'); return; }
+        if (nova && nova.length < 6) { toast('❌ A nova senha precisa ter ao menos 6 caracteres.', 'err'); return; }
+
+        let users = JSON.parse(localStorage.getItem('dme_users')) || [];
+        const idx = users.findIndex(u => u.username === username);
+        if (idx === -1) { toast('❌ Usuário não encontrado.', 'err'); return; }
+        if (users[idx].password !== atual) { toast('❌ Senha atual incorreta.', 'err'); return; }
+
+        if (email) users[idx].email = email;
+        if (tag && tag.length === 3 && !users[idx].tag) {
+            users[idx].tag = tag;
+            tagEl.disabled = true;
+            document.getElementById('tagHint').textContent = 'TAG já definida — permanente e não pode ser alterada.';
+        }
+        if (nova) users[idx].password = nova;
+
+        localStorage.setItem('dme_users', JSON.stringify(users));
+
+        const savedTag = users[idx].tag;
+        if (savedTag) {
+            document.getElementById('tagBadge').textContent = '[' + savedTag + ']';
+            document.getElementById('dropdownTag').textContent = '[' + savedTag + '] Militar DME';
+        }
+
+        document.getElementById('inputSenhaAtual').value = '';
+        document.getElementById('inputNovaSenha').value = '';
+        document.getElementById('inputConfirmarSenha').value = '';
+        toast('✅ Configurações salvas com sucesso!');
+    }
+
+    // ── EMBLEMAS ──
+    let emblemasArr = [];
+
+    function renderEmblemas() {
+        const grid = document.getElementById('emblemasGrid');
+        let html = '';
+        for (let i = 0; i < 12; i++) {
+            const cod = emblemasArr[i];
+            if (cod) {
+                html += `<div class="emblema-slot filled" title="${cod}">
+                    <img src="https://www.habbo.com.br/habbo-imaging/badge/${cod}.gif" alt="" onerror="this.style.opacity=0.3">
+                    <button class="emblema-remove" onclick="removerEmblema(${i})">✕</button>
+                </div>`;
+            } else {
+                html += `<div class="emblema-slot" onclick="document.getElementById('inputEmblema').focus()">
+                    <span class="slot-plus">+</span>
+                    <span class="slot-num">${i + 1}</span>
+                </div>`;
+            }
+        }
+        grid.innerHTML = html;
+    }
+
+    function adicionarEmblema() {
+        const cod = document.getElementById('inputEmblema').value.trim().replace(/\.gif$/i, '');
+        if (!cod) { toast('❌ Cole o código do emblema.', 'err'); return; }
+        if (emblemasArr.filter(Boolean).length >= 12) { toast('❌ Limite de 12 emblemas atingido.', 'err'); return; }
+        if (emblemasArr.includes(cod)) { toast('⚠️ Emblema já adicionado.', 'err'); return; }
+        emblemasArr.push(cod);
+        document.getElementById('inputEmblema').value = '';
+        renderEmblemas();
+    }
+
+    function removerEmblema(i) {
+        emblemasArr.splice(i, 1);
+        renderEmblemas();
+    }
+
+    function salvarEmblemas() {
+        let users = JSON.parse(localStorage.getItem('dme_users')) || [];
+        const idx = users.findIndex(u => u.username === username);
+        if (idx !== -1) { users[idx].emblemas = emblemasArr.filter(Boolean); localStorage.setItem('dme_users', JSON.stringify(users)); }
+        toast('✅ Emblemas salvos!');
+    }
+
+    // ── BBCODE ──
+    function bbTA() { return document.getElementById('bbTextarea'); }
+
+    function bbWrap(tag) {
+        const ta = bbTA();
+        const s = ta.selectionStart, e = ta.selectionEnd;
+        const sel = ta.value.substring(s, e) || 'texto';
+        ta.value = ta.value.substring(0, s) + '[' + tag + ']' + sel + '[/' + tag + ']' + ta.value.substring(e);
+        ta.focus();
+        bbPreview();
+    }
+
+    function bbColor() {
+        const cor = prompt('Cor (nome em inglês ou hex):\nExemplos: red | blue | #2ecc71 | #f39c12', '#2ecc71');
+        if (!cor) return;
+        const ta = bbTA(); const s = ta.selectionStart, e = ta.selectionEnd;
+        const sel = ta.value.substring(s, e) || 'texto';
+        ta.value = ta.value.substring(0, s) + '[color=' + cor + ']' + sel + '[/color]' + ta.value.substring(e);
+        bbPreview();
+    }
+
+    function bbSize() {
+        const sz = prompt('Tamanho da fonte em px:\nExemplos: 10 | 12 | 14 | 18 | 24', '14');
+        if (!sz) return;
+        const ta = bbTA(); const s = ta.selectionStart, e = ta.selectionEnd;
+        const sel = ta.value.substring(s, e) || 'texto';
+        ta.value = ta.value.substring(0, s) + '[size=' + sz + ']' + sel + '[/size]' + ta.value.substring(e);
+        bbPreview();
+    }
+
+    function bbUrl() {
+        const url = prompt('Cole o link (URL):', 'https://');
+        if (!url) return;
+        const ta = bbTA(); const s = ta.selectionStart, e = ta.selectionEnd;
+        const sel = ta.value.substring(s, e) || 'clique aqui';
+        ta.value = ta.value.substring(0, s) + '[url=' + url + ']' + sel + '[/url]' + ta.value.substring(e);
+        bbPreview();
+    }
+
+    function bbImg() {
+        const url = prompt('Link da imagem:', 'https://');
+        if (!url) return;
+        const ta = bbTA(); const p = ta.selectionStart;
+        ta.value = ta.value.substring(0, p) + '[img]' + url + '[/img]' + ta.value.substring(p);
+        bbPreview();
+    }
+
+    function bbList() {
+        const ta = bbTA(); const p = ta.selectionStart;
+        ta.value = ta.value.substring(0, p) + '[list]\n[*] Item 1\n[*] Item 2\n[*] Item 3\n[/list]' + ta.value.substring(p);
+        bbPreview();
+    }
+
+    function bbInsert(text) {
+        const ta = bbTA(); const p = ta.selectionStart;
+        ta.value = ta.value.substring(0, p) + text + ta.value.substring(p);
+        bbPreview();
+    }
+
+    function bbInsertTag() {
+        const user = getUser();
+        bbInsert(user?.tag ? '[' + user.tag + ']' : '[???]');
+    }
+
+    function limparBB() {
+        if (!confirm('Limpar toda a assinatura?')) return;
+        bbTA().value = '';
+        bbPreview();
+    }
+
+    function bbToHtml(t) {
+        return t
+            .replace(/\[b\]([\s\S]*?)\[\/b\]/gi, '<strong>$1</strong>')
+            .replace(/\[i\]([\s\S]*?)\[\/i\]/gi, '<em>$1</em>')
+            .replace(/\[u\]([\s\S]*?)\[\/u\]/gi, '<u>$1</u>')
+            .replace(/\[s\]([\s\S]*?)\[\/s\]/gi, '<s>$1</s>')
+            .replace(/\[color=(.*?)\]([\s\S]*?)\[\/color\]/gi, '<span style="color:$1">$2</span>')
+            .replace(/\[size=(\d+)\]([\s\S]*?)\[\/size\]/gi, '<span style="font-size:$1px">$2</span>')
+            .replace(/\[center\]([\s\S]*?)\[\/center\]/gi, '<div style="text-align:center">$1</div>')
+            .replace(/\[left\]([\s\S]*?)\[\/left\]/gi, '<div style="text-align:left">$1</div>')
+            .replace(/\[right\]([\s\S]*?)\[\/right\]/gi, '<div style="text-align:right">$1</div>')
+            .replace(/\[url=(.*?)\]([\s\S]*?)\[\/url\]/gi, '<a href="$1" style="color:var(--primary-green);" target="_blank">$2</a>')
+            .replace(/\[img\]([\s\S]*?)\[\/img\]/gi, '<img src="$1" style="max-width:100%;border-radius:6px;margin:4px 0;" alt="">')
+            .replace(/\[quote\]([\s\S]*?)\[\/quote\]/gi, '<blockquote style="border-left:3px solid var(--primary-green);padding:8px 14px;margin:8px 0;background:var(--bg-card);border-radius:0 6px 6px 0;font-style:italic;color:var(--text-gray);">$1</blockquote>')
+            .replace(/\[list\]([\s\S]*?)\[\/list\]/gi, (_, c) => '<ul style="padding-left:20px;">' + c.replace(/\[\*\](.*?)(?=\[\*\]|\[\/list\]|$)/gis, '<li style="margin:3px 0;">$1</li>') + '</ul>')
+            .replace(/\n/g, '<br>');
+    }
+
+    function bbPreview() {
+        const raw = bbTA().value;
+        const el = document.getElementById('bbPreviewBody');
+        if (!raw.trim()) {
+            el.innerHTML = '<span style="color:var(--text-gray);font-size:0.82rem;">A pré-visualização aparecerá aqui...</span>';
+            return;
+        }
+        el.innerHTML = bbToHtml(raw);
+    }
+
+    function salvarAssinatura() {
+        let users = JSON.parse(localStorage.getItem('dme_users')) || [];
+        const idx = users.findIndex(u => u.username === username);
+        if (idx !== -1) { users[idx].assinatura = bbTA().value; localStorage.setItem('dme_users', JSON.stringify(users)); }
+        toast('✅ Assinatura salva!');
+    }
+
+    // ── INIT ──
+    document.addEventListener('DOMContentLoaded', () => {
+        applyTheme(localStorage.getItem('dme_theme') || 'dark');
+
+        document.getElementById('navUserName').textContent = username;
+        document.getElementById('dropdownName').textContent = username;
+        document.getElementById('navUserImage').src = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${username}&headonly=1&size=m&gesture=std&head_direction=2`;
+        document.getElementById('dropdownUserImage').src = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${username}&size=m&direction=2&head_direction=2&gesture=std`;
+
+        const admins = JSON.parse(localStorage.getItem('dme_admins')) || ['Xandelicado'];
+        if (admins.includes(username)) {
+            document.getElementById('dropdownPainel').style.display = 'flex';
+            document.getElementById('dropdownDivider').style.display = 'block';
+        }
+
+        const user = getUser();
+        if (user?.tag) document.getElementById('dropdownTag').textContent = '[' + user.tag + '] Militar DME';
+        if (user?.emblemas) emblemasArr = user.emblemas;
+        if (user?.assinatura) { bbTA().value = user.assinatura; bbPreview(); }
+
+        // TAG live preview
+        document.getElementById('inputTag').addEventListener('input', function() {
+            const v = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 3);
+            this.value = v;
+            document.getElementById('tagBadge').textContent = v ? '[' + v + ']' : '???';
+        });
+
+        // Nav lateral
+        document.querySelectorAll('.config-nav-item[data-section]').forEach(el => {
+            el.addEventListener('click', () => mudarSecao(el.getAttribute('data-section')));
+        });
+
+        // Dropdown
+        const btn = document.getElementById('userProfileBtn');
+        const dd = document.getElementById('userDropdown');
+        btn.addEventListener('click', e => { e.stopPropagation(); dd.classList.toggle('active'); });
+        document.addEventListener('click', () => dd.classList.remove('active'));
+
+        // Sidebar
+        const tog = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('sidebarOverlay').classList.toggle('active'); };
+        document.getElementById('hamburger').addEventListener('click', tog);
+        document.getElementById('sidebarClose').addEventListener('click', tog);
+        document.getElementById('sidebarOverlay').addEventListener('click', tog);
+        document.querySelectorAll('.sidebar-item').forEach(i => i.addEventListener('click', () => {
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+        }));
+
+        carregarConta();
+    });
+</script>
+</body>
+</html>

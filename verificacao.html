@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DME TREINO | Verificação</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        (function () {
+            const theme = localStorage.getItem('dme_theme') || 'dark';
+            if (theme === 'light') document.documentElement.classList.add('light-mode');
+        })();
+    </script>
+    <style>
+        :root {
+            --primary-dark: #0a1f0f;
+            --primary-green: #1a3a24;
+            --accent-green: #2ecc71;
+            --text-white: #ffffff;
+            --text-muted: #7a8f7a;
+            --surface: #ffffff;
+            --card-text: #2c3e50;
+            --instr-text: #6c757d;
+            --code-bg: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-green) 50%, #0d2817 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            color: var(--text-white);
+            transition: background 0.3s ease;
+        }
+
+        .verify-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+            z-index: 1;
+        }
+
+        .verify-card {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+            color: var(--card-text);
+            border: 1px solid rgba(46, 204, 113, 0.2);
+        }
+
+        .step-badge {
+            background: var(--accent-green);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .code-display {
+            background: var(--code-bg);
+            border: 2px dashed var(--accent-green);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 4px;
+            color: var(--accent-green);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .code-display:hover {
+            background: #e0e7e0;
+        }
+
+        .copy-hint {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .instructions {
+            font-size: 0.85rem;
+            color: var(--instr-text);
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .instructions b {
+            color: var(--primary-green);
+        }
+
+        .btn-verify {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-verify:hover {
+            background: #254a2f;
+            transform: translateY(-2px);
+        }
+
+        /* Animação simples de check */
+        .success-animation {
+            display: none;
+            color: var(--accent-green);
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="verify-container">
+        <div class="verify-card">
+            <div class="step-badge">Verificação de Segurança</div>
+            <h2 style="margin-bottom: 10px;">Quase lá, <span id="user-display">Militar</span>!</h2>
+            <p class="instructions">
+                Para confirmar sua identidade, copie o código abaixo e cole na sua <b>missão no Habbo</b>.
+            </p>
+
+            <div class="code-display" id="verify-code" onclick="copyCode()">
+                DME-7829
+            </div>
+            <p class="copy-hint">Clique no código para copiar</p>
+
+            <div class="instructions" style="margin-top: 20px;">
+                Após alterar a missão, clique no botão abaixo para finalizar seu registro.
+            </div>
+
+            <button class="btn-verify" onclick="finishRegistration()">Validar Missão e Entrar</button>
+        </div>
+    </div>
+
+    <script>
+        // Pega o nome que salvamos na página de login
+        const username = localStorage.getItem('dme_username') || 'Militar';
+        document.getElementById('user-display').textContent = username;
+
+        // Gera um código aleatório
+        const randomCode = "DME-" + Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('verify-code').textContent = randomCode;
+
+        function copyCode() {
+            const code = document.getElementById('verify-code').textContent.trim();
+            navigator.clipboard.writeText(code);
+            alert("Código copiado: " + code);
+        }
+
+        async function finishRegistration() {
+            const btn = document.querySelector('.btn-verify');
+            const originalText = btn.textContent;
+
+            btn.textContent = "Verificando...";
+            btn.style.opacity = "0.7";
+            btn.disabled = true;
+
+            try {
+                // Busca os dados do usuário na API do Habbo
+                const response = await fetch(`https://www.habbo.com.br/api/public/users?name=${username}`);
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error("Usuário Habbo não encontrado! Verifique se o nome está correto.");
+                    }
+                    throw new Error("Erro ao conectar com o Habbo via API.");
+                }
+
+                const data = await response.json();
+
+                // O código que esperamos encontrar na missão
+                const expectedCode = document.getElementById('verify-code').textContent.trim();
+
+                // Verifica se a missão (motto) contém o código
+                if (data.motto && data.motto.includes(expectedCode)) {
+                    // SUCESSO: Move do pending para o banco final com status PENDENTE
+                    const pending = JSON.parse(localStorage.getItem('dme_pending_registration'));
+
+                    if (pending) {
+                        let users = JSON.parse(localStorage.getItem('dme_users')) || [];
+                        const newUser = {
+                            ...pending,
+                            status: 'pendente',
+                            registradoEm: new Date().toLocaleString('pt-BR'),
+                            habboId: data.uniqueId || null
+                        };
+                        users.push(newUser);
+                        localStorage.setItem('dme_users', JSON.stringify(users));
+
+                        // Limpa dados temporários
+                        localStorage.removeItem('dme_pending_registration');
+                        localStorage.removeItem('dme_username');
+                    }
+
+                    btn.textContent = "Sucesso!";
+                    btn.style.backgroundColor = "#2ecc71";
+
+                    setTimeout(() => {
+                        alert('✅ Verificação concluída!\n\nSua conta foi criada e está aguardando aprovação de um administrador.\nVocê será notificado quando puder acessar o sistema.');
+                        window.location.href = 'login.html';
+                    }, 1000);
+                } else {
+                    alert(`O código "${expectedCode}" não foi encontrado na sua missão do Habbo. Sua missão atual é: "${data.motto}". Tente novamente em alguns instantes.`);
+                    resetButton(btn, originalText);
+                }
+
+            } catch (error) {
+                console.error(error);
+                alert("Erro na verificação: " + error.message);
+                resetButton(btn, originalText);
+            }
+        }
+
+        function resetButton(btn, text) {
+            btn.textContent = text;
+            btn.style.opacity = "1";
+            btn.disabled = false;
+            btn.style.backgroundColor = ""; // Volta a cor original (definida no CSS)
+        }
+    </script>
+</body>
+
+</html>

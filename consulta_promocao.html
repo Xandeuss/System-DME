@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DME TREINO | Consultar Promoção</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script>
+        (function () {
+            const theme = localStorage.getItem('dme_theme') || 'dark';
+            if (theme === 'light') document.documentElement.classList.add('light-mode');
+        })();
+    </script>
+    <style>
+        :root {
+            --bg-dark: #000000;
+            --bg-card: #0a0f0a;
+            --primary-green: #2ecc71;
+            --accent-green: #27ae60;
+            --text-white: #ffffff;
+            --text-gray: #8c9c8c;
+            --border-color: #1a2a1a;
+            --hover-bg: #0f1a0f;
+            --error-red: #e74c3c;
+        }
+
+        body.light-mode {
+            --bg-dark: #fdfdfd;
+            --bg-card: #ffffff;
+            --text-white: #2c3e50;
+            --text-gray: #6c757d;
+            --border-color: #2ecc71;
+            --hover-bg: #f8f9fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-white);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        /* SIDEBAR CSS */
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            margin-right: 15px;
+        }
+
+        .hamburger:hover {
+            background: var(--hover-bg);
+        }
+
+        .hamburger span {
+            width: 24px;
+            height: 3px;
+            background: var(--primary-green);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-sidebar {
+            position: fixed;
+            left: -300px;
+            top: 0;
+            width: 300px;
+            height: 100vh;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            z-index: 3000;
+            transition: left 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .mobile-sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        .sidebar-close {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 1.5rem;
+            color: var(--text-gray);
+        }
+
+        .sidebar-close:hover {
+            background: var(--hover-bg);
+            color: var(--primary-green);
+        }
+
+        .sidebar-menu {
+            padding: 20px;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            color: var(--text-white);
+            text-decoration: none;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .sidebar-item:hover {
+            background: var(--hover-bg);
+            color: var(--primary-green);
+            transform: translateX(5px);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .user-profile {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 14px;
+            background: var(--hover-bg);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .user-profile:hover {
+            border-color: var(--primary-green);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar img {
+            width: auto;
+            height: 140%;
+            object-fit: contain;
+            transform: scale(1.1) translateY(3px);
+        }
+
+        .user-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            min-width: 220px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .user-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-header {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .dropdown-user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dropdown-avatar {
+            width: 65px;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+
+        .dropdown-avatar img {
+            width: auto;
+            height: 140%;
+            object-fit: contain;
+            transform: translateY(5px);
+        }
+
+        .dropdown-user-details h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .dropdown-user-details p {
+            font-size: 0.7rem;
+            color: var(--text-gray);
+        }
+
+        .dropdown-menu {
+            padding: 8px;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            color: var(--text-white);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: var(--hover-bg);
+            color: var(--primary-green);
+        }
+
+        .dropdown-item.danger:hover {
+            color: var(--error-red);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 8px 0;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 35px;
+            height: 35px;
+            background: url('https://www.habbo.com.br/habbo-imaging/badge/b09134s43114s41194f1035061689.gif') no-repeat center;
+            background-size: contain;
+            filter: drop-shadow(0 0 5px var(--primary-glow));
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-white);
+        }
+
+        .logo-text span {
+            color: var(--primary-green);
+        }
+
+        .btn-back {
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-gray);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-back:hover {
+            background: var(--hover-bg);
+            color: var(--primary-green);
+            border-color: var(--primary-green);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-green);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .page-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-gray);
+        }
+
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            color: var(--primary-green);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-green);
+            padding-left: 12px;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-gray);
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--hover-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-white);
+            font-size: 0.9rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+        }
+
+        .option-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .opt-btn {
+            background: var(--hover-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-gray);
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-transform: uppercase;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .opt-btn:hover {
+            border-color: var(--primary-green);
+            color: var(--text-white);
+        }
+
+        .active-green {
+            border-color: var(--primary-green) !important;
+            color: var(--primary-green) !important;
+            background: rgba(46, 204, 113, 0.1) !important;
+        }
+
+        .active-red {
+            border-color: var(--error-red) !important;
+            color: var(--error-red) !important;
+            background: rgba(231, 76, 60, 0.1) !important;
+        }
+
+        .btn-analyze {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-green), var(--accent-green));
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-analyze:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
+        }
+
+        .btn-copy {
+            background: transparent;
+            color: var(--primary-green);
+            border: 1px solid var(--primary-green);
+            padding: 12px;
+            width: 100%;
+            margin-top: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-copy:hover {
+            background: var(--primary-green);
+            color: #000;
+        }
+
+        #display-resultado {
+            display: none;
+            margin-top: 30px;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--primary-green);
+            background: var(--bg-card);
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .motivo-item {
+            font-size: 0.9rem;
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-gray);
+            line-height: 1.6;
+        }
+
+        .motivo-item:last-child {
+            border: none;
+        }
+
+        .motivo-item b {
+            color: var(--error-red);
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+
+            .option-grid,
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- MOBILE SIDEBAR -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="mobile-sidebar" id="mobileSidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Menu</div>
+            <div class="sidebar-close" id="sidebarClose">×</div>
+        </div>
+        <div class="sidebar-menu">
+            <a href="home.html" class="sidebar-item">
+                <span>Página Inicial</span>
+            </a>
+            <a href="listagens.html" class="sidebar-item">
+                <span>Listagens</span>
+            </a>
+            <a href="requerimentos.html" class="sidebar-item">
+                <span>Requerimentos</span>
+            </a>
+            <a href="sabatina.html" class="sidebar-item">
+                <span>Sabatina</span>
+            </a>
+            <a href="consulta_promocao.html" class="sidebar-item">
+                <span style="color:var(--primary-green);">Consultar Promoção</span>
+            </a>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <div class="logo-section">
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="logo-icon"></div>
+            <div class="logo-text">DME<span>Treino</span></div>
+        </div>
+
+        <div class="nav-actions">
+            <div class="user-profile" id="userProfileBtn">
+                <div class="user-avatar" id="navUserAvatar">
+                    <img id="navUserImage" src="" alt="Avatar">
+                </div>
+                <span class="user-name" id="navUserName">Usuário</span>
+
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-info">
+                            <div class="dropdown-avatar" id="dropdownAvatar">
+                                <img id="dropdownUserImage" src="" alt="Avatar">
+                            </div>
+                            <div class="dropdown-user-details">
+                                <h4 id="dropdownName">Usuário</h4>
+                                <p>Militar DME</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="painel.html" class="dropdown-item" id="dropdownPainel" style="display: none;">
+                            <span>Painel</span>
+                        </a>
+                        <a href="configuracao.html" class="dropdown-item">🔧 Configurações</a>
+                        <a onclick="toggleTheme()" class="dropdown-item">
+                            <span id="themeText">Modo Claro</span>
+                        </a>
+                        <div class="dropdown-divider" id="dropdownDivider" style="display: none;"></div>
+                        <a onclick="logout()" class="dropdown-item danger">
+                            <span>Sair</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Consultar Promoção</h1>
+            <p class="page-subtitle">Sistema de Análise Técnica de Promoções</p>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">1. Identificação de Carreira</h2>
+            <div class="form-group">
+                <label>Nick do Militar</label>
+                <input type="text" id="nick" placeholder="Ex: Fulano.Ab13">
+            </div>
+            <div class="form-group">
+                <label>Corpo Hierárquico</label>
+                <div class="option-grid">
+                    <div class="opt-btn" id="corpo_mil" onclick="mudarCorpo('militar')">Militar</div>
+                    <div class="opt-btn" id="corpo_emp" onclick="mudarCorpo('empresarial')">Empresarial</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Promoção Pretendida</label>
+                <select id="patente" onchange="atualizarInterface()">
+                    <option value="">Selecione o corpo acima...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Data da Última Promoção</label>
+                <input type="date" id="dataPromo">
+            </div>
+        </div>
+
+        <div id="box-projeto" class="section" style="display:none;">
+            <h2 class="section-title">Requisito de Alto Escalão</h2>
+            <div class="form-group">
+                <label>Possui projeto aprovado pelo STM para esta promoção?</label>
+                <div class="option-grid">
+                    <div class="opt-btn" id="pro_sim" onclick="selecionar('pro', true)">Sim, Aprovado</div>
+                    <div class="opt-btn" id="pro_nao" onclick="selecionar('pro', false)">Não possui</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">2. Gestão de Licenças</h2>
+            <div class="form-group">
+                <label>Houve afastamento/licença nesta patente?</label>
+                <div class="option-grid">
+                    <div class="opt-btn" id="lic_sim" onclick="selecionar('lic', true)">Houve Licença</div>
+                    <div class="opt-btn" id="lic_nao" onclick="selecionar('lic', false)">Sem Afastamentos</div>
+                </div>
+            </div>
+            <div id="box-licenca" style="display:none; margin-top:20px;">
+                <div class="two-col">
+                    <div class="form-group">
+                        <label>Total de Dias:</label>
+                        <input type="number" id="diasLic" placeholder="Ex: 7">
+                    </div>
+                    <div class="form-group">
+                        <label>Data do Retorno:</label>
+                        <input type="date" id="dataRetorno">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">3. Desempenho e Educação</h2>
+            <div id="area-educacao" class="form-group" style="display:none;">
+                <label id="label-educacao">Requisito Educacional:</label>
+                <div class="option-grid">
+                    <div class="opt-btn" id="cur_sim" onclick="selecionar('cur', true)">Concluído</div>
+                    <div class="opt-btn" id="cur_nao" onclick="selecionar('cur', false)">Pendente</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Metas Semanais:</label>
+                <div class="option-grid">
+                    <div class="opt-btn" id="met_sim" onclick="selecionar('met', true)">Batidas</div>
+                    <div class="opt-btn" id="met_nao" onclick="selecionar('met', false)">Insuficientes</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">4. Registros Disciplinares</h2>
+            <div class="form-group">
+                <label>Possui Advertência Ativa?</label>
+                <div class="option-grid">
+                    <div class="opt-btn" id="adv_sim" onclick="selecionar('adv', true)">Sim, possui</div>
+                    <div class="opt-btn" id="adv_nao" onclick="selecionar('adv', false)">Ficha Limpa</div>
+                </div>
+            </div>
+            <div id="box-advertencia" style="display:none; margin-top:20px;">
+                <div class="form-group">
+                    <label>Data da Advertência:</label>
+                    <input type="date" id="dataAdv">
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-analyze" onclick="gerarDiagnostico()">Analisar Promoção</button>
+
+        <div id="display-resultado">
+            <h3 id="res-header" class="result-header"></h3>
+            <div id="res-lista"></div>
+            <button class="btn-copy" id="btnCopiar" onclick="copiarTexto()">Copiar Diagnóstico</button>
+        </div>
+    </div>
+
+    <script>
+        // Auth Guard
+        const username = localStorage.getItem('dme_username');
+        if (!username) {
+            window.location.href = 'login.html';
+        }
+
+        function logout() {
+            localStorage.removeItem('dme_username');
+            window.location.href = 'login.html';
+        }
+
+        // Theme Management
+        function applyTheme(theme) {
+            const body = document.body;
+            const themeText = document.getElementById('themeText');
+
+            if (theme === 'light') {
+                body.classList.add('light-mode');
+                if (themeText) themeText.textContent = 'Modo Escuro';
+            } else {
+                body.classList.remove('light-mode');
+                if (themeText) themeText.textContent = 'Modo Claro';
+            }
+        }
+
+        function toggleTheme() {
+            const currentTheme = localStorage.getItem('dme_theme') || 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('dme_theme', newTheme);
+            applyTheme(newTheme);
+        }
+
+        // Initialize UI
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('dme_theme') || 'dark';
+            applyTheme(savedTheme);
+
+            document.getElementById('navUserName').textContent = username;
+            const avatarUrl = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${username}&headonly=1&size=m&gesture=std&head_direction=2`;
+            const dropdownAvatarUrl = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${username}&size=m&direction=2&head_direction=2&gesture=std`;
+            document.getElementById('navUserImage').src = avatarUrl;
+            document.getElementById('dropdownUserImage').src = dropdownAvatarUrl;
+            document.getElementById('dropdownName').textContent = username;
+
+            // Check Admin for Panel link
+            const admins = JSON.parse(localStorage.getItem('dme_admins')) || ["Xandelicado", "rafacv", "Ronaldo"];
+            if (admins.includes(username)) {
+                document.getElementById('dropdownPainel').style.display = 'flex';
+                document.getElementById('dropdownDivider').style.display = 'block';
+            }
+
+            // Dropdown Toggle
+            const userProfileBtn = document.getElementById('userProfileBtn');
+            const userDropdown = document.getElementById('userDropdown');
+
+            if (userProfileBtn) {
+                userProfileBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('active');
+                };
+            }
+
+            document.addEventListener('click', () => {
+                if (userDropdown) userDropdown.classList.remove('active');
+            });
+
+            // Sidebar Toggle Logic
+            const hamburger = document.getElementById('hamburger');
+            const mobileSidebar = document.getElementById('mobileSidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const sidebarClose = document.getElementById('sidebarClose');
+
+            function toggleSidebar() {
+                mobileSidebar.classList.toggle('active');
+                sidebarOverlay.classList.toggle('active');
+            }
+
+            if (hamburger) hamburger.addEventListener('click', toggleSidebar);
+            if (sidebarClose) sidebarClose.addEventListener('click', toggleSidebar);
+            if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
+        });
+        // Dados de patentes
+        const patentesMilitares = [
+            { n: "Comandante a Comandante-Geral (30d)", v: 30, p: false, d: true, praca: false },
+            { n: "Subcomandante a Comandante (30d)", v: 30, p: false, d: true, praca: false },
+            { n: "Marechal a Subcomandante (25d)", v: 25, p: true, d: true, praca: false },
+            { n: "General a Marechal (25d)", v: 25, p: false, d: true, praca: false },
+            { n: "Coronel a General (20d)", v: 20, p: false, d: true, praca: false },
+            { n: "Tenente-Coronel a Coronel (16d)", v: 16, p: false, d: false, praca: false },
+            { n: "Major a Tenente-Coronel (14d)", v: 14, p: false, d: false, praca: false },
+            { n: "Capitão a Major (12d)", v: 12, p: false, d: false, praca: false },
+            { n: "Tenente a Capitão (10d)", v: 10, p: false, d: false, praca: false },
+            { n: "Aspirante a Oficial a Tenente (7d)", v: 7, p: false, d: false, praca: false },
+            { n: "Subtenente a Aspirante a Oficial (4d)", v: 4, p: false, d: false, praca: true },
+            { n: "Sargento a Subtenente (2d)", v: 2, p: false, d: false, praca: true },
+            { n: "Cabo a Sargento (1d)", v: 1, p: false, d: false, praca: true },
+            { n: "Soldado a Cabo (0d)", v: 0, p: false, d: false, praca: true },
+            { n: "Recruta a Soldado (0d)", v: 0, p: false, d: false, praca: true }
+        ];
+
+        const patentesEmpresariais = [
+            { n: "Presidente a Chanceler (30d)", v: 30, p: true, d: true, praca: false },
+            { n: "Vice-Presidente a Presidente (30d)", v: 30, p: true, d: true, praca: false },
+            { n: "Ministro a Vice-Presidente (25d)", v: 25, p: true, d: true, praca: false },
+            { n: "Comissário a Ministro (20d)", v: 20, p: false, d: true, praca: false },
+            { n: "Delegado a Comissário (15d)", v: 15, p: false, d: true, praca: false },
+            { n: "Executivo a Delegado (15d)", v: 15, p: false, d: false, praca: false },
+            { n: "Diretor a Executivo (10d)", v: 10, p: false, d: false, praca: false },
+            { n: "Coordenador a Diretor (10d)", v: 10, p: false, d: false, praca: false },
+            { n: "Supervisor a Coordenador (10d)", v: 10, p: false, d: false, praca: false },
+            { n: "Escrivão a Supervisor (7d)", v: 7, p: false, d: false, praca: true },
+            { n: "Analista a Escrivão (4d)", v: 4, p: false, d: false, praca: true },
+            { n: "Inspetor a Analista (2d)", v: 2, p: false, d: false, praca: true },
+            { n: "Sócio a Inspetor (1d)", v: 1, p: false, d: false, praca: true },
+            { n: "Agente a Sócio (0d)", v: 0, p: false, d: false, praca: true }
+        ];
+
+        let estado = { lic: null, cur: null, met: null, adv: null, pro: null, corpo: null };
+
+        function mudarCorpo(tipo) {
+            estado.corpo = tipo;
+            document.getElementById('corpo_mil').className = 'opt-btn' + (tipo === 'militar' ? ' active-green' : '');
+            document.getElementById('corpo_emp').className = 'opt-btn' + (tipo === 'empresarial' ? ' active-green' : '');
+            const select = document.getElementById('patente');
+            select.innerHTML = '<option value="">Selecione...</option>';
+            const lista = tipo === 'militar' ? patentesMilitares : patentesEmpresariais;
+            lista.forEach(p => {
+                let opt = document.createElement('option');
+                opt.value = p.v; opt.text = p.n; opt.dataset.projeto = p.p;
+                opt.dataset.diploma = p.d; opt.dataset.praca = p.praca;
+                select.appendChild(opt);
+            });
+            atualizarInterface();
+        }
+
+        function atualizarInterface() {
+            const sel = document.getElementById('patente');
+            const opt = sel.options[sel.selectedIndex];
+            if (!opt || opt.value === "") return;
+            const precisaProjeto = opt.dataset.projeto === "true";
+            const precisaDiploma = opt.dataset.diploma === "true";
+            const ehPraca = opt.dataset.praca === "true";
+            document.getElementById('box-projeto').style.display = precisaProjeto ? 'block' : 'none';
+            estado.pro = precisaProjeto ? null : true;
+            if (ehPraca || precisaDiploma) {
+                document.getElementById('area-educacao').style.display = 'block';
+                document.getElementById('label-educacao').innerText = precisaDiploma ? "Possui Diploma Militar?" : "Cursos e Aulas Concluídos?";
+                estado.cur = null;
+            } else {
+                document.getElementById('area-educacao').style.display = 'none';
+                estado.cur = true;
+            }
+        }
+
+        function selecionar(campo, valor) {
+            estado[campo] = valor;
+            document.getElementById(campo + '_sim').className = 'opt-btn';
+            document.getElementById(campo + '_nao').className = 'opt-btn';
+            if (campo === 'adv' || (campo === 'pro' && !valor)) {
+                valor ? document.getElementById(campo + '_sim').classList.add('active-red') : document.getElementById(campo + '_nao').classList.add('active-green');
+            } else {
+                valor ? document.getElementById(campo + '_sim').classList.add('active-green') : document.getElementById(campo + '_nao').classList.add('active-red');
+            }
+            if (campo === 'lic') document.getElementById('box-licenca').style.display = valor ? 'block' : 'none';
+            if (campo === 'adv') document.getElementById('box-advertencia').style.display = valor ? 'block' : 'none';
+        }
+
+        function gerarDiagnostico() {
+            const nick = document.getElementById('nick').value;
+            if (!nick) {
+                alert('Por favor, informe o nick do militar!');
+                return;
+            }
+
+            const prazoPatente = parseInt(document.getElementById('patente').value);
+            if (isNaN(prazoPatente)) {
+                alert('Por favor, selecione a promoção pretendida!');
+                return;
+            }
+
+            const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+            const dataPromoInput = new Date(document.getElementById('dataPromo').value);
+            dataPromoInput.setMinutes(dataPromoInput.getMinutes() + dataPromoInput.getTimezoneOffset());
+            const diasDePraca = Math.floor((hoje - dataPromoInput) / (1000 * 60 * 60 * 24));
+
+            let erros = [], diasAdicionais = 0;
+
+            if (estado.lic) {
+                const diasF = parseInt(document.getElementById('diasLic').value) || 0;
+                diasAdicionais = diasF >= 21 ? 15 : (diasF >= 14 ? 10 : (diasF >= 7 ? 5 : 0));
+            }
+
+            if (estado.adv) {
+                const dataAdvInput = new Date(document.getElementById('dataAdv').value);
+                dataAdvInput.setMinutes(dataAdvInput.getMinutes() + dataAdvInput.getTimezoneOffset());
+                const diasDesdeAdv = Math.floor((hoje - dataAdvInput) / (1000 * 60 * 60 * 24));
+                if (diasDesdeAdv < 7) erros.push(`<b>DISCIPLINA:</b> Bloqueio de 7 dias ativo.`);
+                else if (diasDesdeAdv < 30) erros.push(`<b>DISCIPLINA:</b> Advertência ativa (${30 - diasDesdeAdv} dias restantes).`);
+            }
+
+            const meta = prazoPatente + diasAdicionais;
+            if (diasDePraca < meta) erros.push(`<b>INTERSTÍCIO:</b> ${diasDePraca}/${meta} dias cumpridos.`);
+            if (!estado.cur) erros.push(`<b>REQUISITOS:</b> Pendência educacional.`);
+            if (estado.pro === false) erros.push("<b>PROJETO:</b> Falta projeto STM.");
+            if (!estado.met) erros.push("<b>METAS:</b> Metas não atingidas.");
+
+            const res = document.getElementById('display-resultado');
+            res.style.display = 'block';
+            const h = document.getElementById('res-header'); const l = document.getElementById('res-lista');
+            l.innerHTML = "";
+
+            if (erros.length === 0) {
+                h.innerText = "✓ PARECER FAVORÁVEL"; h.style.color = "var(--primary-green)";
+                l.innerHTML = `<div class="motivo-item" style="text-align:center; color: var(--primary-green);">O militar <b style="color: var(--primary-green);">${nick}</b> está apto para a promoção.</div>`;
+            } else {
+                h.innerText = "✗ PARECER CONTRÁRIO"; h.style.color = "var(--error-red)";
+                erros.forEach(e => l.innerHTML += `<div class="motivo-item">${e}</div>`);
+            }
+            res.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copiarTexto() {
+            const header = document.getElementById('res-header').innerText;
+            const nick = document.getElementById('nick').value;
+            const motivos = Array.from(document.querySelectorAll('.motivo-item')).map(el => el.innerText.replace('>', '')).join('\n');
+            const textoFinal = `DIAGNÓSTICO TÉCNICO - DME\nMilitar: ${nick}\nStatus: ${header}\n\nDetalhes:\n${motivos}`;
+
+            navigator.clipboard.writeText(textoFinal).then(() => {
+                const btn = document.getElementById('btnCopiar');
+                btn.innerText = "Copiado!";
+                setTimeout(() => btn.innerText = "Copiar Diagnóstico", 2000);
+            });
+        }
+    </script>
+</body>
+
+</html>
