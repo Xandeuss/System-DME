@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">DME TREINO | Órgão</title>
+    <link rel="stylesheet" href="../styles/global.css">
+    <link rel="stylesheet" href="../styles/orgao_interno.css">
+    <script>
+        (function () {
+            const theme = localStorage.getItem('dme_theme') || 'dark';
+            if (theme === 'light') document.documentElement.classList.add('light-mode');
+        })();
+    </script>
+</head>
+
+<body>
+    <!-- Sidebar Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="mobile-sidebar" id="mobileSidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Menu</div>
+            <div class="sidebar-close" id="sidebarClose">×</div>
+        </div>
+        <div class="sidebar-menu">
+            <a href="home.html" class="sidebar-item"><span>Página Inicial</span></a>
+            <a href="listagens.html" class="sidebar-item"><span>Listagens</span></a>
+            <a href="requerimentos.html" class="sidebar-item"><span>Requerimentos</span></a>
+            <a href="sabatina.html" class="sidebar-item"><span>Sabatina</span></a>
+            <a href="consulta_promocao.html" class="sidebar-item"><span>Consultar Promoção</span></a>
+            <a href="centro_tarefas_orgaos.html" class="sidebar-item" style="color:var(--primary-green);"><span>Centro
+                    de Tarefas e Órgãos</span></a>
+            <a href="documentos.html" class="sidebar-item"><span>Documentos</span></a>
+            <a href="ponto_servico.html" class="sidebar-item"><span>Ponto de Serviço</span></a>
+            <a href="loja.html" class="sidebar-item"><span>Loja</span></a>
+            <a href="recrutamentos.html" class="sidebar-item"><span>Recrutamentos</span></a>
+            <a href="ouvidoria.html" class="sidebar-item"><span>Ouvidoria de Projetos</span></a>
+            <a href="setor_legislativo.html" class="sidebar-item"><span>Setor Legislativo</span></a>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo-section">
+            <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+            <div class="logo-icon"></div>
+            <div class="logo-text">DME<span>Treino</span></div>
+        </div>
+        <div class="nav-actions">
+            <div class="user-profile" id="userProfileBtn">
+                <div class="user-avatar">
+                    <img id="navUserImage" src="" alt="Avatar">
+                </div>
+                <span class="user-name" id="navUserName">Usuário</span>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-info">
+                            <div class="dropdown-avatar">
+                                <img id="dropdownUserImage" src="" alt="">
+                            </div>
+                            <div class="dropdown-user-details">
+                                <h4 id="dropdownName">Usuário</h4>
+                                <p id="dropdownCargo">Militar DME</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="painel.html" class="dropdown-item" id="dropdownPainel" style="display:none;">Painel</a>
+                        <a href="configuracao.html" class="dropdown-item">🔧 Configurações</a>
+                        <a class="dropdown-item" onclick="toggleTheme()"><span id="themeText">Modo Claro</span></a>
+                        <div class="dropdown-divider" id="dropdownDivider" style="display:none;"></div>
+                        <a class="dropdown-item danger" onclick="logout()">Sair</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Layout -->
+    <div class="page-layout">
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content" id="mainContent">
+            <!-- Cabeçalho do Órgão -->
+            <div class="orgao-header" id="orgaoHeader">
+                <div class="orgao-header-icon" id="orgaoIcon">🛡️</div>
+                <div class="orgao-header-info">
+                    <h1 class="orgao-header-title" id="orgaoTitle">Órgão</h1>
+                    <p class="orgao-header-sub" id="orgaoMembros">0 Membros</p>
+                </div>
+                <div class="orgao-header-badge" id="orgaoBadge">Membro</div>
+            </div>
+
+            <!-- Área de Conteúdo Dinâmico -->
+            <div class="content-area" id="contentArea">
+                <!-- Conteúdo carregado via JS -->
+            </div>
+        </main>
+
+        <!-- Menu Rápido (Sidebar Direita) -->
+        <aside class="quick-menu" id="quickMenu">
+            <div class="quick-menu-title">Menu Rápido</div>
+
+            <div class="quick-menu-section">
+                <a class="quick-menu-item active" data-section="inicio" onclick="navigateTo('inicio')">
+                    <span class="qm-label">Início</span>
+                </a>
+                <a class="quick-menu-item" data-section="membros" onclick="navigateTo('membros')">
+                    <span class="qm-label">Membros</span>
+                </a>
+                <a class="quick-menu-item" data-section="documentos" onclick="navigateTo('documentos')">
+                    <span class="qm-label">Documentos</span>
+                </a>
+                <a class="quick-menu-item" data-section="forum" onclick="navigateTo('forum')">
+                    <span class="qm-label">Fórum</span>
+                </a>
+            </div>
+
+            <!-- Seção Liderança (só para Líder e cargos com permissão) -->
+            <div class="quick-menu-section" id="liderancaSection" style="display:none;">
+                <div class="quick-menu-category">Liderança</div>
+                <a class="quick-menu-item" data-section="configuracao" onclick="navigateTo('configuracao')">
+                    <span class="qm-label">Configuração</span>
+                </a>
+                <a class="quick-menu-item" data-section="controle-membros" onclick="navigateTo('controle-membros')">
+                    <span class="qm-label">Controle de Membros</span>
+                </a>
+                <a class="quick-menu-item" data-section="publicacao" onclick="navigateTo('publicacao')">
+                    <span class="qm-label">Publicação</span>
+                </a>
+                <a class="quick-menu-item" data-section="grupo" onclick="navigateTo('grupo')">
+                    <span class="qm-label">Grupo</span>
+                </a>
+            </div>
+
+            <!-- Botão voltar -->
+            <div class="quick-menu-back">
+                <a href="centro_tarefas_orgaos.html" class="btn-voltar">← Voltar aos Órgãos</a>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Modal: Criar/Editar Tópico -->
+    <div class="modal-overlay" id="modalTopico">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTopicoTitle">Novo Tópico</h3>
+                <button class="modal-close" onclick="fecharModal('modalTopico')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Título</label>
+                    <input type="text" class="form-input" id="topicoTitulo" placeholder="Ex: Regulamento Interno">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Conteúdo</label>
+                    <textarea class="form-textarea" id="topicoConteudo" rows="6"
+                        placeholder="Escreva o conteúdo aqui..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="fecharModal('modalTopico')">Cancelar</button>
+                <button class="btn-primary" onclick="salvarTopico()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Adicionar Cargo -->
+    <div class="modal-overlay" id="modalCargo">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 class="modal-title">Novo Cargo</h3>
+                <button class="modal-close" onclick="fecharModal('modalCargo')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Nome do Cargo</label>
+                    <input type="text" class="form-input" id="cargoNome" placeholder="Ex: Suboficial, Sargento...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Permissões</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="permSubtopicos"> Criar Subtópicos
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="permMembros"> Gerenciar Membros
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="permPublicacao"> Publicações
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="fecharModal('modalCargo')">Cancelar</button>
+                <button class="btn-primary" onclick="salvarCargo()">Adicionar Cargo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Adicionar Membro -->
+    <div class="modal-overlay" id="modalMembro">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 class="modal-title">Adicionar Membro</h3>
+                <button class="modal-close" onclick="fecharModal('modalMembro')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Nome de Usuário (Habbo)</label>
+                    <input type="text" class="form-input" id="membroUsername" placeholder="Ex: Xandelicado">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cargo</label>
+                    <select class="form-select" id="membroCargo"></select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="fecharModal('modalMembro')">Cancelar</button>
+                <button class="btn-primary" onclick="salvarMembro()">Adicionar</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="../scripts/notificacoes.js"></script>
+    <script src="../scripts/orgao_interno.js"></script>
+</body>
+
+</html>

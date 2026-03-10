@@ -1,0 +1,167 @@
+/* recrutamentos.css — específico. Depende de global.css */
+
+/* ── LAYOUT ──────────────────────────────────────────── */
+.main-wrapper {
+    display: flex;
+    gap: 20px;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 22px 20px 40px;
+    align-items: flex-start;
+}
+
+/* ── SIDEBAR ESQUERDA ────────────────────────────────── */
+.sidebar-left {
+    width: 220px;
+    flex-shrink: 0;
+    background: var(--bg-2);
+    border: 1px solid var(--b1);
+    border-radius: 12px;
+    padding: 16px 10px;
+    position: sticky;
+    top: calc(var(--navbar-h) + 14px);
+}
+
+.sidebar-left-title {
+    font-size: .8rem;
+    font-weight: 800;
+    color: var(--green);
+    padding: 0 6px 12px;
+    border-bottom: 1px solid var(--b1);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sidebar-left-title svg {
+    width: 15px;
+    height: 15px;
+}
+
+.sidebar-left-search {
+    margin-bottom: 10px;
+    width: 100%;
+    font-size: .74rem;
+}
+
+.sidebar-nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    font-size: .76rem;
+    font-weight: 600;
+    color: var(--t2);
+    cursor: pointer;
+    transition: all var(--dur) var(--ease);
+    margin-bottom: 3px;
+}
+
+.sidebar-nav-btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.sidebar-nav-btn:hover {
+    background: var(--bg-3);
+    color: var(--t1);
+}
+
+.sidebar-nav-btn.active {
+    background: var(--green-muted);
+    color: var(--green);
+}
+
+/* ── MAIN CONTENT ────────────────────────────────────── */
+.main-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.content-card {
+    background: var(--bg-2);
+    border: 1px solid var(--b1);
+    border-radius: 14px;
+    padding: 22px;
+}
+
+.req-form-title {
+    font-size: .95rem;
+    font-weight: 800;
+    color: var(--t1);
+    margin: 0 0 12px;
+}
+
+.req-divider {
+    height: 1px;
+    background: var(--b1);
+    margin-bottom: 18px;
+}
+
+/* Recrutas tags */
+.recrutas-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-height: 36px;
+    padding: 8px;
+    background: var(--bg-3);
+    border: 1px solid var(--b1);
+    border-radius: 8px;
+}
+
+.recruta-tag {
+    background: var(--green-muted);
+    color: var(--green);
+    border: 1px solid var(--b3);
+    border-radius: 5px;
+    padding: 3px 9px;
+    font-size: .72rem;
+    font-weight: 700;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    gap: 5px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+}
+
+.pag-btn {
+    padding: 5px 10px;
+    background: var(--bg-3);
+    border: 1px solid var(--b1);
+    border-radius: 6px;
+    font-size: .74rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--t2);
+    transition: all var(--dur) var(--ease);
+}
+
+.pag-btn:hover {
+    border-color: var(--b3);
+    color: var(--green);
+}
+
+.pag-btn.active {
+    background: var(--green-muted);
+    color: var(--green);
+    border-color: var(--b3);
+}
+
+@media (max-width: 768px) {
+    .main-wrapper {
+        flex-direction: column;
+        padding: 14px 12px 24px;
+    }
+
+    .sidebar-left {
+        width: 100%;
+        position: static;
+    }
+}

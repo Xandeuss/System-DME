@@ -1,0 +1,516 @@
+/* configuracao.css — específico. Depende de global.css */
+
+/* ── LAYOUT ──────────────────────────────────────────── */
+.page-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 35px 25px;
+    display: flex;
+    gap: 25px;
+    align-items: flex-start;
+}
+
+/* ── MENU LATERAL CONFIG ─────────────────────────────── */
+.config-sidebar {
+    width: 215px;
+    flex-shrink: 0;
+    background: var(--bg-2);
+    border: 1px solid var(--b1);
+    border-radius: 12px;
+    overflow: hidden;
+    position: sticky;
+    top: calc(var(--navbar-h) + 14px);
+}
+
+.config-sidebar-title {
+    padding: 16px 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--t2);
+    border-bottom: 1px solid var(--b1);
+}
+
+.config-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--t2);
+    border-left: 3px solid transparent;
+    transition: all var(--dur) var(--ease);
+    text-decoration: none;
+}
+
+.config-nav-item:hover {
+    background: var(--bg-3);
+    color: var(--t1);
+}
+
+.config-nav-item.active {
+    background: var(--bg-3);
+    color: var(--green);
+    border-left-color: var(--green);
+    font-weight: 600;
+}
+
+/* ── PAINÉIS ─────────────────────────────────────────── */
+.config-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.config-panel {
+    background: var(--bg-2);
+    border: 1px solid var(--b1);
+    border-radius: 12px;
+    overflow: hidden;
+    display: none;
+    animation: fadeIn 0.3s var(--ease);
+}
+
+.config-panel.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.config-panel-header {
+    padding: 22px 28px;
+    border-bottom: 1px solid var(--b1);
+}
+
+.config-panel-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--t1);
+    margin-bottom: 4px;
+}
+
+.config-panel-sub {
+    font-size: 0.82rem;
+    color: var(--t2);
+}
+
+.config-panel-body {
+    padding: 28px;
+}
+
+/* ── FORMULÁRIOS ─────────────────────────────────────── */
+.form-group {
+    margin-bottom: 22px;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--t2);
+    margin-bottom: 8px;
+}
+
+.form-hint {
+    font-size: 0.74rem;
+    color: var(--t2);
+    margin-top: 6px;
+    opacity: 0.75;
+    line-height: 1.5;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 15px;
+    background: var(--bg-3);
+    border: 1px solid var(--b1);
+    border-radius: 8px;
+    color: var(--t1);
+    font-family: inherit;
+    font-size: 0.9rem;
+    transition: all var(--dur) var(--ease);
+    outline: none;
+}
+
+.form-input:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px var(--green-glow);
+}
+
+.form-input:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.form-input::placeholder {
+    color: var(--t3);
+}
+
+/* ── TAG ─────────────────────────────────────────────── */
+.tag-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tag-input {
+    max-width: 100px;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    text-align: center;
+}
+
+.tag-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 16px;
+    background: var(--green-muted);
+    border: 1px solid var(--green);
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--green);
+    letter-spacing: 2px;
+    transition: all var(--dur) var(--ease);
+}
+
+/* ── SENHA ───────────────────────────────────────────── */
+.password-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+/* ── DIVIDER ─────────────────────────────────────────── */
+.divider {
+    height: 1px;
+    background: var(--b1);
+    margin: 24px 0;
+}
+
+/* ── BOTÃO SALVAR ────────────────────────────────────── */
+.btn-save {
+    padding: 12px 28px;
+    background: var(--green);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--dur) var(--ease);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-save:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px var(--green-glow);
+}
+
+/* ── EMBLEMAS ────────────────────────────────────────── */
+.emblemas-toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.emblema-code-input {
+    flex: 1;
+}
+
+.btn-add-emblema {
+    padding: 12px 18px;
+    background: var(--bg-3);
+    border: 1px solid var(--b1);
+    border-radius: 8px;
+    color: var(--t1);
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--dur) var(--ease);
+    white-space: nowrap;
+}
+
+.btn-add-emblema:hover {
+    border-color: var(--green);
+    color: var(--green);
+}
+
+.emblemas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+    gap: 12px;
+    margin: 18px 0;
+}
+
+.emblema-slot {
+    aspect-ratio: 1;
+    background: var(--bg-3);
+    border: 2px dashed var(--b2);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--dur) var(--ease);
+    position: relative;
+    overflow: hidden;
+}
+
+.emblema-slot:hover {
+    border-color: var(--green);
+}
+
+.emblema-slot.filled {
+    border-style: solid;
+    border-color: var(--green);
+}
+
+.emblema-slot img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+}
+
+.emblema-slot .slot-num {
+    font-size: 0.6rem;
+    color: var(--b2);
+    position: absolute;
+    bottom: 5px;
+}
+
+.emblema-slot .slot-plus {
+    font-size: 1.4rem;
+    color: var(--b2);
+    transition: color var(--dur);
+}
+
+.emblema-slot:hover .slot-plus {
+    color: var(--green);
+}
+
+.emblema-remove {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 18px;
+    height: 18px;
+    background: var(--red);
+    color: white;
+    border-radius: 50%;
+    border: none;
+    font-size: 0.6rem;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.emblema-slot.filled:hover .emblema-remove {
+    display: flex;
+}
+
+/* ── BBCODE EDITOR ───────────────────────────────────── */
+.bbcode-editor {
+    border: 1px solid var(--b1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.bbcode-toolbar {
+    background: var(--bg-3);
+    padding: 10px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+    border-bottom: 1px solid var(--b1);
+}
+
+.bb-btn {
+    padding: 5px 9px;
+    background: var(--bg-2);
+    border: 1px solid var(--b1);
+    border-radius: 5px;
+    color: var(--t1);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--dur) var(--ease);
+    font-family: inherit;
+    min-width: 30px;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.bb-btn:hover {
+    background: var(--green);
+    border-color: var(--green);
+    color: #000;
+}
+
+.bb-sep {
+    width: 1px;
+    height: 20px;
+    background: var(--b1);
+    margin: 0 3px;
+    flex-shrink: 0;
+}
+
+.bb-textarea {
+    width: 100%;
+    min-height: 180px;
+    padding: 15px;
+    background: var(--bg-3);
+    border: none;
+    color: var(--t1);
+    font-family: inherit;
+    font-size: 0.88rem;
+    resize: vertical;
+    line-height: 1.6;
+    display: block;
+    outline: none;
+}
+
+.bb-preview-header {
+    padding: 10px 15px;
+    background: var(--bg-2);
+    border-top: 1px solid var(--b1);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--t2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.bb-preview-body {
+    padding: 18px;
+    background: var(--bg-3);
+    min-height: 70px;
+    font-size: 0.88rem;
+    line-height: 1.8;
+    color: var(--t1);
+}
+
+/* ── REFERÊNCIA BBCODE ───────────────────────────────── */
+.bb-reference {
+    background: var(--bg-3);
+    border: 1px solid var(--b1);
+    border-radius: 10px;
+    padding: 18px;
+    margin-top: 18px;
+}
+
+.bb-ref-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--t2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+}
+
+.bb-ref-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+    gap: 6px;
+}
+
+.bb-ref-item {
+    padding: 8px 12px;
+    background: var(--bg-2);
+    border-radius: 6px;
+    font-size: 0.76rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.bb-ref-tag {
+    font-family: monospace;
+    color: var(--green);
+    font-size: 0.8rem;
+}
+
+.bb-ref-desc {
+    color: var(--t2);
+    font-size: 0.7rem;
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────── */
+@media (max-width: 768px) {
+    .page-container {
+        flex-direction: column;
+        padding: 16px 12px;
+    }
+
+    .config-sidebar {
+        width: 100%;
+        position: static;
+    }
+
+    .password-row {
+        grid-template-columns: 1fr;
+    }
+
+    .emblemas-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* ── TOAST ───────────────────────────────────────────── */
+.toast {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    padding: 13px 22px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    box-shadow: var(--shadow-md);
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 9999;
+    color: #000;
+}
+
+.toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.toast.ok {
+    background: var(--green);
+    box-shadow: 0 8px 25px var(--green-glow);
+}
+
+.toast.err {
+    background: var(--red);
+    color: white;
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+}

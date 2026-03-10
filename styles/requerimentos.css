@@ -1,0 +1,378 @@
+/* requerimentos.css — específico. Depende de global.css */
+
+/* ── LAYOUT ──────────────────────────────────────────── */
+.req-wrapper {
+    display: flex;
+    gap: 20px;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 22px 20px 40px;
+    align-items: flex-start;
+}
+
+/* ── NAV LATERAL (tipos) ─────────────────────────────── */
+.req-nav {
+    width: 210px;
+    flex-shrink: 0;
+    background: var(--bg-2);
+    border: 1px solid var(--b1);
+    border-radius: 12px;
+    padding: 12px 8px;
+    position: sticky;
+    top: calc(var(--navbar-h) + 14px);
+}
+
+.req-nav-group {
+    margin-bottom: 14px;
+}
+
+.req-nav-label {
+    font-size: .58rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--t3);
+    padding: 4px 10px 6px;
+}
+
+.req-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--t2);
+    cursor: pointer;
+    transition: all var(--dur) var(--ease);
+}
+
+.req-nav-item svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+}
+
+.req-nav-item:hover {
+    background: var(--bg-3);
+    color: var(--t1);
+}
+
+.req-nav-item.active {
+    background: var(--green-muted);
+    color: var(--green);
+}
+
+/* Botão "Criar Requerimento" — estilo de nav-item com ícone + */
+.req-btn-add {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 9px 10px;
+    border-radius: 8px;
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--green);
+    background: var(--green-muted);
+    border: 1px dashed rgba(34, 197, 94, .3);
+    cursor: pointer;
+    transition: all var(--dur) var(--ease);
+    text-align: left;
+}
+
+.req-btn-add:hover {
+    background: rgba(34, 197, 94, .18);
+    border-color: var(--green);
+}
+
+.req-btn-add svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+/* Botão × para remover item (visível só em modo admin) */
+.req-del-btn {
+    opacity: 0;
+    margin-left: auto;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--t3);
+    padding: 2px 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    transition: all .15s;
+    flex-shrink: 0;
+}
+
+.req-del-btn:hover {
+    color: var(--red);
+    background: rgba(239, 68, 68, .1);
+}
+
+.req-nav-item:hover .req-del-btn {
+    opacity: 1;
+}
+
+.req-nav-item.active .req-del-btn {
+    opacity: .6;
+}
+
+/* ── MAIN AREA ───────────────────────────────────────── */
+.req-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.req-card {
+    background: var(--bg-2);
+    border: 1px solid var(--b1);
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+/* TABS */
+.req-tabs {
+    display: flex;
+    gap: 2px;
+    background: var(--bg-1);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--b1);
+}
+
+.req-tab {
+    padding: 7px 16px;
+    font-size: .76rem;
+    font-weight: 600;
+    border-radius: 7px;
+    cursor: pointer;
+    color: var(--t2);
+    transition: all var(--dur) var(--ease);
+}
+
+.req-tab:hover {
+    color: var(--t1);
+    background: var(--bg-3);
+}
+
+.req-tab.active {
+    background: var(--bg-4);
+    color: var(--green);
+}
+
+/* FORM AREA */
+.req-form-area {
+    padding: 22px;
+}
+
+.req-form-title {
+    font-size: .95rem;
+    font-weight: 800;
+    color: var(--t1);
+    margin: 0 0 12px;
+}
+
+.req-divider {
+    height: 1px;
+    background: var(--b1);
+    margin-bottom: 18px;
+}
+
+/* Nick row */
+.req-nick-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+}
+
+.req-nick-row .g-input {
+    flex: 1;
+}
+
+/* User found badge */
+.user-found {
+    font-size: .74rem;
+    color: var(--green);
+    margin-top: 5px;
+    display: none;
+}
+
+.info-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--green-muted);
+    border: 1px solid var(--b3);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-top: 8px;
+    font-size: .76rem;
+    color: var(--t1);
+}
+
+/* Log section */
+.log-section {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--b1);
+}
+
+/* History list items */
+#lista-historico {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.hist-item {
+    background: var(--bg-1);
+    border: 1px solid var(--b1);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    transition: all var(--dur) var(--ease);
+    cursor: pointer;
+}
+
+.hist-item:hover {
+    border-color: var(--b2);
+    background: var(--bg-3);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.hist-content {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    min-width: 0;
+}
+
+.hist-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--bg-4);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--green);
+    flex-shrink: 0;
+}
+
+.hist-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.hist-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.hist-title {
+    font-size: .88rem;
+    font-weight: 700;
+    color: var(--t1);
+    margin-bottom: 3px;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.hist-meta {
+    font-size: .74rem;
+    color: var(--t3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hist-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+/* Status Pills */
+.status-pill {
+    font-size: .65rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.status-pill.pendente {
+    background: rgba(245, 158, 11, .1);
+    color: var(--gold);
+    border: 1px solid rgba(245, 158, 11, .2);
+}
+
+.status-pill.aprovado {
+    background: rgba(34, 197, 94, .1);
+    color: var(--green);
+    border: 1px solid rgba(34, 197, 94, .2);
+}
+
+.status-pill.reprovado {
+    background: rgba(239, 68, 68, .1);
+    color: var(--red);
+    border: 1px solid rgba(239, 68, 68, .2);
+}
+
+.btn-details {
+    background: var(--bg-4);
+    border: 1px solid var(--b2);
+    color: var(--t2);
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: .78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--dur);
+}
+
+.btn-details:hover {
+    border-color: var(--green);
+    color: var(--green);
+    background: var(--green-muted);
+}
+
+/* Modal actions */
+.modal-actions {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--b1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .req-wrapper {
+        flex-direction: column;
+        padding: 14px 12px 24px;
+    }
+
+    .req-nav {
+        width: 100%;
+        position: static;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .req-nav-group {
+        margin-bottom: 0;
+    }
+}

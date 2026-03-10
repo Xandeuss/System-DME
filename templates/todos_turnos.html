@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de Turnos — DME System</title>
+    <link rel="stylesheet" href="../styles/global.css">
+    <link rel="stylesheet" href="../styles/todos_turnos.css">
+    <script src="../scripts/theme.js"></script>
+</head>
+
+<body>
+
+    <!-- ══ NAVBAR (simples, sem sidebar) ════════════════ -->
+    <nav class="navbar">
+        <div class="logo-section">
+            <a href="ponto_servico.html" class="btn-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6" />
+                </svg>
+                Voltar
+            </a>
+            <div class="logo-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+            </div>
+            <div class="logo-text">DME<em>System</em></div>
+        </div>
+        <div class="user-profile" id="userProfileBtn">
+            <div class="user-avatar"><img id="navUserImage" src="" alt=""></div>
+            <span class="user-name" id="navUserName">Usuário</span>
+            <div class="user-dropdown" id="userDropdown">
+                <div class="dropdown-header">
+                    <div class="dropdown-user-info">
+                        <div class="dropdown-avatar"><img id="dropdownUserImage" src="" alt=""></div>
+                        <div class="dropdown-user-details">
+                            <h4 id="dropdownName">Usuário</h4>
+                            <p>Militar DME</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown-menu">
+                    <a onclick="toggleTheme()" class="dropdown-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5" />
+                            <line x1="12" y1="1" x2="12" y2="3" />
+                            <line x1="12" y1="21" x2="12" y2="23" />
+                        </svg>
+                        <span id="themeText">Modo Claro</span>
+                    </a>
+                    <a onclick="logout()" class="dropdown-item danger">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                        Sair
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ══ CONTEÚDO ════════════════════════════════════ -->
+    <div class="main-container">
+
+        <div class="page-header">
+            <h2 class="page-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                </svg>
+                Histórico de Turnos
+            </h2>
+        </div>
+
+        <!-- FILTROS -->
+        <div class="filters-panel">
+            <div class="g-form-group" style="flex:1;min-width:180px">
+                <label class="g-label">Nickname</label>
+                <div style="position:relative">
+                    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input type="text" id="filterNick" class="g-input" style="padding-left:32px"
+                        placeholder="Ex: Xandelicado">
+                </div>
+            </div>
+            <div class="g-form-group" style="min-width:150px">
+                <label class="g-label">Data Início</label>
+                <input type="date" id="filterDataIni" class="g-input">
+            </div>
+            <div class="g-form-group" style="min-width:150px">
+                <label class="g-label">Data Fim</label>
+                <input type="date" id="filterDataFim" class="g-input">
+            </div>
+            <button class="btn-primary" onclick="filtrarTurnos()"
+                style="align-self:flex-end;padding:9px 18px;white-space:nowrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                Filtrar
+            </button>
+        </div>
+
+        <!-- TABELA -->
+        <div class="g-table-wrap">
+            <table class="g-table">
+                <thead>
+                    <tr>
+                        <th>Militar</th>
+                        <th>Início</th>
+                        <th>Fim</th>
+                        <th>Duração</th>
+                        <th>Setor</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="historyList">
+                    <tr>
+                        <td colspan="6" style="text-align:center;padding:28px;color:var(--t3)">Carregando...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TOTAL -->
+        <div id="totalHours" class="total-hours-card" style="display:none">
+            Total de Horas: 0h 0m
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            /* auth guard */
+            const u = localStorage.getItem('dme_username');
+            if (!u) { window.location.href = 'login.html'; return; }
+
+            /* dropdown */
+            const img = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${u}&direction=2&head_direction=2&gesture=sml&size=s`;
+            document.getElementById('navUserImage').src = img;
+            document.getElementById('dropdownUserImage').src = img;
+            document.getElementById('navUserName').textContent = u;
+            document.getElementById('dropdownName').textContent = u;
+
+            /* defaults */
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('filterDataIni').value = today;
+            document.getElementById('filterDataFim').value = today;
+            filtrarTurnos();
+        });
+
+        document.getElementById('userProfileBtn').addEventListener('click', () => {
+            document.getElementById('userDropdown').classList.toggle('active');
+        });
+
+        function filtrarTurnos() {
+            const nick = document.getElementById('filterNick').value.toLowerCase();
+            const dataIni = document.getElementById('filterDataIni').value;
+            const dataFim = document.getElementById('filterDataFim').value;
+
+            const history = JSON.parse(localStorage.getItem('dme_turnos') || '[]');
+            const ativos = JSON.parse(localStorage.getItem('dme_turnos_ativos') || '[]');
+
+            const todos = [
+                ...history.map(h => ({ ...h, ativo: false })),
+                ...ativos.map(a => ({ ...a, ativo: true }))
+            ];
+
+            const filtrados = todos.filter(t => {
+                const dataTurno = t.inicio.split('T')[0];
+                const matchNick = !nick || t.user.toLowerCase().includes(nick);
+                const matchData = (!dataIni || dataTurno >= dataIni) && (!dataFim || dataTurno <= dataFim);
+                return matchNick && matchData;
+            });
+
+            renderTable(filtrados);
+        }
+
+        function renderTable(lista) {
+            const tbody = document.getElementById('historyList');
+            tbody.innerHTML = '';
+            let totalMs = 0;
+
+            if (lista.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:28px;color:var(--t3)">Nenhum registro encontrado.</td></tr>';
+                document.getElementById('totalHours').style.display = 'none';
+                return;
+            }
+
+            lista.sort((a, b) => new Date(b.inicio) - new Date(a.inicio));
+
+            lista.forEach(t => {
+                const inicio = new Date(t.inicio);
+                const fim = t.fim ? new Date(t.fim) : new Date();
+                const duracaoMs = t.duracaoMs || (fim - inicio);
+                totalMs += duracaoMs;
+
+                const diffMin = Math.floor(duracaoMs / 60000);
+                const horas = Math.floor(diffMin / 60);
+                const mins = diffMin % 60;
+                const duracaoTexto = horas > 0 ? `${horas}h ${mins}m` : `${mins} min`;
+
+                let statusHtml;
+                if (t.ativo) {
+                    statusHtml = '<span class="g-badge g-badge-green">Em Andamento</span>';
+                } else if (t.status === 'encerrado_por_superior') {
+                    statusHtml = '<span class="g-badge g-badge-orange">Compulsório</span>';
+                } else {
+                    statusHtml = '<span class="g-badge" style="background:var(--bg-3);color:var(--t3)">Encerrado</span>';
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                <td>
+                    <div style="display:flex;align-items:center;gap:10px">
+                        <div style="width:28px;height:28px;border-radius:6px;background:var(--bg-3);overflow:visible;display:flex;align-items:flex-end;justify-content:center;flex-shrink:0">
+                            <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=${t.user}&direction=2&head_direction=2&gesture=sml&size=s" style="height:130%;width:auto;object-fit:contain">
+                        </div>
+                        <span style="font-weight:600;font-size:.82rem">${t.user}</span>
+                    </div>
+                </td>
+                <td style="font-size:.78rem">${inicio.toLocaleString('pt-BR')}</td>
+                <td style="font-size:.78rem">${t.ativo ? '—' : fim.toLocaleString('pt-BR')}</td>
+                <td style="font-weight:700;color:var(--green)">${duracaoTexto}</td>
+                <td style="font-size:.78rem">${t.setor || '—'}</td>
+                <td>${statusHtml}</td>
+            `;
+                tbody.appendChild(tr);
+            });
+
+            const totalMin = Math.floor(totalMs / 60000);
+            const totalH = Math.floor(totalMin / 60);
+            const totalM = totalMin % 60;
+
+            const divTotal = document.getElementById('totalHours');
+            divTotal.textContent = `Total de Horas no Período: ${totalH}h ${totalM}m`;
+            divTotal.style.display = 'block';
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            body.classList.toggle('light-mode');
+            const isLight = body.classList.contains('light-mode');
+            localStorage.setItem('dme_theme', isLight ? 'light' : 'dark');
+            document.getElementById('themeText').textContent = isLight ? 'Modo Escuro' : 'Modo Claro';
+        }
+
+        function logout() {
+            localStorage.removeItem('dme_username');
+            window.location.href = 'login.html';
+        }
+    </script>
+    <script src="../scripts/notificacoes.js"></script>
+</body>
+
+</html>

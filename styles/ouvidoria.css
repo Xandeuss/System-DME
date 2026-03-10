@@ -1,0 +1,849 @@
+/* ══════════════════════════════════════════════════════
+   OUVIDORIA — CSS
+   ══════════════════════════════════════════════════════ */
+
+/* ── Breadcrumb ─────────────────────────────────────── */
+.breadcrumb-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 24px;
+    background: var(--bg-2);
+    border-bottom: 1px solid var(--b1);
+    font-size: 0.8rem;
+}
+
+.breadcrumb-link {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--green);
+    text-decoration: none;
+    font-weight: 600;
+    transition: opacity .2s;
+}
+
+.breadcrumb-link:hover {
+    opacity: .75;
+}
+
+.breadcrumb-link svg {
+    width: 14px;
+    height: 14px;
+}
+
+.breadcrumb-sep {
+    width: 14px;
+    height: 14px;
+    color: var(--t3);
+}
+
+.breadcrumb-current {
+    color: var(--t2);
+    font-weight: 500;
+}
+
+/* ── Progresso ──────────────────────────────────────── */
+.ouv-progress-wrap {
+    height: 3px;
+    background: var(--b1);
+    position: sticky;
+    top: var(--navbar-h, 60px);
+    z-index: 100;
+}
+
+.ouv-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green), #4ade80);
+    transition: width .4s ease;
+}
+
+/* ── Layout ─────────────────────────────────────────── */
+.ouv-main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 64px;
+}
+
+/* ── Etapas ─────────────────────────────────────────── */
+.ouv-step {
+    display: none;
+}
+
+.ouv-step.active {
+    display: block;
+    animation: ouvFade .3s ease;
+}
+
+@keyframes ouvFade {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* ── Card ────────────────────────────────────────────── */
+.ouv-card {
+    background: var(--bg-2);
+    border: 1px solid var(--b1);
+    border-radius: 18px;
+    padding: 36px;
+    box-shadow: var(--shadow-md);
+}
+
+/* ── Intro Card ──────────────────────────────────────── */
+.ouv-intro-card {
+    text-align: center;
+}
+
+.ouv-intro-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--green-muted);
+    border: 1px solid rgba(34, 197, 94, .2);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: var(--green);
+}
+
+.ouv-intro-icon svg {
+    width: 28px;
+    height: 28px;
+}
+
+.ouv-intro-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--t1);
+    margin-bottom: 6px;
+    line-height: 1.3;
+}
+
+.ouv-intro-sub {
+    font-size: .85rem;
+    color: var(--t3);
+    margin-bottom: 14px;
+}
+
+.ouv-intro-desc {
+    font-size: .84rem;
+    color: var(--t2);
+    line-height: 1.7;
+    margin-bottom: 28px;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ── Info Grid ───────────────────────────────────────── */
+.ouv-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 22px;
+    text-align: left;
+}
+
+.ouv-info-card {
+    background: var(--bg-1);
+    border: 1px solid var(--b1);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.ouv-info-card h3 {
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--t1);
+    margin-bottom: 5px;
+}
+
+.ouv-info-card p {
+    font-size: .75rem;
+    color: var(--t2);
+    line-height: 1.6;
+    margin-bottom: 6px;
+}
+
+.ouv-info-card em {
+    font-size: .72rem;
+    color: var(--t3);
+    font-style: italic;
+}
+
+.ouv-info-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ouv-info-icon.proj {
+    background: rgba(59, 130, 246, .1);
+    color: #60a5fa;
+}
+
+.ouv-info-icon.emenda {
+    background: rgba(168, 85, 247, .1);
+    color: #c084fc;
+}
+
+.ouv-info-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* ── Alert box ───────────────────────────────────────── */
+.ouv-alert-box {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: rgba(245, 158, 11, .08);
+    border: 1px solid rgba(245, 158, 11, .2);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 28px;
+    text-align: left;
+}
+
+.ouv-alert-box svg {
+    width: 18px;
+    height: 18px;
+    color: var(--gold, #f59e0b);
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.ouv-alert-box p {
+    font-size: .78rem;
+    color: var(--t2);
+    line-height: 1.6;
+}
+
+/* ── Step Header ─────────────────────────────────────── */
+.ouv-step-header {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.ouv-step-num {
+    width: 36px;
+    height: 36px;
+    background: var(--green-muted);
+    border: 1px solid rgba(34, 197, 94, .3);
+    color: var(--green);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .88rem;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.ouv-step-num.proj {
+    background: rgba(59, 130, 246, .1);
+    border-color: rgba(59, 130, 246, .25);
+    color: #60a5fa;
+}
+
+.ouv-step-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--t1);
+    margin-bottom: 4px;
+}
+
+.ouv-step-desc {
+    font-size: .78rem;
+    color: var(--t3);
+    line-height: 1.6;
+}
+
+.ouv-divider {
+    height: 1px;
+    background: var(--b1);
+    margin-bottom: 22px;
+}
+
+/* ── Radio cards ─────────────────────────────────────── */
+.ouv-field-label {
+    font-size: .78rem;
+    font-weight: 700;
+    color: var(--t1);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.ouv-field-hint {
+    font-size: .72rem;
+    color: var(--t3);
+    margin-top: -4px;
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.ouv-req {
+    color: var(--red, #ef4444);
+}
+
+.ouv-opt {
+    color: var(--t3);
+    font-weight: 400;
+    font-size: .7rem;
+}
+
+.ouv-radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 28px;
+}
+
+.ouv-radio-card {
+    display: block;
+    cursor: pointer;
+    border: 1.5px solid var(--b2);
+    border-radius: 12px;
+    padding: 14px 16px;
+    background: var(--bg-3);
+    transition: all .2s;
+}
+
+.ouv-radio-card input {
+    display: none;
+}
+
+.ouv-radio-card:hover {
+    border-color: var(--green);
+    background: var(--green-muted);
+}
+
+.ouv-radio-card.selected {
+    border-color: var(--green);
+    background: var(--green-muted);
+}
+
+.ouv-radio-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ouv-radio-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--b3);
+    background: var(--bg-1);
+    transition: all .2s;
+    flex-shrink: 0;
+}
+
+.ouv-radio-card.selected .ouv-radio-dot {
+    border-color: var(--green);
+    background: var(--green);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, .2);
+}
+
+/* ── Objetivo hint ───────────────────────────────────── */
+.ouv-obj-hint {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: var(--bg-1);
+    border: 1px solid var(--b1);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    font-size: .74rem;
+    color: var(--t2);
+    line-height: 1.6;
+}
+
+.ouv-obj-hint strong {
+    color: var(--t1);
+}
+
+/* ── Sub-forms (campos condicionais de emenda) ─────────*/
+.ouv-sub-form {
+    margin-top: 22px;
+    border-top: 1px solid var(--b1);
+    padding-top: 20px;
+    animation: ouvFade .25s ease;
+}
+
+.ouv-sub-header {
+    font-size: .7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: #c084fc;
+    background: rgba(168, 85, 247, .08);
+    border: 1px solid rgba(168, 85, 247, .15);
+    border-radius: 8px;
+    padding: 7px 12px;
+    margin-bottom: 18px;
+}
+
+.ouv-radio-title {
+    font-size: .84rem;
+    font-weight: 700;
+    color: var(--t1);
+    display: block;
+}
+
+.ouv-radio-sub {
+    font-size: .72rem;
+    color: var(--t3);
+    display: block;
+}
+
+/* ── Form ────────────────────────────────────────────── */
+.ouv-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+.ouv-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ouv-form-group.full {
+    grid-column: 1 / -1;
+}
+
+.ouv-input {
+    background: var(--bg-1);
+    border: 1.5px solid var(--b2);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-size: .83rem;
+    color: var(--t1);
+    font-family: inherit;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color .2s;
+    resize: none;
+}
+
+.ouv-input:focus {
+    outline: none;
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, .1);
+}
+
+.ouv-input::placeholder {
+    color: var(--t3);
+}
+
+/* ── Nav row ─────────────────────────────────────────── */
+.ouv-nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    border-top: 1px solid var(--b1);
+}
+
+.ouv-btn-next {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 24px;
+    background: var(--green);
+    color: #000;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: .84rem;
+    cursor: pointer;
+    transition: all .2s;
+    text-decoration: none;
+}
+
+.ouv-btn-next:hover {
+    background: #4ade80;
+    transform: translateY(-1px);
+}
+
+/* Variante roxa — Emenda Legislativa */
+.ouv-btn-emenda {
+    background: rgba(168, 85, 247, .85);
+    color: #fff;
+}
+
+.ouv-btn-emenda:hover {
+    background: #a855f7;
+    color: #fff;
+}
+
+.ouv-btn-back {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    background: var(--bg-3);
+    border: 1px solid var(--b2);
+    border-radius: 10px;
+    color: var(--t2);
+    font-weight: 600;
+    font-size: .82rem;
+    cursor: pointer;
+    transition: all .2s;
+}
+
+.ouv-btn-back:hover {
+    border-color: var(--b3);
+    color: var(--t1);
+}
+
+/* ── Sucesso ─────────────────────────────────────────── */
+.ouv-success-card {
+    text-align: center;
+    padding: 56px 40px;
+}
+
+.ouv-success-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--green-muted);
+    border: 2px solid rgba(34, 197, 94, .3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: var(--green);
+    animation: popIn .35s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.ouv-success-icon svg {
+    width: 30px;
+    height: 30px;
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.ouv-success-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--t1);
+    margin-bottom: 10px;
+}
+
+.ouv-success-desc {
+    font-size: .82rem;
+    color: var(--t2);
+    line-height: 1.7;
+    max-width: 420px;
+    margin: 0 auto 28px;
+}
+
+.ouv-success-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+/* ── Histórico ───────────────────────────────────────── */
+.ouv-hist-section {
+    max-width: 760px;
+    margin: 0 auto 64px;
+    padding: 0 20px;
+}
+
+.ouv-hist-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.ouv-hist-title {
+    font-size: .88rem;
+    font-weight: 800;
+    color: var(--t1);
+}
+
+.ouv-hist-count {
+    background: var(--green-muted);
+    color: var(--green);
+    font-size: .68rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+
+.ouv-hist-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ouv-hist-item {
+    background: var(--bg-2);
+    border: 1px solid var(--b1);
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    transition: all .18s;
+}
+
+.ouv-hist-item:hover {
+    border-color: var(--b2);
+    transform: translateY(-1px);
+}
+
+.ouv-hist-tipo {
+    font-size: .62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+}
+
+.ouv-hist-tipo.projeto {
+    background: rgba(59, 130, 246, .12);
+    color: #60a5fa;
+}
+
+.ouv-hist-tipo.emenda {
+    background: rgba(168, 85, 247, .12);
+    color: #c084fc;
+}
+
+.ouv-hist-titulo {
+    font-size: .84rem;
+    font-weight: 700;
+    color: var(--t1);
+}
+
+.ouv-hist-meta {
+    font-size: .72rem;
+    color: var(--t3);
+    margin-top: 2px;
+}
+
+.ouv-hist-badge {
+    font-size: .65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgba(245, 158, 11, .1);
+    color: var(--gold, #f59e0b);
+    border: 1px solid rgba(245, 158, 11, .2);
+    flex-shrink: 0;
+}
+
+/* ── Sidebar Mobile ─────────────────────────────────── */
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .55);
+    backdrop-filter: blur(2px);
+    z-index: 900;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.mobile-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100%;
+    background: var(--bg-1);
+    border-right: 1px solid var(--b2);
+    z-index: 950;
+    transform: translateX(-100%);
+    transition: transform .28s var(--ease);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding-bottom: 24px;
+}
+
+.mobile-sidebar.active {
+    transform: translateX(0);
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--b1);
+}
+
+.sidebar-title {
+    font-weight: 800;
+    font-size: .95rem;
+    color: var(--t1);
+}
+
+.sidebar-close {
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--b2);
+    border-radius: 7px;
+    background: var(--bg-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--t2);
+}
+
+.sidebar-close svg {
+    width: 14px;
+    height: 14px;
+}
+
+.sidebar-section {
+    padding: 10px 10px 0;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    color: var(--t2);
+    text-decoration: none;
+    font-size: .84rem;
+    font-weight: 600;
+    transition: all .15s;
+}
+
+.sidebar-item:hover {
+    background: var(--bg-3);
+    color: var(--t1);
+}
+
+.sidebar-item.active {
+    background: var(--green-muted);
+    color: var(--green);
+}
+
+/* ── Toast ───────────────────────────────────────────── */
+.toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 9999;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: .82rem;
+    font-weight: 600;
+    background: var(--bg-3);
+    border: 1px solid var(--b2);
+    color: var(--t1);
+    box-shadow: var(--shadow-lg);
+    animation: slideIn .3s ease;
+    max-width: 300px;
+}
+
+.toast svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.toast.success {
+    border-color: rgba(34, 197, 94, .3);
+    color: var(--green);
+}
+
+.toast.error {
+    border-color: rgba(239, 68, 68, .3);
+    color: var(--red, #ef4444);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: none;
+        opacity: 1;
+    }
+}
+
+/* ── Responsivo ──────────────────────────────────────── */
+@media (max-width: 640px) {
+    .ouv-card {
+        padding: 22px 18px;
+    }
+
+    .ouv-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ouv-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ouv-form-group.full {
+        grid-column: auto;
+    }
+
+    .ouv-intro-title {
+        font-size: 1.1rem;
+    }
+}

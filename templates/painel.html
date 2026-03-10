@@ -1,0 +1,1044 @@
+﻿﻿<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin — DME System</title>
+    <link rel="stylesheet" href="../styles/global.css">
+    <link rel="stylesheet" href="../styles/painel.css">
+    <script src="../scripts/theme.js"></script>
+</head>
+
+<body>
+
+    <!-- ══ SIDEBAR ══════════════════════════════════════ -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="mobile-sidebar" id="mobileSidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-title">DME System</span>
+            <button class="sidebar-close" id="sidebarClose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Principal</div>
+            <a href="home.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+                Página Inicial
+            </a>
+            <a href="listagens.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="8" y1="6" x2="21" y2="6" />
+                    <line x1="8" y1="12" x2="21" y2="12" />
+                    <line x1="8" y1="18" x2="21" y2="18" />
+                    <line x1="3" y1="6" x2="3.01" y2="6" />
+                    <line x1="3" y1="12" x2="3.01" y2="12" />
+                    <line x1="3" y1="18" x2="3.01" y2="18" />
+                </svg>
+                Listagens
+            </a>
+            <a href="requerimentos.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                </svg>
+                Requerimentos
+            </a>
+            <a href="sabatina.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                </svg>
+                Sabatina
+            </a>
+            <a href="consulta_promocao.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                    <polyline points="16 7 22 7 22 13" />
+                </svg>
+                Consultar Promoção
+            </a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Ferramentas</div>
+            <a href="ponto_servico.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                </svg>
+                Ponto de Serviço
+            </a>
+            <a href="loja.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <path d="M16 10a4 4 0 0 1-8 0" />
+                </svg>
+                Loja
+            </a>
+            <a href="documentos.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                </svg>
+                Documentos
+            </a>
+            <a href="centro_tarefas_orgaos.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 10v11M16 10v11M12 10v11" />
+                </svg>
+                Centros e Órgãos
+            </a>
+            <a href="recrutamentos.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                Recrutamentos
+            </a>
+            <a href="ouvidoria.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                Ouvidoria
+            </a>
+            <a href="setor_legislativo.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m18 16 4-4-4-4" />
+                    <path d="m6 8-4 4 4 4" />
+                    <path d="m14.5 4-5 16" />
+                </svg>
+                Setor Legislativo
+            </a>
+            <a href="postar_aula.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:6px;flex-shrink:0">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                </svg>
+                Postar Aula
+            </a>
+        </div>
+    </div>
+
+    <!-- ══ NAVBAR ════════════════════════════════════════ -->
+    <nav class="navbar">
+        <div class="logo-section">
+            <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+            <div class="logo-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+            </div>
+            <div class="logo-text">DME<em>System</em></div>
+        </div>
+        <div class="user-profile" id="userProfileBtn">
+            <div class="user-avatar"><img id="navUserImage" src="" alt=""></div>
+            <span class="user-name" id="navUserName">Usuário</span>
+            <div class="user-dropdown" id="userDropdown">
+                <div class="dropdown-header">
+                    <div class="dropdown-user-info">
+                        <div class="dropdown-avatar"><img id="dropdownUserImage" src="" alt=""></div>
+                        <div class="dropdown-user-details">
+                            <h4 id="dropdownName">Usuário</h4>
+                            <p>Militar DME</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown-menu">
+                    <a href="painel.html" class="dropdown-item active">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7" />
+                            <rect x="14" y="3" width="7" height="7" />
+                            <rect x="14" y="14" width="7" height="7" />
+                            <rect x="3" y="14" width="7" height="7" />
+                        </svg>
+                        Painel Admin
+                    </a>
+                    <a onclick="toggleTheme()" class="dropdown-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5" />
+                            <line x1="12" y1="1" x2="12" y2="3" />
+                            <line x1="12" y1="21" x2="12" y2="23" />
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                            <line x1="1" y1="12" x2="3" y2="12" />
+                            <line x1="21" y1="12" x2="23" y2="12" />
+                        </svg>
+                        <span id="themeText">Modo Claro</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a onclick="logout()" class="dropdown-item danger">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                        Sair
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ══ CONTEÚDO PRINCIPAL ═════════════════════════════ -->
+    <main class="page-container">
+
+        <header class="page-header">
+            <h1 class="page-title">Painel Administrativo</h1>
+            <p class="page-subtitle">Gestão centralizada de usuários, acesso e sistema.</p>
+        </header>
+
+        <!-- Estatísticas Rápidas -->
+        <div class="stats-row">
+            <div class="stat-card" onclick="mudarAba('usuarios'); setFiltroUsuario('todos')">
+                <span class="stat-label">Total de Usuários</span>
+                <span class="stat-value" id="stat-total-usuarios">0</span>
+                <span class="stat-sub">Registrados no sistema</span>
+            </div>
+            <div class="stat-card" onclick="mudarAba('usuarios'); setFiltroUsuario('pendente')">
+                <span class="stat-label">Pendentes</span>
+                <span class="stat-value" id="stat-usuarios-pendentes" style="color:#f59e0b">0</span>
+                <span class="stat-sub">Aguardando aprovação</span>
+            </div>
+            <div class="stat-card" onclick="mudarAba('militares')">
+                <span class="stat-label">Militares Ativos</span>
+                <span class="stat-value" id="stat-militares-ativos">0</span>
+                <span class="stat-sub">Corpo Militar e Empresarial</span>
+            </div>
+            <div class="stat-card" onclick="mudarAba('historico')">
+                <span class="stat-label">Ações (24h)</span>
+                <span class="stat-value" id="stat-acoes-dia">0</span>
+                <span class="stat-sub">Registros no histórico</span>
+            </div>
+        </div>
+
+        <!-- Abas de Navegação -->
+        <div class="tabs-bar">
+            <button class="tab-btn active" data-tab="geral">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <path d="M3 9h18" />
+                    <path d="M9 21V9" />
+                </svg>
+                Geral
+            </button>
+            <button class="tab-btn" data-tab="usuarios">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                Gestão de Usuários
+                <span class="badge-count" id="badge-pendentes" style="display:none">0</span>
+            </button>
+            <button class="tab-btn" data-tab="militares">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                Militares Cadastrados
+            </button>
+            <button class="tab-btn" data-tab="ips">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16">
+                    <path d="M5 12h14" />
+                    <path d="M12 5v14" />
+                    <circle cx="12" cy="12" r="9" />
+                </svg>
+                Verificação de IP
+            </button>
+            <button class="tab-btn" data-tab="funcoes">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16">
+                    <path
+                        d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                    <circle cx="12" cy="12" r="3" />
+                </svg>
+                Cargos e Funções
+            </button>
+            <button class="tab-btn" data-tab="historico">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16">
+                    <path d="M12 8v4l3 3" />
+                    <circle cx="12" cy="12" r="9" />
+                </svg>
+                Histórico de Ações
+            </button>
+        </div>
+
+        <!-- ABA: GERAL -->
+        <div class="tab-content active" id="tab-geral">
+            <div class="panel-card">
+                <div class="panel-card-header">
+                    <h2 class="panel-card-title">Resumo do Sistema</h2>
+                </div>
+                <div class="req-grid" id="solicitacoesLista">
+                    <!-- Solicitações pendentes renderizadas aqui -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA: GESTÃO DE USUÁRIO -->
+        <div class="tab-content" id="tab-usuarios">
+            <div class="panel-card">
+                <div class="panel-card-header">
+                    <h2 class="panel-card-title">Contas DME</h2>
+                    <input type="text" class="g-input" id="usuariosSearch" placeholder="Buscar por nick ou email..."
+                        style="max-width:300px">
+                </div>
+                <div class="filter-container">
+                    <button class="filter-btn active" data-filter-usuario="todos">Todos</button>
+                    <button class="filter-btn" data-filter-usuario="ativo">Ativos</button>
+                    <button class="filter-btn" data-filter-usuario="pendente">Pendentes</button>
+                    <button class="filter-btn" data-filter-usuario="desativado">Desativados</button>
+                    <button class="filter-btn" data-filter-usuario="banido">Banidos</button>
+                </div>
+                <div class="usuarios-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Usuário</th>
+                                <th>E-mail</th>
+                                <th>Status</th>
+                                <th>Cargo/Patente</th>
+                                <th>Último IP</th>
+                                <th>Funções</th>
+                                <th>Registro</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usuariosTableBody"></tbody>
+                    </table>
+                </div>
+                <div id="usuariosEmpty" class="empty-state" style="display:none">
+                    <div class="empty-icon">👥</div>
+                    <div class="empty-text">Nenhum usuário encontrado com estes filtros.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA: MILITARES -->
+        <div class="tab-content" id="tab-militares">
+            <div class="panel-card">
+                <div class="panel-card-header">
+                    <h2 class="panel-card-title">Militares Cadastrados</h2>
+                    <input type="text" class="g-input" id="panelSearch" placeholder="Nome ou patente..."
+                        style="max-width:300px">
+                </div>
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Militar</th>
+                                <th>Patente / Cargo</th>
+                                <th>Corpo</th>
+                                <th>Admin</th>
+                                <th>Gerenciamento</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA: IPs -->
+        <div class="tab-content" id="tab-ips">
+            <div class="panel-card">
+                <div class="panel-card-header">
+                    <h2 class="panel-card-title">Monitoramento de Conexões</h2>
+                    <input type="text" class="g-input" id="ipsSearch" placeholder="IP ou Nickname..."
+                        style="max-width:300px">
+                </div>
+
+                <div class="ip-duplicado-alerta" id="ips-duplicados-alerta" style="display:none">
+                    <div class="ip-duplicado-icon">⚠️</div>
+                    <div class="ip-duplicado-info">
+                        <h4>Múltiplos Acessos Detectados</h4>
+                        <p>Os IPs abaixo foram utilizados por mais de uma conta no sistema.</p>
+                        <div class="ips-lista-duplos" id="ips-duplicados-lista"></div>
+                    </div>
+                </div>
+
+                <div class="ips-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Endereço IP / VPN</th>
+                                <th>Contas Utilizadas</th>
+                                <th>Último Acesso</th>
+                                <th>ISP / Rede</th>
+                                <th>Alerta</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ipsTableBody"></tbody>
+                    </table>
+                </div>
+                <div id="ipsEmpty" class="empty-state" style="display:none">
+                    <div class="empty-icon">🌐</div>
+                    <div class="empty-text">Nenhum registro de IP encontrado.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA: FUNÇÕES -->
+        <div class="tab-content" id="tab-funcoes">
+            <div class="panel-card">
+                <div class="panel-card-header">
+                    <h2 class="panel-card-title">Funções e Permissões</h2>
+                    <button class="btn-primary" id="btnNovaFuncao">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16">
+                            <path d="M12 5v14M5 12h14" />
+                        </svg>
+                        Nova Função
+                    </button>
+                </div>
+                <div class="funcoes-grid" id="funcoesLista">
+                    <!-- Funções renderizadas aqui -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA: HISTÓRICO -->
+        <div class="tab-content" id="tab-historico">
+            <div class="panel-card">
+                <div class="panel-card-header">
+                    <h2 class="panel-card-title">Log de Atividades</h2>
+                    <input type="text" class="g-input" id="historicoSearch" placeholder="Ação, usuário..."
+                        style="max-width:300px">
+                </div>
+                <div class="filter-container">
+                    <button class="filter-btn active" data-filter-historico="todos">Geral</button>
+                    <button class="filter-btn" data-filter-historico="usuarios">Usuários</button>
+                    <button class="filter-btn" data-filter-historico="militares">Painel</button>
+                    <button class="filter-btn" data-filter-historico="funcoes">Funções</button>
+                </div>
+                <div class="historico-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Data/Hora</th>
+                                <th>Responsável</th>
+                                <th>Cargo</th>
+                                <th>Ação</th>
+                                <th>Detalhes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historicoTableBody"></tbody>
+                    </table>
+                </div>
+                <div id="historicoEmpty" class="empty-state" style="display:none">
+                    <div class="empty-icon">📜</div>
+                    <div class="empty-text">Nenhuma atividade registrada.</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ══ MODAIS ════════════════════════════════════════ -->
+
+    <!-- Modal Função -->
+    <div class="modal-admin-wrap" id="funcaoModal">
+        <div class="modal-admin-content">
+            <div class="modal-admin-header">
+                <h3 id="modalFuncaoTitulo">Nova Função</h3>
+                <button class="sidebar-close" id="modalFuncaoClose">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20">
+                        <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-admin-body">
+                <input type="hidden" id="modalFuncaoId">
+                <div class="g-form-group">
+                    <label class="g-label">Nome da Função</label>
+                    <input type="text" class="g-input" id="modalFuncaoNome" placeholder="Ex: Gestor de Recursos">
+                </div>
+                <div class="g-form-group">
+                    <label class="g-label">Descrição (Opcional)</label>
+                    <textarea class="g-input" id="modalFuncaoDesc" style="min-height:80px; resize:vertical"
+                        placeholder="Descreva brevemente o propósito desta função..."></textarea>
+                </div>
+                <h4
+                    style="font-size:.75rem; text-transform:uppercase; color:var(--t3); margin:20px 0 12px; font-weight:800">
+                    Permissões de Acesso</h4>
+                <div class="perm-check-grid" id="modalFuncaoPermissoes"></div>
+            </div>
+            <div class="modal-admin-footer">
+                <button class="btn-secondary" id="modalFuncaoCancel">Cancelar</button>
+                <button class="btn-primary" id="modalFuncaoSalvar">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Atribuir Funções -->
+    <div class="modal-admin-wrap" id="modalAtribuirFuncoes">
+        <div class="modal-admin-content">
+            <div class="modal-admin-header">
+                <h3>Atribuir Funções</h3>
+                <button class="sidebar-close" id="modalAtribuirClose">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20">
+                        <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-admin-body">
+                <p id="modalAtribuirUser"
+                    style="font-weight:700; color:var(--green); margin-bottom:15px; font-size:.9rem"></p>
+                <div class="perm-check-grid" id="modalAtribuirCheckboxes"></div>
+            </div>
+            <div class="modal-admin-footer">
+                <button class="btn-secondary" id="modalAtribuirCancel">Cancelar</button>
+                <button class="btn-primary" id="modalAtribuirSalvar">Salvar Funções</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Cargo -->
+    <div class="modal-admin-wrap" id="modalEditarCargo">
+        <div class="modal-admin-content" style="max-width:400px">
+            <div class="modal-admin-header">
+                <h3>Definir Cargo</h3>
+                <button class="sidebar-close" id="modalEditarCargoClose">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20">
+                        <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-admin-body">
+                <p id="modalEditarCargoUser"
+                    style="font-weight:700; color:var(--green); margin-bottom:15px; font-size:.9rem"></p>
+                <div class="g-form-group">
+                    <label class="g-label">Novo Cargo / Patente</label>
+                    <input type="text" class="g-input" id="modalEditarCargoInput" placeholder="Ex: General de Divisão">
+                </div>
+            </div>
+            <div class="modal-admin-footer">
+                <button class="btn-secondary" id="modalEditarCargoCancel">Cancelar</button>
+                <button class="btn-primary" id="modalEditarCargoSalvar">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ SCRIPTS ════════════════════════════════════════ -->
+    <script src="../scripts/notificacoes.js"></script>
+    <script>
+        // Auth Guard
+        const username = localStorage.getItem('dme_username');
+        const adminsList = JSON.parse(localStorage.getItem('dme_admins')) || ["Xandelicado", "rafacv", "Ronaldo"];
+        const isAdmin = adminsList.includes(username);
+
+        if (!username) window.location.href = 'login.html';
+        if (!isAdmin) window.location.href = 'home.html';
+
+        function logout() { localStorage.removeItem('dme_username'); window.location.href = 'login.html'; }
+
+        // ── DEFINIÇÕES DE PERMISSÕES ──
+        const LISTA_PERMISSOES = [
+            { id: 'painel.geral', label: 'Ver Resumo Geral' },
+            { id: 'painel.usuarios', label: 'Gerir Usuários (Aprovar/Banir)' },
+            { id: 'painel.militares', label: 'Gerir Painel Militares' },
+            { id: 'painel.ips', label: 'Verificar IPs' },
+            { id: 'painel.funcoes', label: 'Gerir Funções/Cargos' },
+            { id: 'painel.historico', label: 'Ver Histórico Total' }
+        ];
+
+        function temPermissao(permId) {
+            if (isAdmin) return true;
+            const users = JSON.parse(localStorage.getItem('dme_users')) || [];
+            const me = users.find(u => (u.username || '').toString().toLowerCase() === username.toLowerCase());
+            if (!me || !me.funcoesIds) return false;
+            const funcoes = JSON.parse(localStorage.getItem('dme_funcoes')) || [];
+            const minhasFuncoes = funcoes.filter(f => me.funcoesIds.includes(f.id));
+            return minhasFuncoes.some(f => (f.permissoes || []).includes(permId));
+        }
+
+        function registrarAcao(acao, detalhes, categoria = 'outros') {
+            const hist = JSON.parse(localStorage.getItem('dme_historico_acoes')) || [];
+            const users = JSON.parse(localStorage.getItem('dme_users')) || [];
+            const me = users.find(u => (u.username || '').toLowerCase() === username.toLowerCase());
+            hist.unshift({
+                data: new Date().toLocaleString('pt-BR'),
+                usuario: username,
+                cargo: (me && me.cargo) || 'Admin',
+                acao,
+                detalhes,
+                categoria
+            });
+            localStorage.setItem('dme_historico_acoes', JSON.stringify(hist.slice(0, 1000)));
+        }
+
+        // ── LÓGICA DE ABAS ──
+        function mudarAba(id) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            const btn = document.querySelector(`.tab-btn[data-tab="${id}"]`);
+            const content = document.getElementById(`tab-${id}`);
+            if (btn) btn.classList.add('active');
+            if (content) content.classList.add('active');
+
+            if (id === 'usuarios') carregarUsuarios();
+            else if (id === 'militares') carregarPainel();
+            else if (id === 'ips') carregarAbaIps();
+            else if (id === 'funcoes') carregarFuncoes();
+            else if (id === 'historico') carregarHistorico();
+            else if (id === 'geral') carregarSolicitacoes();
+        }
+
+        function setFiltroUsuario(filtro) {
+            const btn = document.querySelector(`.filter-btn[data-filter-usuario="${filtro}"]`);
+            if (btn) btn.click();
+        }
+
+        // ── STATS ──
+        function atualizarStats() {
+            const users = JSON.parse(localStorage.getItem('dme_users')) || [];
+            const milit = JSON.parse(localStorage.getItem('dme_militar')) || [];
+            const empir = JSON.parse(localStorage.getItem('dme_empresarial')) || [];
+            const hist = JSON.parse(localStorage.getItem('dme_historico_acoes')) || [];
+
+            const pendentes = users.filter(u => u.status === 'pendente').length;
+
+            document.getElementById('stat-total-usuarios').textContent = users.length;
+            document.getElementById('stat-usuarios-pendentes').textContent = pendentes;
+            document.getElementById('stat-militares-ativos').textContent = milit.length + empir.length;
+            document.getElementById('stat-acoes-dia').textContent = hist.filter(h => h.data.startsWith(new Date().toLocaleDateString('pt-BR'))).length;
+
+            const badge = document.getElementById('badge-pendentes');
+            if (pendentes > 0) {
+                badge.textContent = pendentes;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // ── ABA GERAL (Solicitações) ──
+        function carregarSolicitacoes() {
+            const list = document.getElementById('solicitacoesLista');
+            if (!list) return;
+            const users = JSON.parse(localStorage.getItem('dme_users')) || [];
+            const pendentes = users.filter(u => u.status === 'pendente');
+
+            if (pendentes.length === 0) {
+                list.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--t3)">Nenhuma solicitação pendente no momento.</div>`;
+                return;
+            }
+
+            list.innerHTML = pendentes.map(u => `
+                <div class="req-card">
+                    <div class="req-card-top">
+                        <span class="badge-status pendente">Novo Cadastro</span>
+                        <span class="req-data">${u.registradoEm || '-'}</span>
+                    </div>
+                    <div class="req-card-body">
+                        <h4 class="user-cell-name">${(u.username || '').replace(/</g, '&lt;')}</h4>
+                        <p style="font-size:.8rem;color:var(--t2);margin-bottom:15px">${(u.email || '').replace(/</g, '&lt;')}</p>
+                        <div class="req-info-box">
+                            <div class="req-info-label">Cargo Pretendido</div>
+                            <div class="req-info-value">${(u.cargo || 'Militar').replace(/</g, '&lt;')}</div>
+                        </div>
+                        <div style="display:flex;gap:10px">
+                            <button class="btn-primary" style="flex:1" onclick="aprovarUsuario('${(u.username || '').replace(/'/g, "\\'")}')">Aprovar</button>
+                            <button class="btn-secondary" style="flex:1;background:#ef4444;color:white;border:none" onclick="recusarUsuario('${(u.username || '').replace(/'/g, "\\'")}')">Recusar</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ── ABA GESTÃO DE USUÁRIO ──
+        let filtroUsuarioAtual = 'todos';
+        function getUsuariosFiltrados() {
+            const usuarios = JSON.parse(localStorage.getItem('dme_users')) || [];
+            const termo = (document.getElementById('usuariosSearch') && document.getElementById('usuariosSearch').value || '').toLowerCase().trim();
+            let lista = usuarios;
+            if (filtroUsuarioAtual !== 'todos') lista = usuarios.filter(u => (u.status || 'ativo').toLowerCase() === filtroUsuarioAtual);
+            if (termo) lista = lista.filter(u => (u.username || '').toLowerCase().includes(termo) || (u.email || '').toLowerCase().includes(termo));
+            return lista;
+        }
+
+        function atualizarStatusUsuario(username, novoStatus) {
+            const users = JSON.parse(localStorage.getItem('dme_users')) || [];
+            const idx = users.findIndex(u => (u.username || '').toString().toLowerCase() === username.toLowerCase());
+            if (idx === -1) return false;
+            users[idx].status = novoStatus;
+            users[idx].ultimaAlteracao = new Date().toLocaleString('pt-BR');
+            localStorage.setItem('dme_users', JSON.stringify(users));
+            return true;
+        }
+
+        function aprovarUsuario(u) {
+            if (!confirm(`Aprovar cadastro de "${u}"?`)) return;
+            if (atualizarStatusUsuario(u, 'ativo')) {
+                registrarAcao('Aprovação de cadastro', `Conta "${u}" aprovada.`, 'usuarios');
+                atualizarStats(); carregarUsuarios(); carregarSolicitacoes();
+            }
+        }
+
+        function recusarUsuario(u) {
+            if (!confirm(`Recusar cadastro de "${u}"?`)) return;
+            if (atualizarStatusUsuario(u, 'desativado')) {
+                registrarAcao('Recusa de cadastro', `Cadastro de "${u}" recusado.`, 'usuarios');
+                atualizarStats(); carregarUsuarios(); carregarSolicitacoes();
+            }
+        }
+
+        function desativarUsuario(u) {
+            if (!confirm(`Desativar conta de "${u}"?`)) return;
+            if (atualizarStatusUsuario(u, 'desativado')) { registrarAcao('Desativação', `Conta "${u}" desativada.`, 'usuarios'); atualizarStats(); carregarUsuarios(); }
+        }
+
+        function reativarUsuario(u) {
+            if (!confirm(`Reativar conta de "${u}"?`)) return;
+            if (atualizarStatusUsuario(u, 'ativo')) { registrarAcao('Reativação', `Conta "${u}" reativada.`, 'usuarios'); atualizarStats(); carregarUsuarios(); }
+        }
+
+        function banirUsuario(u) {
+            if (!confirm(`Banir conta de "${u}"?`)) return;
+            if (atualizarStatusUsuario(u, 'banido')) { registrarAcao('Banimento', `Conta "${u}" banida.`, 'usuarios'); atualizarStats(); carregarUsuarios(); }
+        }
+
+        function carregarUsuarios() {
+            const tbody = document.getElementById('usuariosTableBody');
+            const lista = getUsuariosFiltrados();
+            const avatarBase = 'https://www.habbo.com.br/habbo-imaging/avatarimage?user=';
+            const statusLabels = { ativo: 'Ativado', pendente: 'Pendente', desativado: 'Desativado', banido: 'Banido' };
+
+            document.getElementById('usuariosEmpty').style.display = lista.length === 0 ? 'block' : 'none';
+            document.querySelector('.usuarios-table-wrap').style.display = lista.length === 0 ? 'none' : 'block';
+
+            const funcoesList = JSON.parse(localStorage.getItem('dme_funcoes')) || [];
+            const logIp = JSON.parse(localStorage.getItem('dme_login_log')) || [];
+
+            tbody.innerHTML = lista.map(u => {
+                const nick = (u.username || '').toString();
+                const status = (u.status || 'ativo').toLowerCase();
+                const userFuncoesNames = (u.funcoesIds || []).map(fid => funcoesList.find(f => f.id === fid)).filter(Boolean).map(f => f.nome);
+                const funcoesCell = userFuncoesNames.map(n => `<span class="badge-status ativo" style="margin-right:4px">${n}</span>`).join('');
+
+                let botoes = '';
+                if (status === 'pendente') botoes = `<button class="btn-user-action btn-user-approve" data-action="aprovar" data-user="${nick}">Aprovar</button><button class="btn-user-action btn-user-reject" data-action="recusar" data-user="${nick}">Recusar</button>`;
+                else if (status === 'ativo') botoes = `<button class="btn-user-action btn-user-deactivate" data-action="desativar" data-user="${nick}">Desativar</button><button class="btn-user-action btn-user-ban" data-action="banir" data-user="${nick}">Banir</button>`;
+                else if (status === 'desativado') botoes = `<button class="btn-user-action btn-user-reactivate" data-action="reativar" data-user="${nick}">Reativar</button><button class="btn-user-action btn-user-ban" data-action="banir" data-user="${nick}">Banir</button>`;
+                else if (status === 'banido') botoes = `<button class="btn-user-action btn-user-reactivate" data-action="reativar" data-user="${nick}">Reativar</button>`;
+
+                return `<tr>
+                    <td><div class="user-cell"><img class="user-cell-avatar" src="${avatarBase}${nick}&headonly=1" alt=""><strong>${nick}</strong></div></td>
+                    <td>${u.email || '-'}</td>
+                    <td><span class="badge-status ${status}">${statusLabels[status] || status}</span></td>
+                    <td>${u.cargo || '-'} <button class="btn-user-action" onclick="abrirModalEditarCargo('${nick}')">✎</button></td>
+                    <td>${u.lastLoginIp || '-'}</td>
+                    <td>${funcoesCell} <button class="btn-user-action" onclick="abrirModalAtribuirFuncoes('${nick}')">+</button></td>
+                    <td>${u.registradoEm || '-'}</td>
+                    <td>${botoes}</td>
+                </tr>`;
+            }).join('');
+
+            tbody.querySelectorAll('[data-action][data-user]').forEach(btn => {
+                btn.onclick = function () {
+                    const u = this.getAttribute('data-user');
+                    const a = this.getAttribute('data-action');
+                    if (a === 'aprovar') aprovarUsuario(u);
+                    else if (a === 'recusar') recusarUsuario(u);
+                    else if (a === 'desativar') desativarUsuario(u);
+                    else if (a === 'reativar') reativarUsuario(u);
+                    else if (a === 'banir') banirUsuario(u);
+                };
+            });
+        }
+
+        // Search inputs
+        document.getElementById('usuariosSearch').oninput = carregarUsuarios;
+
+        // ── ABA IPs ──
+        function carregarAbaIps() {
+            const termo = document.getElementById('ipsSearch').value.toLowerCase().trim();
+            const log = JSON.parse(localStorage.getItem('dme_login_log')) || [];
+            const porIp = {};
+            log.forEach(e => {
+                if (!porIp[e.ip]) porIp[e.ip] = { users: new Set(), last: '', isVpn: false, isp: 'Desconhecido' };
+                porIp[e.ip].users.add(e.username);
+                if (e.isVpn) porIp[e.ip].isVpn = true;
+                if (e.isp) porIp[e.ip].isp = e.isp;
+                if (e.date > porIp[e.ip].last) porIp[e.ip].last = e.date;
+            });
+
+            let entries = Object.entries(porIp).map(([ip, d]) => ({
+                ip,
+                users: Array.from(d.users),
+                last: d.last,
+                isVpn: d.isVpn,
+                isp: d.isp
+            }));
+
+            if (termo) entries = entries.filter(e => e.ip.includes(termo) || e.users.some(u => u.toLowerCase().includes(termo)));
+
+            const duplos = entries.filter(e => e.users.length > 1);
+            const alerta = document.getElementById('ips-duplicados-alerta');
+            if (duplos.length > 0) {
+                alerta.style.display = 'flex';
+                document.getElementById('ips-duplicados-lista').innerHTML = duplos.map(d => `
+                    <div class="ip-duplicado-item">
+                        <div class="ip-val">${d.ip} ${d.isVpn ? '<span class="badge-vpn-mini">VPN</span>' : ''}</div>
+                        <div class="ip-contas">${d.users.map(u => `<span>${u}</span>`).join('')}</div>
+                    </div>
+                `).join('');
+            } else alerta.style.display = 'none';
+
+            document.getElementById('ipsTableBody').innerHTML = entries.map(e => `
+                <tr>
+                    <td>
+                        <strong>${e.ip}</strong>
+                        ${e.isVpn ? '<br><span class="badge-status banido" style="font-size:10px; padding:2px 6px">VPN/PROXY</span>' : ''}
+                    <td><div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center">${e.users.map(u => `<span style="background:rgba(255,255,255,.05);padding:2px 6px;border-radius:4px;font-size:12px;border:1px solid var(--b2)">${u}</span>`).join('')}</div></td>
+                    <td><span style="font-size:12px; color:var(--t2)">${e.isp}</span></td>
+                    <td>
+                        ${e.users.length > 1 ? '<span class="badge-status desativado">Multicontas</span>' : ''}
+                        ${e.isVpn ? '<span class="badge-status pendente">Proxy</span>' : ''}
+                        ${(e.users.length === 1 && !e.isVpn) ? '<span class="badge-status ativo">Seguro</span>' : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+        document.getElementById('ipsSearch').oninput = carregarAbaIps;
+
+        // ── ABA FUNÇÕES ──
+        function carregarFuncoes() {
+            const list = document.getElementById('funcoesLista');
+            const funcoes = JSON.parse(localStorage.getItem('dme_funcoes')) || [];
+            if (funcoes.length === 0) { list.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--t3)">Nenhum cargo customizado criado.</div>`; return; }
+            list.innerHTML = funcoes.map(f => {
+                const perms = (f.permissoes || []).map(pid => LISTA_PERMISSOES.find(p => p.id === pid)).filter(Boolean).map(p => p.label);
+                return `<div class="funcao-card">
+                    <div>
+                        <h4>${f.nome}</h4>
+                        <p>${f.descricao || 'Sem descrição'}</p>
+                        <div class="funcao-card-badges">${perms.map(p => `<span>${p}</span>`).join('')}</div>
+                    </div>
+                    <div style="margin-top:20px;display:flex;gap:8px">
+                        <button class="btn-secondary" style="flex:1" onclick="abrirModalFuncao('${f.id}')">Editar</button>
+                        <button class="btn-secondary" style="flex:1;background:rgba(239,68,68,.1);color:#ef4444;border-color:#ef4444" onclick="excluirFuncao('${f.id}')">Excluir</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function abrirModalFuncao(id) {
+            const modal = document.getElementById('funcaoModal');
+            document.getElementById('modalFuncaoId').value = id || '';
+            document.getElementById('modalFuncaoNome').value = '';
+            document.getElementById('modalFuncaoDesc').value = '';
+            const f = id ? (JSON.parse(localStorage.getItem('dme_funcoes')) || []).find(x => x.id === id) : null;
+            if (f) {
+                document.getElementById('modalFuncaoTitulo').textContent = 'Editar Função';
+                document.getElementById('modalFuncaoNome').value = f.nome;
+                document.getElementById('modalFuncaoDesc').value = f.descricao || '';
+            } else {
+                document.getElementById('modalFuncaoTitulo').textContent = 'Nova Função';
+            }
+            document.getElementById('modalFuncaoPermissoes').innerHTML = LISTA_PERMISSOES.map(p => `<label class="perm-check"><input type="checkbox" data-perm="${p.id}" ${f && (f.permissoes || []).includes(p.id) ? 'checked' : ''}> ${p.label}</label>`).join('');
+            modal.style.display = 'flex';
+        }
+
+        function salvarFuncaoModal() {
+            const id = document.getElementById('modalFuncaoId').value;
+            const nome = document.getElementById('modalFuncaoNome').value.trim();
+            const desc = document.getElementById('modalFuncaoDesc').value.trim();
+            if (!nome) return alert('Nome é obrigatório');
+            const perms = Array.from(document.querySelectorAll('#modalFuncaoPermissoes input:checked')).map(cb => cb.getAttribute('data-perm'));
+            let list = JSON.parse(localStorage.getItem('dme_funcoes')) || [];
+            if (id) {
+                const idx = list.findIndex(x => x.id === id);
+                list[idx] = { ...list[idx], nome, descricao: desc, permissoes: perms };
+            } else {
+                list.push({ id: Date.now().toString(36), nome, descricao: desc, permissoes: perms });
+            }
+            localStorage.setItem('dme_funcoes', JSON.stringify(list));
+            document.getElementById('funcaoModal').style.display = 'none';
+            carregarFuncoes();
+        }
+
+        function excluirFuncao(id) {
+            if (!confirm('Deseja excluir esta função? Usuários associados perderão estas permissões.')) return;
+            let list = JSON.parse(localStorage.getItem('dme_funcoes')) || [];
+            localStorage.setItem('dme_funcoes', JSON.stringify(list.filter(x => x.id !== id)));
+            carregarFuncoes();
+        }
+
+        // ── ABA MILITARES ──
+        function carregarPainel() {
+            const m = JSON.parse(localStorage.getItem('dme_militar')) || [];
+            const e = JSON.parse(localStorage.getItem('dme_empresarial')) || [];
+            const admins = JSON.parse(localStorage.getItem('dme_admins')) || [];
+            const todos = [...m.map(x => ({ ...x, corpo: 'Militar' })), ...e.map(x => ({ ...x, corpo: 'Empresarial' }))];
+
+            document.getElementById('adminTableBody').innerHTML = todos.map(x => `<tr>
+                <td><strong>${x.nick}</strong></td>
+                <td>${x.patente}</td>
+                <td><span class="badge-status ${x.corpo === 'Militar' ? 'ativo' : 'pendente'}">${x.corpo}</span></td>
+                <td>${admins.includes(x.nick) ? '<span class="badge-status banido">Admin</span>' : '-'}</td>
+                <td>
+                    <button class="btn-user-action" onclick="editarMilitar('${x.nick}', '${x.corpo}')">✎</button>
+                    <button class="btn-user-action" style="color:#ef4444" onclick="apagarMilitar('${x.nick}', '${x.corpo}')">🗑</button>
+                    <button class="btn-user-action" onclick="toggleAdmin('${x.nick}')">${admins.includes(x.nick) ? 'Remover Admin' : 'Dar Admin'}</button>
+                </td>
+            </tr>`).join('');
+        }
+
+        function editarMilitar(nick, corpo) {
+            const nova = prompt('Nova patente para ' + nick);
+            if (!nova) return;
+            const key = corpo === 'Militar' ? 'dme_militar' : 'dme_empresarial';
+            let list = JSON.parse(localStorage.getItem(key)) || [];
+            const idx = list.findIndex(x => x.nick === nick);
+            if (idx !== -1) { list[idx].patente = nova; localStorage.setItem(key, JSON.stringify(list)); carregarPainel(); }
+        }
+
+        function apagarMilitar(nick, corpo) {
+            if (!confirm('Apagar ' + nick + '?')) return;
+            const key = corpo === 'Militar' ? 'dme_militar' : 'dme_empresarial';
+            let list = JSON.parse(localStorage.getItem(key)) || [];
+            localStorage.setItem(key, JSON.stringify(list.filter(x => x.nick !== nick)));
+            carregarPainel(); atualizarStats();
+        }
+
+        function toggleAdmin(nick) {
+            let admins = JSON.parse(localStorage.getItem('dme_admins')) || [];
+            if (admins.includes(nick)) {
+                if (admins.length === 1) return alert('O sistema precisa de ao menos um admin');
+                admins = admins.filter(a => a !== nick);
+            } else admins.push(nick);
+            localStorage.setItem('dme_admins', JSON.stringify(admins));
+            carregarPainel();
+        }
+
+        // ── ABA HISTÓRICO ──
+        let filtroHistoricoAtual = 'todos';
+        function carregarHistorico() {
+            const termo = document.getElementById('historicoSearch').value.toLowerCase().trim();
+            let hist = JSON.parse(localStorage.getItem('dme_historico_acoes')) || [];
+            if (filtroHistoricoAtual !== 'todos') hist = hist.filter(h => h.categoria === filtroHistoricoAtual);
+            if (termo) hist = hist.filter(h => h.usuario.toLowerCase().includes(termo) || h.acao.toLowerCase().includes(termo));
+
+            document.getElementById('historicoTableBody').innerHTML = hist.slice(0, 200).map(h => `<tr>
+                <td style="white-space:nowrap">${h.data}</td>
+                <td><strong>${h.usuario}</strong></td>
+                <td><span class="badge-status desativado" style="font-size:.6rem">${h.cargo}</span></td>
+                <td><span class="badge-status ativo">${h.acao}</span></td>
+                <td style="font-size:.8rem;color:var(--t2)">${h.detalhes}</td>
+            </tr>`).join('');
+        }
+
+        // Modais helper logic
+        let currentModalUser = '';
+        function abrirModalAtribuirFuncoes(nick) {
+            currentModalUser = nick;
+            const users = JSON.parse(localStorage.getItem('dme_users')) || [];
+            const me = users.find(u => (u.username || '').toLowerCase() === nick.toLowerCase());
+            const myIds = (me && me.funcoesIds) || [];
+            const funcoes = JSON.parse(localStorage.getItem('dme_funcoes')) || [];
+            document.getElementById('modalAtribuirUser').textContent = 'Militar: ' + nick;
+            document.getElementById('modalAtribuirCheckboxes').innerHTML = funcoes.map(f => `<label class="perm-check"><input type="checkbox" data-id="${f.id}" ${myIds.includes(f.id) ? 'checked' : ''}> ${f.nome}</label>`).join('');
+            document.getElementById('modalAtribuirFuncoes').style.display = 'flex';
+        }
+        function salvarAtribuirFuncoes() {
+            const ids = Array.from(document.querySelectorAll('#modalAtribuirCheckboxes input:checked')).map(cb => cb.getAttribute('data-id'));
+            let users = JSON.parse(localStorage.getItem('dme_users')) || [];
+            const idx = users.findIndex(u => (u.username || '').toLowerCase() === currentModalUser.toLowerCase());
+            if (idx !== -1) { users[idx].funcoesIds = ids; localStorage.setItem('dme_users', JSON.stringify(users)); }
+            document.getElementById('modalAtribuirFuncoes').style.display = 'none';
+            carregarUsuarios();
+        }
+        function abrirModalEditarCargo(nick) {
+            currentModalUser = nick;
+            const users = JSON.parse(localStorage.getItem('dme_users')) || [];
+            const me = users.find(u => (u.username || '').toLowerCase() === nick.toLowerCase());
+            document.getElementById('modalEditarCargoUser').textContent = 'Militar: ' + nick;
+            document.getElementById('modalEditarCargoInput').value = (me && me.cargo) || '';
+            document.getElementById('modalEditarCargo').style.display = 'flex';
+        }
+        function salvarCargoUsuario() {
+            const cargo = document.getElementById('modalEditarCargoInput').value.trim();
+            let users = JSON.parse(localStorage.getItem('dme_users')) || [];
+            const idx = users.findIndex(u => (u.username || '').toLowerCase() === currentModalUser.toLowerCase());
+            if (idx !== -1) { users[idx].cargo = cargo; localStorage.setItem('dme_users', JSON.stringify(users)); }
+            document.getElementById('modalEditarCargo').style.display = 'none';
+            carregarUsuarios();
+        }
+
+        // INIT UI
+        document.addEventListener('DOMContentLoaded', () => {
+            // Navbar data
+            document.getElementById('navUserName').textContent = username;
+            document.getElementById('dropdownName').textContent = username;
+            document.getElementById('navUserImage').src = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${username}&headonly=1&size=m&gesture=std&head_direction=2`;
+            document.getElementById('dropdownUserImage').src = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${username}&size=m&direction=2&head_direction=2&gesture=std`;
+
+            // Menu interactions
+            const userProfileBtn = document.getElementById('userProfileBtn');
+            const userDropdown = document.getElementById('userDropdown');
+            userProfileBtn.onclick = (e) => { e.stopPropagation(); userDropdown.classList.toggle('active'); };
+            document.onclick = () => userDropdown.classList.remove('active');
+
+            const hamburger = document.getElementById('hamburger');
+            const mobileSidebar = document.getElementById('mobileSidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const sidebarClose = document.getElementById('sidebarClose');
+            const toggleSidebar = () => { mobileSidebar.classList.toggle('active'); sidebarOverlay.classList.toggle('active'); };
+            hamburger.onclick = toggleSidebar;
+            sidebarClose.onclick = toggleSidebar;
+            sidebarOverlay.onclick = toggleSidebar;
+
+            // Tab Buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.onclick = () => mudarAba(btn.getAttribute('data-tab'));
+            });
+
+            // Filters
+            document.querySelectorAll('.filter-btn[data-filter-usuario]').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('.filter-btn[data-filter-usuario]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    filtroUsuarioAtual = btn.getAttribute('data-filter-usuario');
+                    carregarUsuarios();
+                };
+            });
+            document.querySelectorAll('.filter-btn[data-filter-historico]').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('.filter-btn[data-filter-historico]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    filtroHistoricoAtual = btn.getAttribute('data-filter-historico');
+                    carregarHistorico();
+                };
+            });
+
+            // Modals Close
+            document.getElementById('modalFuncaoClose').onclick = () => document.getElementById('funcaoModal').style.display = 'none';
+            document.getElementById('modalFuncaoCancel').onclick = () => document.getElementById('funcaoModal').style.display = 'none';
+            document.getElementById('modalFuncaoSalvar').onclick = salvarFuncaoModal;
+            document.getElementById('btnNovaFuncao').onclick = () => abrirModalFuncao('');
+
+            document.getElementById('modalAtribuirClose').onclick = () => document.getElementById('modalAtribuirFuncoes').style.display = 'none';
+            document.getElementById('modalAtribuirCancel').onclick = () => document.getElementById('modalAtribuirFuncoes').style.display = 'none';
+            document.getElementById('modalAtribuirSalvar').onclick = salvarAtribuirFuncoes;
+
+            document.getElementById('modalEditarCargoClose').onclick = () => document.getElementById('modalEditarCargo').style.display = 'none';
+            document.getElementById('modalEditarCargoCancel').onclick = () => document.getElementById('modalEditarCargo').style.display = 'none';
+            document.getElementById('modalEditarCargoSalvar').onclick = salvarCargoUsuario;
+
+            // Load initial data
+            atualizarStats();
+            carregarSolicitacoes();
+        });
+    </script>
+</body>
+
+</html>

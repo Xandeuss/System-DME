@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DME System | Acesso</title>
+    <link rel="stylesheet" href="../styles/global.css">
+    <link rel="stylesheet" href="../styles/login.css">
+</head>
+
+<body>
+
+    <div class="auth-card">
+
+        <!-- BRAND -->
+        <div class="auth-brand">
+            <div class="auth-logo-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+            </div>
+            <div class="auth-brand-name">DME<em>System</em></div>
+            <div class="auth-brand-sub">Sistema de Gestão Militar</div>
+        </div>
+
+        <!-- ── SEÇÃO: LOGIN ────────────────────────────── -->
+        <div id="loginSection">
+            <div class="auth-header">
+                <div class="auth-title">Acessar conta</div>
+                <div class="auth-sub">Bem-vindo de volta, soldado.</div>
+            </div>
+
+            <form id="loginForm" novalidate>
+                <div class="field">
+                    <label class="field-label" for="loginUsername">Nome de Usuário</label>
+                    <input type="text" id="loginUsername" class="field-input" placeholder="Seu nickname no Habbo"
+                        autocomplete="username" required>
+                    <div class="field-error" id="err-loginUsername"></div>
+                </div>
+
+                <div class="field">
+                    <label class="field-label" for="loginPassword">Senha</label>
+                    <input type="password" id="loginPassword" class="field-input" placeholder="Sua senha"
+                        autocomplete="current-password" required>
+                    <div class="field-error" id="err-loginPassword"></div>
+                </div>
+
+                <button type="submit" class="btn-auth" id="loginBtn">
+                    <span class="btn-text">Entrar</span>
+                    <div class="spinner"></div>
+                </button>
+            </form>
+
+            <div class="auth-sep">ou</div>
+
+            <div class="auth-link-row">
+                Novo por aqui? <a onclick="toggleForm('register')">Criar conta</a>
+            </div>
+        </div>
+
+        <!-- ── SEÇÃO: REGISTRO ────────────────────────── -->
+        <div id="registerSection" style="display:none">
+            <div class="auth-header">
+                <div class="auth-title">Criar uma conta</div>
+                <div class="auth-sub">Junte-se ao DME System.</div>
+            </div>
+
+            <form id="registerForm" novalidate>
+                <div class="field">
+                    <label class="field-label" for="username">Nome de Usuário</label>
+                    <input type="text" id="username" class="field-input" placeholder="Seu nickname exato do Habbo"
+                        autocomplete="username" required>
+                    <div class="field-error" id="username-error"></div>
+                </div>
+
+                <div class="field">
+                    <label class="field-label" for="email">E-mail</label>
+                    <input type="email" id="email" class="field-input" placeholder="Seu e-mail de contato"
+                        autocomplete="email" required>
+                    <div class="field-error" id="email-error"></div>
+                </div>
+
+                <div class="field">
+                    <label class="field-label" for="password">Senha</label>
+                    <input type="password" id="password" class="field-input" placeholder="Mínimo 6 caracteres"
+                        autocomplete="new-password" required>
+                    <div class="field-error" id="password-error"></div>
+                </div>
+
+                <div class="check-group">
+                    <input type="checkbox" id="terms" class="check-input" required>
+                    <label for="terms" class="check-label">
+                        Aceito os <a href="#">Termos de Serviço</a>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-auth" id="submitBtn">
+                    <span class="btn-text">Avançar para Verificação</span>
+                    <div class="spinner"></div>
+                </button>
+            </form>
+
+            <div class="auth-sep">ou</div>
+
+            <div class="auth-link-row">
+                Já possui uma conta? <a onclick="toggleForm('login')">Entrar</a>
+            </div>
+        </div>
+
+        <!-- Avatares decorativos -->
+        <div class="auth-avatars">
+            <div class="avatar-slot">
+                <div class="avatar-img-wrap">
+                    <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Leticinha-_-&direction=4&head_direction=4&size=l&action=wav"
+                        alt="Leticinha-_-" loading="lazy">
+                </div>
+                <span class="avatar-nick">Leticinha-_-</span>
+            </div>
+            <div class="avatar-slot">
+                <div class="avatar-img-wrap">
+                    <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Jodie-Foster&direction=3&head_direction=3&size=l"
+                        alt="Jodie-Foster" loading="lazy">
+                </div>
+                <span class="avatar-nick">Jodie-Foster</span>
+            </div>
+            <div class="avatar-slot">
+                <div class="avatar-img-wrap">
+                    <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=rafacv&direction=2&head_direction=2&size=l"
+                        alt="rafacv" loading="lazy">
+                </div>
+                <span class="avatar-nick">rafacv</span>
+            </div>
+            <div class="avatar-slot">
+                <div class="avatar-img-wrap">
+                    <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Horcrux-&direction=4&head_direction=4&size=l&action=wav"
+                        alt="Horcrux-" loading="lazy">
+                </div>
+                <span class="avatar-nick">Horcrux-</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script src="../scripts/login.js"></script>
+</body>
+
+</html>

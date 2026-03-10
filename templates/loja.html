@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja de Recompensas — DME System</title>
+    <link rel="stylesheet" href="../styles/global.css">
+    <link rel="stylesheet" href="../styles/loja.css">
+    <script src="../scripts/theme.js"></script>
+</head>
+
+<body>
+
+    <!-- ══ SIDEBAR ══════════════════════════════════════ -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="mobile-sidebar" id="mobileSidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-title">DME System</span>
+            <button class="sidebar-close" id="sidebarClose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Principal</div>
+            <a href="home.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+                Página Inicial
+            </a>
+            <a href="listagens.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="8" y1="6" x2="21" y2="6" />
+                    <line x1="8" y1="12" x2="21" y2="12" />
+                    <line x1="8" y1="18" x2="21" y2="18" />
+                    <line x1="3" y1="6" x2="3.01" y2="6" />
+                    <line x1="3" y1="12" x2="3.01" y2="12" />
+                    <line x1="3" y1="18" x2="3.01" y2="18" />
+                </svg>
+                Listagens
+            </a>
+            <a href="requerimentos.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                </svg>
+                Requerimentos
+            </a>
+            <a href="sabatina.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                </svg>
+                Sabatina
+            </a>
+            <a href="consulta_promocao.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                    <polyline points="16 7 22 7 22 13" />
+                </svg>
+                Consultar Promoção
+            </a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Ferramentas</div>
+            <a href="ponto_servico.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                </svg>
+                Ponto de Serviço
+            </a>
+            <a href="loja.html" class="sidebar-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <path d="M16 10a4 4 0 0 1-8 0" />
+                </svg>
+                Loja
+            </a>
+            <a href="documentos.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                </svg>
+                Documentos
+            </a>
+            <a href="centro_tarefas_orgaos.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 10v11M16 10v11M12 10v11" />
+                </svg>
+                Centros e Órgãos
+            </a>
+            <a href="recrutamentos.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                Recrutamentos
+            </a>
+            <a href="ouvidoria.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                Ouvidoria
+            </a>
+            <a href="setor_legislativo.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m18 16 4-4-4-4" />
+                    <path d="m6 8-4 4 4 4" />
+                    <path d="m14.5 4-5 16" />
+                </svg>
+                Setor Legislativo
+            </a>
+            <a href="postar_aula.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:6px;flex-shrink:0"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                Postar Aula
+            </a>
+        </div>
+    </div>
+
+
+    <!-- ══ NAVBAR ════════════════════════════════════════ -->
+    <nav class="navbar">
+        <div class="logo-section">
+            <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+            <div class="logo-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+            </div>
+            <div class="logo-text">DME<em>System</em></div>
+        </div>
+        <div class="nav-links">
+            <a href="home.html" class="nav-link">Home</a>
+            <a href="listagens.html" class="nav-link">Listagens</a>
+            <a href="requerimentos.html" class="nav-link">Requerimentos</a>
+            <a href="loja.html" class="nav-link active">Loja</a>
+        </div>
+        <div class="user-profile" id="userProfileBtn">
+            <div class="user-avatar"><img id="navUserImage" src="" alt=""></div>
+            <span class="user-name" id="navUserName">Usuário</span>
+            <div class="user-dropdown" id="userDropdown">
+                <div class="dropdown-header">
+                    <div class="dropdown-user-info">
+                        <div class="dropdown-avatar" id="dropdownAvatar"><img id="dropdownUserImage" src="" alt="">
+                        </div>
+                        <div class="dropdown-user-details">
+                            <h4 id="dropdownName">Usuário</h4>
+                            <p id="dropdownCargo">Militar DME</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown-menu">
+                    <a href="painel.html" class="dropdown-item" id="dropdownPainel" style="display:none">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7" />
+                            <rect x="14" y="3" width="7" height="7" />
+                            <rect x="14" y="14" width="7" height="7" />
+                            <rect x="3" y="14" width="7" height="7" />
+                        </svg>
+                        Painel Admin
+                    </a>
+                    <a onclick="toggleTheme()" class="dropdown-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5" />
+                            <line x1="12" y1="1" x2="12" y2="3" />
+                            <line x1="12" y1="21" x2="12" y2="23" />
+                        </svg>
+                        <span id="themeText">Modo Claro</span>
+                    </a>
+                    <div class="dropdown-divider" id="dropdownDivider" style="display:none"></div>
+                    <a onclick="logout()" class="dropdown-item danger">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                        Sair
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ══ CONTEÚDO ════════════════════════════════════ -->
+    <main class="main-content">
+        <div class="page-container">
+
+            <!-- HEADER COM SALDO -->
+            <div class="shop-hero">
+                <div class="shop-hero-info">
+                    <div class="shop-hero-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                            <line x1="3" y1="6" x2="21" y2="6" />
+                            <path d="M16 10a4 4 0 0 1-8 0" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="shop-hero-title">Loja de Recompensas</h1>
+                        <p class="shop-hero-sub">Troque suas dragonas por recompensas exclusivas</p>
+                    </div>
+                </div>
+                <div class="saldo-card">
+                    <div class="saldo-label">Seu Saldo</div>
+                    <div class="saldo-value" id="saldoDragonas">0</div>
+                    <div class="saldo-currency">dragonas</div>
+                </div>
+            </div>
+
+            <!-- PAINEL ADMIN -->
+            <div class="admin-panel" id="adminPanel" style="display:none">
+                <div class="admin-header">
+                    <h2 class="admin-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3" />
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" />
+                        </svg>
+                        Painel Administrativo
+                    </h2>
+                    <button class="btn-primary" id="btnNovaCategoria">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 5v14M5 12h14" />
+                        </svg>
+                        Nova Categoria
+                    </button>
+                </div>
+            </div>
+
+            <!-- CATÁLOGO -->
+            <div id="catalogoContainer"></div>
+
+            <!-- HISTÓRICO -->
+            <div class="historico-section">
+                <h2 class="section-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                    Meu Histórico de Compras
+                </h2>
+                <div class="historico-list" id="historicoList">
+                    <div class="g-empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="9" cy="21" r="1" />
+                            <circle cx="20" cy="21" r="1" />
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                        </svg>
+                        <p>Você ainda não realizou nenhuma compra</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ══ MODAL NOVA CATEGORIA ═════════════════════════ -->
+    <div class="g-modal-backdrop" id="modalCategoria">
+        <div class="g-modal">
+            <div class="g-modal-head">
+                <span class="g-modal-title">Nova Categoria</span>
+                <button class="g-modal-close" onclick="fecharModal('modalCategoria')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="g-modal-body">
+                <div class="g-form-group">
+                    <label class="g-label">Nome da Categoria</label>
+                    <input type="text" class="g-input" id="inputNomeCategoria" placeholder="Ex: Benefícios">
+                </div>
+                <div class="g-form-group">
+                    <label class="g-label">Ícone (emoji)</label>
+                    <input type="text" class="g-input" id="inputIconeCategoria" placeholder="🎁" maxlength="2">
+                </div>
+            </div>
+            <div class="g-modal-actions">
+                <button class="btn-secondary" onclick="fecharModal('modalCategoria')">Cancelar</button>
+                <button class="btn-primary" onclick="salvarCategoria()">Criar Categoria</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ MODAL NOVO PRODUTO ════════════════════════════ -->
+    <div class="g-modal-backdrop" id="modalProduto">
+        <div class="g-modal">
+            <div class="g-modal-head">
+                <span class="g-modal-title">Novo Produto</span>
+                <button class="g-modal-close" onclick="fecharModal('modalProduto')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="g-modal-body">
+                <input type="hidden" id="produtoCategoriaId">
+                <input type="hidden" id="produtoEditandoId">
+                <div class="g-form-group">
+                    <label class="g-label">Nome do Produto</label>
+                    <input type="text" class="g-input" id="inputNomeProduto" placeholder="Ex: Alistamento Especial">
+                </div>
+                <div class="g-form-group">
+                    <label class="g-label">Descrição</label>
+                    <textarea class="g-textarea" id="inputDescProduto" rows="3"
+                        placeholder="Descreva o produto..."></textarea>
+                </div>
+                <div class="g-form-group">
+                    <label class="g-label">Preço (dragonas)</label>
+                    <input type="number" class="g-input" id="inputPrecoProduto" placeholder="100" min="0">
+                </div>
+                <div class="g-form-group">
+                    <label class="g-label">URL da Imagem</label>
+                    <input type="url" class="g-input" id="inputImagemProduto"
+                        placeholder="https://exemplo.com/imagem.png">
+                    <small style="font-size:.68rem;color:var(--t3);margin-top:4px;display:block">Cole o link de uma
+                        imagem hospedada (ex: Imgur)</small>
+                </div>
+                <div class="g-form-group">
+                    <label class="g-label">Estoque Disponível</label>
+                    <input type="number" class="g-input" id="inputEstoqueProduto" placeholder="10" min="0">
+                    <small style="font-size:.68rem;color:var(--t3);margin-top:4px;display:block">Deixe 0 para estoque
+                        ilimitado</small>
+                </div>
+            </div>
+            <div class="g-modal-actions">
+                <button class="btn-secondary" onclick="fecharModal('modalProduto')">Cancelar</button>
+                <button class="btn-primary" onclick="salvarProduto()">Adicionar Produto</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ MODAL COMPRAR ═════════════════════════════════ -->
+    <div class="g-modal-backdrop" id="modalCompra">
+        <div class="g-modal">
+            <div class="g-modal-head">
+                <span class="g-modal-title">Confirmar Compra</span>
+                <button class="g-modal-close" onclick="fecharModal('modalCompra')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="g-modal-body">
+                <div class="compra-preview" id="compraPreview"></div>
+            </div>
+            <div class="g-modal-actions">
+                <button class="btn-secondary" onclick="fecharModal('modalCompra')">Cancelar</button>
+                <button class="btn-primary" onclick="confirmarCompra()">Confirmar Compra</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../scripts/notificacoes.js"></script>
+    <script src="../scripts/loja.js"></script>
+</body>
+
+</html>

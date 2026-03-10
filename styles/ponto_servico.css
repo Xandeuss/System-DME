@@ -1,0 +1,199 @@
+/* ponto_servico.css — específico. Depende de global.css */
+
+/* ── CONTAINER ──────────────────────────────────────── */
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 22px 20px 40px;
+}
+
+/* ── PAGE HEADER ─────────────────────────────────────── */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--b1);
+}
+
+.page-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--t1);
+    letter-spacing: -.4px;
+}
+
+.page-title svg {
+    color: var(--green);
+    width: 18px;
+    height: 18px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* ── GRID LAYOUT ─────────────────────────────────────── */
+.ponto-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+@media (max-width: 860px) {
+    .ponto-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── USER SHIFT CARD ─────────────────────────────────── */
+.user-shift-card {
+    background: var(--bg-2);
+    border: 1px solid var(--b1);
+    border-radius: 14px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    text-align: center;
+}
+
+.shift-avatar {
+    width: 80px;
+    height: 80px;
+    background: var(--bg-3);
+    border-radius: 50%;
+    border: 2px solid var(--b2);
+    overflow: visible;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.shift-avatar img {
+    height: 130%;
+    width: auto;
+    object-fit: contain;
+}
+
+.user-shift-card h3 {
+    font-size: .9rem;
+    font-weight: 700;
+    color: var(--t1);
+    margin: 0;
+}
+
+.timer-display {
+    font-size: 2rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: var(--green);
+    letter-spacing: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    text-shadow: 0 0 20px rgba(34, 197, 94, .3);
+}
+
+.shift-status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: .76rem;
+    color: var(--t2);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--t3);
+    transition: background var(--dur) var(--ease),
+        box-shadow var(--dur) var(--ease);
+}
+
+.status-dot.active {
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+}
+
+.shift-controls {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn-start {
+    width: 100%;
+    padding: 11px;
+    background: var(--green);
+    color: #000;
+    font-weight: 700;
+    font-size: .82rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all var(--dur) var(--ease);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+}
+
+.btn-start:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.btn-start.stopping {
+    background: var(--red);
+    color: #fff;
+}
+
+/* ── ACTIVE SHIFTS ───────────────────────────────────── */
+.active-shifts-area {
+    background: var(--bg-2);
+    border: 1px solid var(--b1);
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.shifts-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--b1);
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .84rem;
+    font-weight: 700;
+    color: var(--t1);
+    margin: 0;
+}
+
+.section-title svg {
+    color: var(--green);
+    width: 16px;
+    height: 16px;
+}
+
+.shifts-table {
+    margin: 0;
+}
+
+.shifts-table td,
+.shifts-table th {
+    padding: 12px 16px;
+}

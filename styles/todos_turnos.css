@@ -1,0 +1,101 @@
+/* todos_turnos.css — específico. Depende de global.css */
+
+/* ── CONTAINER ──────────────────────────────────────── */
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 22px 20px 40px;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--b1);
+}
+
+.page-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--t1);
+    letter-spacing: -.4px;
+    margin: 0;
+}
+
+.page-title svg {
+    color: var(--green);
+    width: 18px;
+    height: 18px;
+}
+
+/* ── BACK BUTTON ─────────────────────────────────────── */
+.btn-back {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    background: var(--bg-3);
+    border: 1px solid var(--b1);
+    border-radius: 7px;
+    font-size: .76rem;
+    font-weight: 600;
+    color: var(--t2);
+    text-decoration: none;
+    transition: all var(--dur) var(--ease);
+}
+
+.btn-back:hover {
+    color: var(--t1);
+    border-color: var(--b2);
+}
+
+.btn-back svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* ── FILTERS PANEL ───────────────────────────────────── */
+.filters-panel {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    background: var(--bg-2);
+    border: 1px solid var(--b1);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 18px;
+}
+
+.filters-panel .g-form-group {
+    margin-bottom: 0;
+}
+
+/* icon inside input */
+.input-icon {
+    position: absolute;
+    left: 9px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    height: 14px;
+    color: var(--t3);
+    pointer-events: none;
+}
+
+/* ── TOTAL HOURS CARD ────────────────────────────────── */
+.total-hours-card {
+    background: rgba(34, 197, 94, .08);
+    border: 1px solid rgba(34, 197, 94, .2);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 16px;
+    text-align: right;
+    font-size: .9rem;
+    font-weight: 700;
+    color: var(--green);
+}

@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setor Legislativo — DME System</title>
+    <link rel="stylesheet" href="../styles/global.css">
+    <link rel="stylesheet" href="../styles/centro_detalhe.css">
+    <link rel="stylesheet" href="../styles/setor_legislativo.css">
+    <script src="../scripts/theme.js"></script>
+    <style>
+        /* Ajustes específicos para o mural dentro do novo layout */
+        .tab-content {
+            padding: 0;
+        }
+
+        .pub-card {
+            margin-bottom: 24px;
+        }
+
+        .mural-title {
+            margin: 24px 0 16px;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ══ MODAL: CONFIGURAÇÃO DO MURAL ═══════════════ -->
+    <div class="modal-wrap" id="muralModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>Postar no Mural</h3>
+                <button class="modal-close" onclick="fecharMuralModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="g-form-group">
+                    <label class="g-label">Título da Notícia</label>
+                    <input type="text" class="g-input" id="muralTitulo" placeholder="Ex: Novo Guia de Conduta">
+                </div>
+                <div class="g-form-group">
+                    <label class="g-label">Tag / Categoria</label>
+                    <input type="text" class="g-input" id="muralTag" placeholder="Ex: [STM] Diretriz">
+                </div>
+                <div class="g-form-group">
+                    <label class="g-label">URL da Imagem (opcional)</label>
+                    <input type="text" class="g-input" id="muralImagem" placeholder="Cole o link da imagem">
+                </div>
+                <div class="g-form-group">
+                    <label class="g-label">Conteúdo</label>
+                    <textarea class="g-input" id="muralConteudo" style="min-height:100px;resize:vertical"
+                        placeholder="Escreva o texto da publicação..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="fecharMuralModal()">Cancelar</button>
+                <button class="btn-primary" onclick="salvarPostagem()">Publicar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ NAVBAR ════════════════════════════════════════ -->
+    <nav class="navbar">
+        <div class="logo-section">
+            <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+            <div class="logo-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+            </div>
+            <div class="logo-text">DME<em>System</em></div>
+        </div>
+        <div class="nav-links">
+            <a href="home.html" class="nav-link">Home</a>
+            <a href="listagens.html" class="nav-link">Listagens</a>
+            <a href="requerimentos.html" class="nav-link">Requerimentos</a>
+            <a href="setor_legislativo.html" class="nav-link active">Legislação</a>
+        </div>
+        <div class="user-profile" id="userProfileBtn">
+            <div class="user-avatar"><img id="navUserImage" src="" alt=""></div>
+            <span class="user-name" id="navUserName">Usuário</span>
+        </div>
+    </nav>
+
+    <!-- ══ BREADCRUMB ═══════════════════════════════════ -->
+    <div class="breadcrumb-bar">
+        <a href="centro_tarefas_orgaos.html" class="breadcrumb-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 21h18M3 10h18M3 7l9-4 9 4" />
+            </svg>
+            Centros e Órgãos
+        </a>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="breadcrumb-sep">
+            <polyline points="9 18 15 12 9 6" />
+        </svg>
+        <span class="breadcrumb-current">Setor Legislativo</span>
+    </div>
+
+    <!-- ══ MAIN LAYOUT ═══════════════════════════════════ -->
+    <div class="centro-layout">
+
+        <!-- ── CONTEÚDO PRINCIPAL ─────────────────────── -->
+        <main class="centro-main">
+
+            <!-- Cabeçalho do Card (Padrão Profissional) -->
+            <div class="centro-header-card">
+                <div class="centro-header-icon">⚖️</div>
+                <div class="centro-header-info">
+                    <h1 class="centro-header-title">Setor Legislativo</h1>
+                    <p class="centro-header-sub">Coordena a elaboração de projetos, emendas e diretrizes institucionais.
+                    </p>
+                    <div class="centro-header-meta">
+                        <span class="centro-meta-badge">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                            </svg>
+                            20 membros
+                        </span>
+                        <span class="centro-meta-badge lider-badge">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon
+                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                            Você é Líder
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs de Navegação -->
+            <div class="centro-tabs">
+                <button class="centro-tab active" data-tab="mural">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    </svg>
+                    Mural
+                </button>
+                <button class="centro-tab" data-tab="projetos">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                    Projetos
+                </button>
+                <button class="centro-tab" data-tab="membros">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                    </svg>
+                    Membros
+                </button>
+                <button class="centro-tab" data-tab="hierarquia">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="6" y1="3" x2="6" y2="15" />
+                        <circle cx="18" cy="6" r="3" />
+                        <circle cx="6" cy="18" r="3" />
+                        <path d="M18 9a9 9 0 0 1-9 9" />
+                    </svg>
+                    Hierarquia
+                </button>
+            </div>
+
+            <!-- ── ABA: MURAL (PUBLICAÇÕES) ────────────────── -->
+            <div class="tab-content active" id="tab-mural">
+                <div class="panel-card" style="padding: 24px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h2 class="mural-title" style="margin:0">Publicações Recentes</h2>
+                        <button class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem;"
+                            onclick="abrirMuralModal()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                style="width:14px; height:14px; margin-right:4px;">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                            Postar Notícia
+                        </button>
+                    </div>
+
+                    <!-- Mural de Publicações (Reutilizando os estilos que criamos) -->
+                    <article class="pub-card">
+                        <div class="pub-header">
+                            <div class="pub-author-av">
+                                <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Xande&direction=2&head_direction=2&gesture=sml&size=m"
+                                    alt="Autor">
+                            </div>
+                            <div class="pub-meta">
+                                <span class="pub-tag">[STM] Guia</span>
+                            </div>
+                        </div>
+                        <div class="pub-image">
+                            <img src="https://media.discordapp.net/attachments/1114294474747068487/1114294475149721660/guia_elaboracao.png"
+                                alt="Guia">
+                        </div>
+                        <div class="pub-content">
+                            <h2>Guia de Elaboração de Projetos do DME</h2>
+                            <p>Neste guia, você vai aprender como fazer um projeto completo e pronto para usar. Um
+                                projeto não é só ter uma ideia, ele precisa estar detalhado, explicado e com tudo pronto
+                                para aplicação.</p>
+                        </div>
+                    </article>
+
+                    <!-- Central Welcome Banner (Similar ao centro_detalhe) -->
+                    <div class="inicio-content" style="border-top: 1px solid var(--b1); margin-top:20px">
+                        <div class="inicio-welcome-icon">📜</div>
+                        <h3>Bem-vindo ao Setor Legislativo</h3>
+                        <p class="inicio-desc">Aqui você encontra toda a documentação legal e propostas em andamento no
+                            DME.</p>
+                        <div class="inicio-stats">
+                            <div class="inicio-stat-card">
+                                <span class="stat-num">12</span>
+                                <span class="stat-lbl">Projetos</span>
+                            </div>
+                            <div class="inicio-stat-card">
+                                <span class="stat-num">05</span>
+                                <span class="stat-lbl">Emendas</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Outras abas (vazias por enquanto) -->
+            <div class="tab-content" id="tab-projetos">
+                <div class="panel-card" style="padding:40px; text-align:center; color:var(--t3)">
+                    Seção de Projetos em desenvolvimento.
+                </div>
+            </div>
+
+        </main>
+
+        <!-- ── MENU LATERAL RÁPIDO ════════════════════ -->
+        <aside class="centro-quick-menu">
+            <div class="quick-menu-section">
+                <div class="quick-menu-label">Menu Rápido</div>
+                <button class="quick-menu-item active" data-tab="mural">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    </svg>
+                    Início
+                </button>
+                <button class="quick-menu-item" data-tab="membros">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                    </svg>
+                    Membros
+                </button>
+                <button class="quick-menu-item" data-tab="documentos">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    </svg>
+                    Documentos
+                </button>
+                <button class="quick-menu-item" data-tab="forum">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                    Fórum
+                </button>
+            </div>
+
+            <div class="quick-menu-section">
+                <div class="quick-menu-label" style="color:#fbbf24">LIDERANÇA</div>
+                <button class="quick-menu-item" onclick="abrirMuralModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3" />
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg>
+                    Configuração
+                </button>
+                <button class="quick-menu-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                    </svg>
+                    Controle de Membros
+                </button>
+            </div>
+        </aside>
+
+    </div>
+
+
+    <!-- Scripts (Hamburger, Tabs, user info, Mural Logic) -->
+    <script>
+        const MURAL_STORAGE_KEY = 'dme_legis_mural';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('dme_user_logged'));
+            if (user) {
+                document.getElementById('navUserName').innerText = user.nickname;
+                document.getElementById('navUserImage').src = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${user.nickname}&direction=2&head_direction=2&gesture=sml&size=m`;
+            }
+
+            // Tabs logic - Usando addEventListener para não sobrepor outros eventos
+            const tabs = document.querySelectorAll('.centro-tab, .quick-menu-item[data-tab]');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.dataset.tab;
+                    if (!target) return;
+
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+
+                    document.querySelectorAll(`[data-tab="${target}"]`).forEach(t => t.classList.add('active'));
+                    const targetEl = document.getElementById(`tab-${target}`);
+                    if (targetEl) targetEl.classList.add('active');
+                });
+            });
+
+            // Carregar Mural Inicial
+            carregarMural();
+        });
+
+        // Lógica do Mural
+        function carregarMural() {
+            const muralContainer = document.getElementById('tab-mural');
+            // Mantém o título fixo se existir
+            const muralTitle = muralContainer.querySelector('.mural-title');
+            const muralData = JSON.parse(localStorage.getItem(MURAL_STORAGE_KEY)) || [];
+
+            // Limpa posts antigos, mas mantém o título e o banner de boas-vindas se quiserem ser fixos
+            // Aqui vamos reconstruir a lista de posts dinamicamente em uma div dedicada
+            let muralList = document.getElementById('mural-posts-list');
+            if (!muralList) {
+                muralList = document.createElement('div');
+                muralList.id = 'mural-posts-list';
+                muralContainer.insertBefore(muralList, muralContainer.querySelector('.inicio-content'));
+            }
+
+            muralList.innerHTML = '';
+
+            if (muralData.length === 0) {
+                // Posts iniciais (fallback caso esteja vazio)
+                const defaultPosts = [
+                    {
+                        titulo: 'Guia de Elaboração de Projetos do DME',
+                        tag: '[STM] Guia',
+                        imagem: 'https://media.discordapp.net/attachments/1114294474747068487/1114294475149721660/guia_elaboracao.png',
+                        conteudo: 'Neste guia, você vai aprender como fazer um projeto completo e pronto para usar. Um projeto não é só ter uma ideia, ele precisa estar detalhado, explicado e com tudo pronto para aplicação.',
+                        autor: 'Xande'
+                    }
+                ];
+                localStorage.setItem(MURAL_STORAGE_KEY, JSON.stringify(defaultPosts));
+                return carregarMural();
+            }
+
+            muralData.forEach((post, index) => {
+                const article = document.createElement('article');
+                article.className = 'pub-card';
+                article.innerHTML = `
+                    <div class="pub-header">
+                        <div class="pub-author-av">
+                            <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=${post.autor}&direction=2&head_direction=2&gesture=sml&size=m" alt="Autor">
+                        </div>
+                        <div class="pub-meta">
+                            <span class="pub-tag">${post.tag}</span>
+                        </div>
+                        <button class="btn-danger" style="padding:4px; border-radius:6px; font-size:10px;" onclick="deletarPost(${index})">Deletar</button>
+                    </div>
+                    ${post.imagem ? `<div class="pub-image"><img src="${post.imagem}" alt="Imagem"></div>` : ''}
+                    <div class="pub-content">
+                        <h2>${post.titulo}</h2>
+                        <p>${post.conteudo}</p>
+                    </div>
+                `;
+                muralList.appendChild(article);
+            });
+        }
+
+        function abrirMuralModal() {
+            console.log('Abrindo modal do mural...');
+            const modal = document.getElementById('muralModal');
+            if (modal) {
+                modal.classList.add('active');
+            } else {
+                console.error('Erro: Elemento #muralModal não encontrado no DOM!');
+            }
+        }
+
+        function fecharMuralModal() {
+            document.getElementById('muralModal').classList.remove('active');
+        }
+
+        function salvarPostagem() {
+            const titulo = document.getElementById('muralTitulo').value;
+            const tag = document.getElementById('muralTag').value;
+            const imagem = document.getElementById('muralImagem').value;
+            const conteudo = document.getElementById('muralConteudo').value;
+            const user = JSON.parse(localStorage.getItem('dme_user_logged'));
+
+            if (!titulo || !conteudo) {
+                alert('Título e Conteúdo são obrigatórios!');
+                return;
+            }
+
+            const novoPost = {
+                titulo,
+                tag: tag || '[DME] Comunicado',
+                imagem,
+                conteudo,
+                autor: user ? user.nickname : 'Sistema',
+                data: new Date().toISOString()
+            };
+
+            const muralData = JSON.parse(localStorage.getItem(MURAL_STORAGE_KEY)) || [];
+            muralData.unshift(novoPost); // Adiciona no início
+            localStorage.setItem(MURAL_STORAGE_KEY, JSON.stringify(muralData));
+
+            // Limpar campos
+            document.getElementById('muralTitulo').value = '';
+            document.getElementById('muralTag').value = '';
+            document.getElementById('muralImagem').value = '';
+            document.getElementById('muralConteudo').value = '';
+
+            fecharMuralModal();
+            carregarMural();
+        }
+
+        function deletarPost(index) {
+            if (!confirm('Deseja realmente apagar esta publicação?')) return;
+            const muralData = JSON.parse(localStorage.getItem(MURAL_STORAGE_KEY)) || [];
+            muralData.splice(index, 1);
+            localStorage.setItem(MURAL_STORAGE_KEY, JSON.stringify(muralData));
+            carregarMural();
+        }
+    </script>
+</body>
+
+</html>

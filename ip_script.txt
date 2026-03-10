@@ -1,0 +1,79 @@
+async function verIpMilitar(user) {
+    const log = JSON.parse(localStorage.getItem('dme_login_log')) || [];
+    const entradas = log.filter(e => (e.username || '').toLowerCase() === user.toLowerCase());
+
+    const porIp = {};
+    entradas.forEach(e => {
+        if (!porIp[e.ip]) porIp[e.ip] = { ip: e.ip, dates: [], isVpn: e.isVpn || false };
+        if (e.date) porIp[e.ip].dates.push(e.date);
+        if (e.isVpn) porIp[e.ip].isVpn = true;
+    });
+    const ips = Object.values(porIp)
+        .map(g => ({ ...g, last: g.dates.sort().reverse()[0] || '-' }))
+        .sort((a, b) => b.last.localeCompare(a.last));
+
+    const modal = document.getElementById('modalIpDetalhes');
+    const modalBody = document.getElementById('modalIpBody');
+    document.getElementById('modalIpUser').textContent = user;
+    modal.classList.add('active');
+
+    if (ips.length === 0) {
+        modalBody.innerHTML = `<div class="ip-det-empty">Nenhum registro de login encontrado para este usuário.</div>`;
+        return;
+    }
+
+    modalBody.innerHTML = ips.map((entry, i) => `
+        <div class="ip-det-card ${i === 0 ? 'current' : ''}" id="ip-card-${i}">
+            <div class="ip-det-card-head">
+                <div>
+                    <span class="ip-det-addr">${entry.ip}</span>
+                    ${entry.isVpn ? '<span class="badge-status banido" style="font-size:.6rem;padding:2px 7px;margin-left:6px">VPN/PROXY</span>' : ''}
+                    ${i === 0 ? '<span class="badge-status ativo" style="font-size:.6rem;padding:2px 7px;margin-left:6px">Mais recente</span>' : ''}
+                </div>
+                <span class="ip-det-date">${entry.last}</span>
+            </div>
+            <div class="ip-det-geo" id="ip-geo-${i}">
+                <div class="ip-det-loading">Consultando localização...</div>
+            </div>
+        </div>
+    `).join('');
+
+    for (let i = 0; i < ips.length; i++) {
+        const geo = document.getElementById(`ip-geo-${i}`);
+        if (!geo) continue;
+        try {
+            const r = await fetch(`https://ip-api.com/json/${ips[i].ip}?fields=status,country,regionName,city,zip,timezone,isp,org,as,hosting,proxy`);
+            const d = await r.json();
+            if (d.status === 'success') {
+                geo.innerHTML = `
+                    <div class="ip-det-cols">
+                        <div class="ip-det-section">
+                            <div class="ip-det-section-title">Localização</div>
+                            <div class="ip-det-row"><span>País</span><span>${d.country || 'N/A'}</span></div>
+                            <div class="ip-det-row"><span>Cidade</span><span>${d.city || 'N/A'}</span></div>
+                            <div class="ip-det-row"><span>Região</span><span>${d.regionName || 'N/A'}</span></div>
+                            <div class="ip-det-row"><span>Código</span><span>${d.zip || 'N/A'}</span></div>
+                            <div class="ip-det-row"><span>Timezone</span><span>${d.timezone || 'N/A'}</span></div>
+                        </div>
+                        <div class="ip-det-section">
+                            <div class="ip-det-section-title">Informações Técnicas</div>
+                            <div class="ip-det-row"><span>Provedor</span><span>${d.isp || 'N/A'}</span></div>
+                            <div class="ip-det-row"><span>Organização</span><span>${d.org || 'N/A'}</span></div>
+                            <div class="ip-det-row"><span>ASN</span><span>${d.as || 'N/A'}</span></div>
+                            <div class="ip-det-row"><span>Hospedagem</span><span>${d.hosting ? '<span style="color:#ef4444">Sim</span>' : 'Não'}</span></div>
+                            <div class="ip-det-row"><span>Proxy/VPN</span><span>${d.proxy ? '<span style="color:#ef4444">Detectado</span>' : 'Não'}</span></div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                geo.innerHTML = `<div class="ip-det-empty">Falha ao obter info deste IP.</div>`;
+            }
+        } catch {
+            geo.innerHTML = `<div class="ip-det-empty">Erro ao consultar API.</div>`;
+        }
+    }
+}
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('modalIpClose')?.addEventListener('click', () => document.getElementById('modalIpDetalhes').classList.remove('active'));
+    document.getElementById('modalIpDetalhes')?.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
+});

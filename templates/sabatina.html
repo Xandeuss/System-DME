@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sabatina — DME System</title>
+    <link rel="stylesheet" href="../styles/global.css">
+    <link rel="stylesheet" href="../styles/sabatina.css">
+    <script src="../scripts/theme.js"></script>
+</head>
+
+<body>
+
+    <!-- ══ SIDEBAR ══════════════════════════════════════ -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="mobile-sidebar" id="mobileSidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-title">DME System</span>
+            <button class="sidebar-close" id="sidebarClose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Principal</div>
+            <a href="home.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+                Página Inicial
+            </a>
+            <a href="listagens.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="8" y1="6" x2="21" y2="6" />
+                    <line x1="8" y1="12" x2="21" y2="12" />
+                    <line x1="8" y1="18" x2="21" y2="18" />
+                    <line x1="3" y1="6" x2="3.01" y2="6" />
+                    <line x1="3" y1="12" x2="3.01" y2="12" />
+                    <line x1="3" y1="18" x2="3.01" y2="18" />
+                </svg>
+                Listagens
+            </a>
+            <a href="requerimentos.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                </svg>
+                Requerimentos
+            </a>
+            <a href="sabatina.html" class="sidebar-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                </svg>
+                Sabatina
+            </a>
+            <a href="consulta_promocao.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                    <polyline points="16 7 22 7 22 13" />
+                </svg>
+                Consultar Promoção
+            </a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Ferramentas</div>
+            <a href="ponto_servico.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                </svg>
+                Ponto de Serviço
+            </a>
+            <a href="loja.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <path d="M16 10a4 4 0 0 1-8 0" />
+                </svg>
+                Loja
+            </a>
+            <a href="documentos.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                </svg>
+                Documentos
+            </a>
+            <a href="centro_tarefas_orgaos.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 10v11M16 10v11M12 10v11" />
+                </svg>
+                Centros e Órgãos
+            </a>
+            <a href="recrutamentos.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                Recrutamentos
+            </a>
+            <a href="ouvidoria.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                Ouvidoria
+            </a>
+            <a href="setor_legislativo.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m18 16 4-4-4-4" />
+                    <path d="m6 8-4 4 4 4" />
+                    <path d="m14.5 4-5 16" />
+                </svg>
+                Setor Legislativo
+            </a>
+            <a href="postar_aula.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:6px;flex-shrink:0"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                Postar Aula
+            </a>
+        </div>
+    </div>
+
+    <!-- ══ NAVBAR ════════════════════════════════════════ -->
+    <nav class="navbar">
+        <div class="logo-section">
+            <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+            <div class="logo-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+            </div>
+            <div class="logo-text">DME<em>System</em></div>
+        </div>
+        <div class="user-profile" id="userProfileBtn">
+            <div class="user-avatar"><img id="navUserImage" src="" alt=""></div>
+            <span class="user-name" id="navUserName">Usuário</span>
+            <div class="user-dropdown" id="userDropdown">
+                <div class="dropdown-header">
+                    <div class="dropdown-user-info">
+                        <div class="dropdown-avatar"><img id="dropdownUserImage" src="" alt=""></div>
+                        <div class="dropdown-user-details">
+                            <h4 id="dropdownName">Usuário</h4>
+                            <p>Militar DME</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown-menu">
+                    <a href="painel.html" class="dropdown-item" id="dropdownPainel" style="display:none">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7" />
+                            <rect x="14" y="3" width="7" height="7" />
+                            <rect x="14" y="14" width="7" height="7" />
+                            <rect x="3" y="14" width="7" height="7" />
+                        </svg>
+                        Painel Admin
+                    </a>
+                    <a onclick="toggleTheme()" class="dropdown-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5" />
+                            <line x1="12" y1="1" x2="12" y2="3" />
+                            <line x1="12" y1="21" x2="12" y2="23" />
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                            <line x1="1" y1="12" x2="3" y2="12" />
+                            <line x1="21" y1="12" x2="23" y2="12" />
+                        </svg>
+                        <span id="themeText">Modo Claro</span>
+                    </a>
+                    <div class="dropdown-divider" id="dropdownDivider" style="display:none"></div>
+                    <a onclick="logout()" class="dropdown-item danger">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                        Sair
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ══ CONTEÚDO ═══════════════════════════════════════ -->
+    <div class="quiz-wrapper">
+
+        <!-- TELA 1: INÍCIO -->
+        <div class="screen active" id="scr1">
+            <div class="quiz-card">
+                <div class="quiz-badge">Avaliação Oficial</div>
+                <h1 class="quiz-title">Sabatina DME</h1>
+                <p class="quiz-subtitle">Teste de conhecimento sobre procedimentos, hierarquia e regulamentos do DME. 10
+                    questões aleatórias com 2 minutos cada.</p>
+
+                <div class="quiz-rules">
+                    <h4>Regras</h4>
+                    <div class="rule-item">
+                        <div class="rule-dot"></div>10 questões sorteadas aleatoriamente
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-dot"></div>2 minutos por questão — tempo esgotado = erro
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-dot"></div>Mínimo de 7 acertos para ser aprovado
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-dot"></div>Resultado salvo automaticamente
+                    </div>
+                </div>
+
+                <input type="text" class="g-input" id="nick" placeholder="Seu nickname no Habbo..."
+                    style="margin-bottom:12px">
+                <button class="btn-primary w-full" id="btnStart">Iniciar Sabatina</button>
+                <button class="btn-secondary w-full" style="margin-top:10px" onclick="toggleHistory()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16">
+                        <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
+                    </svg>
+                    Ver último resultado
+                </button>
+                <div class="history-box" id="historyBox"></div>
+            </div>
+        </div>
+
+        <!-- TELA 2: QUESTÕES -->
+        <div class="screen" id="scr2">
+            <div class="quiz-card">
+                <div class="progress-bar-wrap">
+                    <div class="progress-bar-fill" id="bar" style="width:100%;"></div>
+                </div>
+                <div class="question-counter" id="counter">QUESTÃO 1/10</div>
+                <div class="question-text" id="question"></div>
+                <div class="options-grid" id="options"></div>
+            </div>
+        </div>
+
+        <!-- TELA 3: RESULTADO -->
+        <div class="screen" id="scr3">
+            <div class="quiz-card result-center">
+                <div class="result-emoji" id="resultEmoji"></div>
+                <div class="result-score" id="score">0/10</div>
+                <div class="result-status" id="status">MILITAR APTO</div>
+                <div class="result-details">
+                    <div class="result-detail-item">
+                        <span class="result-detail-label">Militar</span>
+                        <span class="result-detail-value" id="resultNick">-</span>
+                    </div>
+                    <div class="result-detail-item">
+                        <span class="result-detail-label">Acertos</span>
+                        <span class="result-detail-value" id="resultAcertos">-</span>
+                    </div>
+                    <div class="result-detail-item">
+                        <span class="result-detail-label">Erros</span>
+                        <span class="result-detail-value" id="resultErros">-</span>
+                    </div>
+                    <div class="result-detail-item">
+                        <span class="result-detail-label">Data</span>
+                        <span class="result-detail-value" id="resultData">-</span>
+                    </div>
+                </div>
+                <button class="btn-primary w-full" onclick="reiniciar()">Realizar Novamente</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="../scripts/notificacoes.js"></script>
+    <script>
+        function logout() { localStorage.removeItem('dme_username'); window.location.href = 'login.html'; }
+
+        // ── BASE DE QUESTÕES ──
+        const database = [
+            { q: "Um Capitão utiliza permissões administrativas para apagar registros de infração do seu irmão (Subtenente) antes do julgamento. Qual o crime e punição?", options: ["Conduta Imprópria e Rebaixamento", "Nepotismo e Comprometimento de Investigação, com Exoneração", "Abuso de Poder e Advertência", "Prevaricação e Suspensão"], a: 1 },
+            { q: "Um Oficial General reformado é flagrado recrutando membros para rivais e ofendendo o Alto Comando. Qual a punição?", options: ["Advertência Escrita", "Suspensão de 30 dias", "Reforma convertida em Exoneração imediata", "Apenas uma nota de repúdio"], a: 2 },
+            { q: "Um policial cria um script de treinamento idêntico ao do DME e o vende para outra instituição. Qual o crime?", options: ["Corrupção Ativa", "Plágio", "Insubordinação", "Uso Indevido de Imagem"], a: 1 },
+            { q: "Um Oficial incentiva subordinados em grupo de mensagens a realizarem uma greve geral para derrubar a gestão. Qual crime e punição?", options: ["Desobediência e Suspensão", "Motim e Golpe de Estado, com Exoneração imediata", "Conspiração Leve e Rebaixamento", "Conduta Imprópria e Advertência"], a: 1 },
+            { q: "Um Aspirante é flagrado consultando o manual em outra aba durante um teste oficial que proíbe consultas. Qual a conduta e punição?", options: ["Corrupção e Exoneração", "Conduta Imprópria (Art. 16) e Advertência escrita", "Falsidade Ideológica e Rebaixamento", "Insubordinação e Suspensão"], a: 1 },
+            { q: "Policial deixa a conta logada no ponto eletrônico enquanto dorme para acumular moedas indevidamente. Qual crime e punição?", options: ["Negligência e Advertência", "Abandono de Posto e Rebaixamento", "Corrupção (Subtração via ponto), com exoneração imediata", "Conduta Imprópria e Suspensão"], a: 2 },
+            { q: "System em instabilidade total. Um Soldado deve ser exonerado por falta gravíssima e outro deve ser promovido a Cabo. Como proceder?", options: ["Ambos os casos devem esperar o sistema voltar", "A exoneração pode ser aplicada (lista manual); a promoção fica suspensa", "A promoção pode ser feita manual; a exoneração deve esperar", "Ambos devem ser realizados via rádio imediatamente"], a: 1 },
+            { q: "O Tenente Miqueias trocou sua missão na recepção. O Comandante Primeteu o condenou e o colocou em 'Apresentar Armas'. O que ocorreu?", options: ["Punição Justa", "Insubordinação do Tenente", "Abuso de Poder do Comandante Geral", "Negligência Administrativa"], a: 2 },
+            { q: "Em situação de Guerra, um Capitão decide entrar no quarto da organização inimiga para espionar. Ele tem autorização?", options: ["Sim, Capitães têm trânsito livre", "Não. Apenas o Setor de Inteligência e a Supremacia podem entrar", "Sim, desde que esteja sem farda", "Não. Apenas Soldados podem entrar"], a: 1 },
+            { q: "Um Major ordena um rebaixamento abusivo. O Capitão recusa e é ameaçado de punição por Insubordinação. O Capitão pode ser punido?", options: ["Sim, ordem superior não se discute", "Não. O Capitão agiu no estrito cumprimento do dever contra ordem ilegal", "Sim, mas pode recorrer depois", "Não, mas deve cumprir a ordem primeiro"], a: 1 },
+            { q: "Policial denuncia superior por corrupção sem provas, mas acredita no fato. Se ele inventou a história para atingir a honra, qual o crime?", options: ["Difamação", "Calúnia", "Falso Testemunho", "Insubordinação"], a: 1 },
+            { q: "Dois policiais cometem Conduta Imprópria. Um Soldado e um Diretor de Aquisição I. Por que o Diretor Aq. I NÃO sofre agravante?", options: ["Pois diretores são imunes", "Pois o agravante só se aplica a Aquisição superior à Aq. II", "Pois o crime foi leve", "Pois não houve testemunhas"], a: 1 },
+            { q: "Militar trocou de nick sem autorização formal (Art. 141 CCM). Segundo o Art. 142, qual a punição?", options: ["Advertência Oral", "Suspensão de 7 dias", "Desligamento Desonroso", "Rebaixamento"], a: 2 },
+            { q: "Qual o prazo mínimo de dias para solicitar nova alteração de nick após a última autorizada? (Art. 140 CCM)", options: ["15 dias", "30 dias", "60 dias", "90 dias"], a: 1 },
+            { q: "Um print enviado como prova ao STM não mostra a barra de tarefas. Segundo o Art. 26 do CDM, qual a validade?", options: ["Válida se houver testemunha", "Totalmente Válida", "Inválida", "Válida apenas para oficiais"], a: 2 }
+        ];
+
+        let current = 0, quizScore = 0, timer, timeLeft, quiz = [], userNick = "";
+
+        function toggleHistory() {
+            const box = document.getElementById('historyBox');
+            const last = localStorage.getItem('dme_sabatina_last');
+            if (last) {
+                const d = JSON.parse(last);
+                box.innerHTML = `<strong>Militar:</strong> ${d.nick}<br><strong>Resultado:</strong> ${d.score}/10 ${d.score >= 7 ? '✅ APTO' : '❌ INAPTO'}<br><strong>Data:</strong> ${d.date}`;
+            } else {
+                box.innerHTML = 'Nenhum resultado encontrado.';
+            }
+            box.style.display = box.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function startQuiz() {
+            userNick = document.getElementById('nick').value.trim();
+            if (userNick.length < 2) { alert("Por favor, informe seu nickname!"); return; }
+            current = 0; quizScore = 0;
+            quiz = [...database].sort(() => 0.5 - Math.random()).slice(0, 10);
+            document.getElementById('scr1').classList.remove('active');
+            document.getElementById('scr2').classList.add('active');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (current >= 10) return showResult();
+            const data = quiz[current];
+            document.getElementById('counter').textContent = `QUESTÃO ${current + 1}/10`;
+            document.getElementById('question').textContent = data.q;
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            data.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = opt;
+                btn.addEventListener('click', () => checkAnswer(idx, btn));
+                optionsDiv.appendChild(btn);
+            });
+            timeLeft = 120;
+            clearInterval(timer);
+            timer = setInterval(() => {
+                timeLeft -= 0.1;
+                document.getElementById('bar').style.width = (timeLeft / 120) * 100 + '%';
+                if (timeLeft <= 0) checkAnswer(-1);
+            }, 100);
+        }
+
+        function checkAnswer(idx, btn) {
+            clearInterval(timer);
+            document.querySelectorAll('.option-btn').forEach(b => b.style.pointerEvents = 'none');
+            const correctIdx = quiz[current].a;
+            if (idx === correctIdx) {
+                quizScore++;
+                if (btn) btn.classList.add('correct');
+            } else {
+                if (btn) btn.classList.add('wrong');
+                document.querySelectorAll('.option-btn')[correctIdx].classList.add('correct');
+            }
+            setTimeout(() => { current++; loadQuestion(); }, 1500);
+        }
+
+        function showResult() {
+            const now = new Date().toLocaleString('pt-BR');
+            const testInfo = { nick: userNick.toUpperCase(), score: quizScore, date: now };
+            localStorage.setItem('dme_sabatina_last', JSON.stringify(testInfo));
+            let hist = JSON.parse(localStorage.getItem('dme_sabatina_historico')) || [];
+            hist.push(testInfo);
+            localStorage.setItem('dme_sabatina_historico', JSON.stringify(hist));
+            document.getElementById('scr2').classList.remove('active');
+            document.getElementById('scr3').classList.add('active');
+            document.getElementById('score').textContent = `${quizScore}/10`;
+            document.getElementById('resultNick').textContent = userNick.toUpperCase();
+            document.getElementById('resultAcertos').textContent = quizScore;
+            document.getElementById('resultErros').textContent = 10 - quizScore;
+            document.getElementById('resultData').textContent = now;
+            const st = document.getElementById('status');
+            const em = document.getElementById('resultEmoji');
+            if (quizScore >= 7) {
+                st.textContent = 'MILITAR APTO'; st.className = 'result-status apto'; em.textContent = '✅';
+            } else {
+                st.textContent = 'MILITAR INAPTO'; st.className = 'result-status inapto'; em.textContent = '❌';
+            }
+        }
+
+        function reiniciar() {
+            document.getElementById('scr3').classList.remove('active');
+            document.getElementById('scr1').classList.add('active');
+            document.getElementById('nick').value = '';
+        }
+
+        // ── INIT ──
+        document.addEventListener('DOMContentLoaded', () => {
+            const username = localStorage.getItem('dme_username');
+            if (!username) { window.location.href = 'login.html'; return; }
+
+            document.getElementById('navUserName').textContent = username;
+            document.getElementById('dropdownName').textContent = username;
+            document.getElementById('navUserImage').src = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${username}&headonly=1&size=m&gesture=std&head_direction=2`;
+            document.getElementById('dropdownUserImage').src = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${username}&size=m&direction=2&head_direction=2&gesture=std`;
+
+            const admins = JSON.parse(localStorage.getItem('dme_admins')) || ['Xandelicado'];
+            if (admins.includes(username)) {
+                document.getElementById('dropdownPainel').style.display = 'flex';
+                document.getElementById('dropdownDivider').style.display = 'block';
+            }
+
+            document.getElementById('btnStart').addEventListener('click', startQuiz);
+            document.getElementById('nick').addEventListener('keypress', e => { if (e.key === 'Enter') startQuiz(); });
+
+            // Dropdown
+            const userProfileBtn = document.getElementById('userProfileBtn');
+            const userDropdown = document.getElementById('userDropdown');
+            userProfileBtn.addEventListener('click', e => { e.stopPropagation(); userDropdown.classList.toggle('active'); });
+            document.addEventListener('click', () => userDropdown.classList.remove('active'));
+
+            // Sidebar / Hamburger
+            const hamburger = document.getElementById('hamburger');
+            const mobileSidebar = document.getElementById('mobileSidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const sidebarClose = document.getElementById('sidebarClose');
+            const toggleSidebar = () => { mobileSidebar.classList.toggle('active'); sidebarOverlay.classList.toggle('active'); };
+            if (hamburger) hamburger.addEventListener('click', toggleSidebar);
+            if (sidebarClose) sidebarClose.addEventListener('click', toggleSidebar);
+            if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
+        });
+    </script>
+
+</body>
+
+</html>

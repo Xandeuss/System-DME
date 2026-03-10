@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DME System — Postar Aula</title>
+    <link rel="stylesheet" href="../styles/global.css">
+    <link rel="stylesheet" href="../styles/postar_aula.css">
+    <script>
+        (function () {
+            const t = localStorage.getItem('dme_theme') || 'dark';
+            if (t === 'light') document.documentElement.classList.add('light-mode');
+        })();
+    </script>
+</head>
+
+<body>
+
+    <!-- ══ SIDEBAR MOBILE ══════════════════════════════════ -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="mobile-sidebar" id="mobileSidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-title">DME System</span>
+            <button class="sidebar-close" id="sidebarClose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="sidebar-section">
+            <a href="home.html" class="sidebar-item">Página Inicial</a>
+            <a href="centro_tarefas_orgaos.html" class="sidebar-item">Centros e Órgãos</a>
+            <a href="requerimentos.html" class="sidebar-item">Requerimentos</a>
+            <a href="postar_aula.html" class="sidebar-item active">Postar Aula</a>
+            <a href="listagens.html" class="sidebar-item">Listagens</a>
+            <a href="ponto_servico.html" class="sidebar-item">Ponto de Serviço</a>
+        </div>
+    </div>
+
+    <!-- ══ NAVBAR ══════════════════════════════════════════ -->
+    <nav class="navbar">
+        <div class="logo-section">
+            <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+            <div class="logo-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+            </div>
+            <div class="logo-text">DME<em>System</em></div>
+        </div>
+        <div class="user-profile" id="userProfileBtn">
+            <div class="user-avatar"><img id="navUserImage" src="" alt=""></div>
+            <span class="user-name" id="navUserName">Usuário</span>
+            <div class="user-dropdown" id="userDropdown">
+                <div class="dropdown-header">
+                    <div class="dropdown-user-info">
+                        <div class="dropdown-avatar"><img id="dropdownUserImage" src="" alt=""></div>
+                        <div class="dropdown-user-details">
+                            <h4 id="dropdownName">Usuário</h4>
+                            <p id="dropdownCargo">Militar DME</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown-menu">
+                    <a href="painel.html" class="dropdown-item" id="dropdownPainel" style="display:none">Painel
+                        Admin</a>
+                    <a onclick="toggleTheme()" class="dropdown-item"><span id="themeText">Modo Claro</span></a>
+                    <div class="dropdown-divider"></div>
+                    <a onclick="logout()" class="dropdown-item danger">Sair</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ══ BREADCRUMB ══════════════════════════════════════ -->
+    <div class="breadcrumb-bar">
+        <a href="home.html" class="breadcrumb-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            </svg>
+            Início
+        </a>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="breadcrumb-sep">
+            <polyline points="9 18 15 12 9 6" />
+        </svg>
+        <span class="breadcrumb-current">Postar Aula</span>
+    </div>
+
+
+    <!-- ══ MAIN ════════════════════════════════════════════ -->
+    <main class="aula-main">
+        <div class="aula-card">
+            <!-- Header -->
+            <div class="aula-card-header">
+                <div class="aula-header-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                        <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="aula-header-title">Postar Aula</h1>
+                    <p class="aula-header-sub">Selecione o centro e o tipo de aula</p>
+                </div>
+            </div>
+
+            <!-- Alertas -->
+            <div id="aula-alert" class="aula-alert" style="display:none"></div>
+
+            <!-- Formulário -->
+            <div class="aula-form">
+
+                <!-- Centro (auto-detectado ou selecionável) -->
+                <div class="g-form-group">
+                    <label class="g-label">Centro de Tarefas</label>
+                    <select class="g-input" id="aula-select-centro">
+                        <option value="">Selecione o centro...</option>
+                    </select>
+                </div>
+
+                <!-- Tipo de Aula -->
+                <div class="g-form-group">
+                    <label class="g-label">Tipo de Aula <span class="req-star">*</span></label>
+                    <select class="g-input" id="aula-select-tipo">
+                        <option value="">Primeiro selecione o centro</option>
+                    </select>
+                </div>
+
+                <!-- Aplicador (readonly) -->
+                <div class="g-form-group">
+                    <label class="g-label">Instrutor Aplicador</label>
+                    <input type="text" class="g-input" id="aula-aplicador" readonly>
+                </div>
+
+                <!-- Data e Hora -->
+                <div class="g-form-row">
+                    <div class="g-form-group">
+                        <label class="g-label">Data e Hora da Aula <span class="req-star">*</span></label>
+                        <input type="datetime-local" class="g-input" id="aula-datahora">
+                    </div>
+                    <div class="g-form-group">
+                        <label class="g-label">Permissor / Autorizou</label>
+                        <input type="text" class="g-input" id="aula-permissor" placeholder="Nick de quem autorizou">
+                    </div>
+                </div>
+
+                <!-- Alunos -->
+                <div class="g-form-row">
+                    <div class="g-form-group">
+                        <label class="g-label">Aprovados</label>
+                        <textarea class="g-input" id="aula-aprovados" style="min-height:80px;resize:vertical"
+                            placeholder="Um nick por linha ou separados por vírgula..."></textarea>
+                    </div>
+                    <div class="g-form-group">
+                        <label class="g-label">Reprovados</label>
+                        <textarea class="g-input" id="aula-reprovados" style="min-height:80px;resize:vertical"
+                            placeholder="Um nick por linha ou separados por vírgula..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Sem alunos -->
+                <div class="g-form-group">
+                    <label class="aula-check-label">
+                        <input type="checkbox" id="aula-sem-alunos">
+                        <span class="aula-check-box"></span>
+                        Aula sem alunos / demonstração
+                    </label>
+                </div>
+
+                <!-- Observação -->
+                <div class="g-form-group">
+                    <label class="g-label">Observação <span class="req-star">*</span></label>
+                    <textarea class="g-input" id="aula-observacao" style="min-height:90px;resize:vertical"
+                        placeholder="Descreva brevemente como foi a aula..."></textarea>
+                </div>
+
+                <!-- Ações -->
+                <div class="aula-form-actions">
+                    <a href="home.html" class="btn-secondary">Cancelar</a>
+                    <button class="btn-primary" id="aula-btn-salvar" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        Confirmar Postagem
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Histórico pessoal -->
+        <div class="aula-card aula-hist-card">
+            <div class="aula-card-header"
+                style="border-bottom:1px solid var(--b1);padding-bottom:16px;margin-bottom:16px">
+                <div class="aula-header-icon" style="background:var(--bg-3)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="aula-header-title" style="font-size:1rem">Minhas Aulas</h2>
+                    <p class="aula-header-sub" id="aula-hist-periodo">Período atual</p>
+                </div>
+            </div>
+            <div id="aula-hist-list" class="aula-hist-list"></div>
+        </div>
+    </main>
+
+    <!-- ══ TOAST ══════════════════════════════════════════= -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="../scripts/notificacoes.js"></script>
+    <script src="../scripts/postar_aula.js"></script>
+</body>
+
+</html>

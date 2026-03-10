@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DME TREINO | Dashboard do Órgão</title>
+    <link rel="stylesheet" href="../styles/global.css">
+    <link rel="stylesheet" href="../styles/dashboard_orgao.css">
+    <script>
+        (function () {
+            const theme = localStorage.getItem('dme_theme') || 'dark';
+            if (theme === 'light') document.documentElement.classList.add('light-mode');
+        })();
+    </script>
+</head>
+
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="mobile-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Menu</div>
+            <div class="sidebar-close" id="sidebarClose">×</div>
+        </div>
+        <div class="sidebar-menu">
+            <a href="home.html" class="sidebar-item">🏠 Página Inicial</a>
+            <a href="centro_tarefas.html" class="sidebar-item">🏛️ Centro de Tarefas</a>
+            <a href="listagens.html" class="sidebar-item">📋 Listagens</a>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <div class="logo-section">
+            <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+            <div class="logo-icon"></div>
+            <div class="logo-text">DME<span>Treino</span></div>
+        </div>
+        <div class="nav-actions">
+            <div class="user-profile" id="userProfileBtn">
+                <div class="user-avatar"><img id="navUserImage" src="" alt=""></div>
+                <span class="user-name" id="navUserName">Usuário</span>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-info">
+                            <div class="dropdown-avatar"><img id="dropdownUserImage" src="" alt=""></div>
+                            <div class="dropdown-user-details">
+                                <h4 id="dropdownName">Usuário</h4>
+                                <p id="dropdownCargo">Militar DME</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="configuracao.html" class="dropdown-item">🔧 Configurações</a>
+                        <a class="dropdown-item"><span id="themeText">☀️ Modo Claro</span></a>
+                        <a class="dropdown-item danger">🚪 Sair</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header-card">
+            <div class="header-top">
+                <div class="header-info">
+                    <div class="header-icon" id="orgaoIcon">🏛️</div>
+                    <div>
+                        <div class="header-title" id="orgaoTitle">Nenhum Órgão Selecionado</div>
+                        <div class="header-sub" id="orgaoSub">Volte ao Centro de Tarefas</div>
+                    </div>
+                </div>
+                <button class="btn-config" id="btnConfig" style="display:none;">⚙️ Gerenciar</button>
+            </div>
+            <div class="hierarquia" id="hierarquia"></div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="tarefas" id="tab-tarefas-btn">📋 Tarefas</button>
+            <button class="tab" data-tab="membros" id="tab-membros-btn">👥 Membros</button>
+            <button class="tab" data-tab="cargos" id="tab-cargos-btn">🎖️ Cargos</button>
+        </div>
+
+        <div class="tab-content active" id="tab-tarefas">
+            <button class="btn-add" id="btnAddTask" style="display:none;">+ Nova Tarefa</button>
+            <div class="tasks-grid" id="tasksList"></div>
+        </div>
+
+        <div class="tab-content" id="tab-membros">
+            <div class="membros-grid" id="membrosList"></div>
+        </div>
+
+        <div class="tab-content" id="tab-cargos">
+            <button class="btn-add" id="btnAddCargo" style="display:none;">+ Novo Cargo</button>
+            <div class="cargos-list" id="cargosList"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalTask">
+        <div class="modal">
+            <div class="modal-title">Nova Tarefa</div>
+            <div class="form-group">
+                <label class="form-label">Ícone</label>
+                <input type="text" class="form-input" id="taskIcon" placeholder="📝" maxlength="2">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Título</label>
+                <input type="text" class="form-input" id="taskTitle" placeholder="Ex: Aplicar Instrução">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Descrição</label>
+                <textarea class="form-textarea" id="taskDesc" placeholder="Breve descrição..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel">Cancelar</button>
+                <button class="btn-save">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalCargo">
+        <div class="modal">
+            <div class="modal-title">Novo Cargo</div>
+            <div class="form-group">
+                <label class="form-label">Nome do Cargo</label>
+                <input type="text" class="form-input" id="cargoNome" placeholder="Ex: Instrutor">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Nível</label>
+                <select class="form-select" id="cargoNivel">
+                    <option value="membro">Membro</option>
+                    <option value="moderador">Moderador</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel">Cancelar</button>
+                <button class="btn-save">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../scripts/dashboard_orgao.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,175 @@
+/* ══ CONSULTA_PROMOCAO.CSS ═══════════════════════════════ */
+
+.promo-container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 20px 60px;
+}
+
+/* Header */
+.promo-header {
+    margin-bottom: 32px;
+}
+
+.promo-header .page-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--t1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.promo-header .page-title svg {
+    color: var(--green);
+}
+
+.page-subtitle {
+    font-size: .875rem;
+    color: var(--t2);
+}
+
+/* Sections */
+.promo-section {
+    background: var(--bg-2);
+    border: 1px solid var(--b1);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 16px;
+    transition: border-color var(--dur) var(--ease);
+}
+
+.promo-section:hover {
+    border-color: var(--b2);
+}
+
+.section-title {
+    font-size: .72rem;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    padding-left: 12px;
+    border-left: 3px solid var(--green);
+}
+
+/* Option buttons */
+.opt-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.opt-btn {
+    background: var(--bg-3);
+    border: 1px solid var(--b1);
+    color: var(--t2);
+    padding: 13px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: .84rem;
+    transition: all var(--dur) var(--ease);
+    text-align: center;
+    text-transform: uppercase;
+    font-family: inherit;
+    user-select: none;
+}
+
+.opt-btn:hover {
+    border-color: var(--b3);
+    color: var(--t1);
+}
+
+.opt-btn.active-green {
+    border-color: var(--green) !important;
+    color: var(--green) !important;
+    background: var(--green-muted) !important;
+}
+
+.opt-btn.active-red {
+    border-color: #ef4444 !important;
+    color: #ef4444 !important;
+    background: rgba(239, 68, 68, .1) !important;
+}
+
+/* Two-column layout */
+.two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+/* Analyze button */
+.btn-analyze {
+    width: 100%;
+    margin-top: 8px;
+    padding: 15px;
+    font-size: 1rem;
+    letter-spacing: .5px;
+}
+
+/* Result box */
+.resultado-box {
+    margin-top: 28px;
+    padding: 28px;
+    border-radius: 14px;
+    border: 1px solid var(--b3);
+    background: var(--bg-2);
+    animation: fadeInUp var(--dur) var(--ease);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.result-header {
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin-bottom: 18px;
+    text-align: center;
+    letter-spacing: 1.5px;
+}
+
+.motivo-item {
+    font-size: .875rem;
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--b1);
+    color: var(--t2);
+    line-height: 1.6;
+}
+
+.motivo-item:last-child {
+    border: none;
+}
+
+.motivo-item b {
+    color: #ef4444;
+}
+
+.btn-copy {
+    width: 100%;
+    margin-top: 16px;
+}
+
+@media (max-width: 600px) {
+
+    .opt-grid,
+    .two-col {
+        grid-template-columns: 1fr;
+    }
+
+    .promo-container {
+        padding: 24px 16px 48px;
+    }
+}

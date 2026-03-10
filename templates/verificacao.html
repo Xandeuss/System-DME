@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DME System | Verificação</title>
+    <link rel="stylesheet" href="../styles/global.css">
+    <link rel="stylesheet" href="../styles/login.css">
+</head>
+
+<body>
+
+    <div class="auth-card">
+
+        <!-- BRAND -->
+        <div class="auth-brand">
+            <div class="auth-logo-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+            </div>
+            <div class="auth-brand-name">DME<em>System</em></div>
+        </div>
+
+        <!-- CABEÇALHO -->
+        <div class="step-chip">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="10" height="10">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            Verificação de Identidade
+        </div>
+
+        <div class="auth-header">
+            <div class="auth-title">Quase lá, <span id="user-display">Militar</span>!</div>
+            <div class="auth-sub">
+                Copie o código abaixo e cole na sua <strong style="color:var(--t1)">missão do Habbo</strong>.
+                Após alterar, clique em Validar.
+            </div>
+        </div>
+
+        <!-- CÓDIGO -->
+        <div class="code-block" id="codeBlock" onclick="copyCode()" title="Clique para copiar">
+            <div class="code-value" id="verify-code">DME-????</div>
+            <div class="code-hint">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Clique para copiar
+            </div>
+        </div>
+
+        <!-- BOTÃO -->
+        <button class="btn-auth" id="verifyBtn" onclick="finishRegistration()" style="margin-top:20px">
+            <span class="btn-text">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"
+                    style="vertical-align:middle;margin-right:4px">
+                    <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Validar Missão e Entrar
+            </span>
+            <div class="spinner"></div>
+        </button>
+
+        <div class="auth-sep">ou</div>
+
+        <div class="auth-link-row">
+            <a onclick="window.location.href='login.html'">← Voltar ao login</a>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ── Pega o usuário salvo ──────────────────────────────
+        const username = localStorage.getItem('dme_username') || 'Militar';
+        document.getElementById('user-display').textContent = username;
+
+        // ── Gera código aleatório ─────────────────────────────
+        const randomCode = 'DME-' + Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('verify-code').textContent = randomCode;
+
+        // ── Toast ─────────────────────────────────────────────
+        function toast(msg, type = 'ok') {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.className = 'toast ' + type;
+            clearTimeout(el._t);
+            setTimeout(() => el.classList.add('show'), 10);
+            el._t = setTimeout(() => el.classList.remove('show'), 3500);
+        }
+
+        // ── Copiar código ─────────────────────────────────────
+        function copyCode() {
+            const code = document.getElementById('verify-code').textContent.trim();
+            navigator.clipboard.writeText(code)
+                .then(() => toast('✓ Código copiado: ' + code, 'info'))
+                .catch(() => toast('Copie manualmente: ' + code, 'info'));
+        }
+
+        // ── Finalizar Registro ────────────────────────────────
+        async function finishRegistration() {
+            const btn = document.getElementById('verifyBtn');
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(
+                    `https://www.habbo.com.br/api/public/users?name=${encodeURIComponent(username)}`
+                );
+
+                if (!response.ok) {
+                    if (response.status === 404) throw new Error('Usuário Habbo não encontrado. Verifique o nome.');
+                    throw new Error('Erro ao conectar com a API do Habbo.');
+                }
+
+                const data = await response.json();
+                const expectedCode = document.getElementById('verify-code').textContent.trim();
+
+                if (data.motto && data.motto.includes(expectedCode)) {
+                    // SUCESSO: Move do pending para users com status pendente
+                    const pending = JSON.parse(localStorage.getItem('dme_pending_registration'));
+
+                    if (pending) {
+                        let users = JSON.parse(localStorage.getItem('dme_users')) || [];
+                        users.push({
+                            ...pending,
+                            status: 'pendente',
+                            registradoEm: new Date().toLocaleString('pt-BR'),
+                            habboId: data.uniqueId || null
+                        });
+                        localStorage.setItem('dme_users', JSON.stringify(users));
+                        localStorage.removeItem('dme_pending_registration');
+                        localStorage.removeItem('dme_username');
+                    }
+
+                    toast('✅ Verificação concluída!', 'ok');
+                    setTimeout(() => {
+                        toast('Aguardando aprovação de um administrador...', 'info');
+                        setTimeout(() => window.location.href = 'login.html', 2000);
+                    }, 1200);
+                } else {
+                    const missao = data.motto ? `"${data.motto}"` : '(vazia)';
+                    toast(`❌ Código não encontrado. Sua missão atual: ${missao}`, 'err');
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
+                }
+
+            } catch (error) {
+                console.error(error);
+                toast('❌ ' + error.message, 'err');
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+
+</html>
