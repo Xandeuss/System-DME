@@ -1,4 +1,4 @@
-(function() {
+(function () {
     const username = localStorage.getItem('dme_username');
     if (!username) { window.location.href = 'login.html'; return; }
 
@@ -32,29 +32,12 @@
         return d.lider === username || d.viceLider === username;
     };
 
-    // Gerenciamento de Tema
-    function applyTheme(t) {
-        const el = getElement('themeText');
-        if (t === 'light') { 
-            document.body.classList.add('light-mode'); 
-            if (el) el.textContent = '🌙 Modo Escuro'; 
-        } else { 
-            document.body.classList.remove('light-mode'); 
-            if (el) el.textContent = '☀️ Modo Claro'; 
-        }
-    }
-    
-    function toggleTheme() {
-        const current = localStorage.getItem('dme_theme') || 'dark';
-        const next = current === 'dark' ? 'light' : 'dark';
-        localStorage.setItem('dme_theme', next);
-        applyTheme(next);
-    }
+
 
     // Gerenciamento de Usuário
-    function logout() { 
-        localStorage.removeItem('dme_username'); 
-        window.location.href = 'login.html'; 
+    function logout() {
+        localStorage.removeItem('dme_username');
+        window.location.href = 'login.html';
     }
 
     // Carregamento de Dados
@@ -91,12 +74,12 @@
         if (!orgao) return;
         const d = getOrgaoData(orgao.id);
         const container = getElement('tasksList');
-        
+
         if (d.tarefas.length === 0) {
             container.innerHTML = '<div class="empty" style="grid-column:1/-1;"><div class="empty-icon">📋</div><div>Nenhuma tarefa criada</div></div>';
             return;
         }
-        
+
         container.innerHTML = d.tarefas.map(t => `
             <div class="task-card" data-id="${t.id}">
                 <div class="task-icon">${t.icon}</div>
@@ -121,16 +104,16 @@
         const icon = getElement('taskIcon').value.trim() || '📝';
         const titulo = getElement('taskTitle').value.trim();
         const descricao = getElement('taskDesc').value.trim();
-        
+
         if (!titulo) { alert('❌ Digite um título!'); return; }
-        
+
         const d = getOrgaoData(orgao.id);
         d.tarefas.push({ id: Date.now().toString(), icon, titulo, descricao, autor: username });
         saveOrgaoData(orgao.id, d);
-        
+
         closeModal('modalTask');
         loadTasks();
-        
+
         getElement('taskIcon').value = '';
         getElement('taskTitle').value = '';
         getElement('taskDesc').value = '';
@@ -143,13 +126,13 @@
         if (d.lider) m.push({ nick: d.lider, cargo: 'Líder' });
         if (d.viceLider) m.push({ nick: d.viceLider, cargo: 'Vice-Líder' });
         m.push(...d.membros);
-        
+
         const container = getElement('membrosList');
         if (m.length === 0) {
             container.innerHTML = '<div class="empty" style="grid-column:1/-1;"><div class="empty-icon">👥</div><div>Nenhum membro</div></div>';
             return;
         }
-        
+
         container.innerHTML = m.map(x => `
             <div class="membro-card">
                 <div class="membro-avatar">
@@ -169,13 +152,13 @@
             { nome: 'Vice-Líder', nivel: 'Gestão', usuario: d.viceLider || 'Vago' }
         ];
         const todos = [...fixos, ...d.cargos];
-        
+
         const container = getElement('cargosList');
         if (todos.length === 0) {
             container.innerHTML = '<div class="empty"><div class="empty-icon">🎖️</div><div>Nenhum cargo</div></div>';
             return;
         }
-        
+
         container.innerHTML = todos.map(x => `
             <div class="cargo-item">
                 <div>
@@ -190,20 +173,20 @@
     function saveCargo() {
         const nome = getElement('cargoNome').value.trim();
         const nivel = getElement('cargoNivel').value;
-        
+
         if (!nome) { alert('❌ Digite um nome!'); return; }
-        
+
         const d = getOrgaoData(orgao.id);
         d.cargos.push({ id: Date.now().toString(), nome, nivel, usuario: null });
         saveOrgaoData(orgao.id, d);
-        
+
         closeModal('modalCargo');
         loadCargos();
         getElement('cargoNome').value = '';
     }
 
-    function closeModal(id) { 
-        getElement(id).classList.remove('active'); 
+    function closeModal(id) {
+        getElement(id).classList.remove('active');
     }
 
     function mudarAba(t) {
@@ -215,7 +198,7 @@
 
     // Inicialização e Event Listeners
     document.addEventListener('DOMContentLoaded', () => {
-        applyTheme(localStorage.getItem('dme_theme') || 'dark');
+        window.applyTheme(localStorage.getItem('dme_theme') || 'dark');
 
         getElement('navUserName').textContent = username;
         getElement('dropdownName').textContent = username;
@@ -242,7 +225,7 @@
 
         // Theme Toggle
         document.querySelector('a[onclick="toggleTheme()"]')?.removeAttribute('onclick');
-        document.getElementById('themeText').parentElement.addEventListener('click', toggleTheme);
+        document.getElementById('themeText').parentElement.addEventListener('click', window.toggleTheme);
 
         // Logout
         document.querySelector('a[onclick="logout()"]')?.removeAttribute('onclick');
@@ -252,7 +235,7 @@
         document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => mudarAba(t.getAttribute('data-tab'))));
 
         // Modais e Botões
-        getElement('btnConfig')?.addEventListener('click', function() {
+        getElement('btnConfig')?.addEventListener('click', function () {
             if (!isLiderOuVice()) { alert('⚠️ Apenas Líder/Vice podem gerenciar.'); return; }
             const d = getOrgaoData(orgao.id);
             const l = prompt('👤 Líder (nickname):', d.lider || '');
@@ -268,24 +251,24 @@
 
         getElement('btnAddTask')?.addEventListener('click', () => getElement('modalTask').classList.add('active'));
         getElement('btnAddCargo')?.addEventListener('click', () => getElement('modalCargo').classList.add('active'));
-        
-        document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { 
-            if (e.target === o) o.classList.remove('active'); 
+
+        document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => {
+            if (e.target === o) o.classList.remove('active');
         }));
 
         // Botões de Salvar/Cancelar Modais
         // Remove onlicks do HTML e adiciona listeners aqui
         const btnSaveTask = document.querySelector('#modalTask .btn-save');
-        if(btnSaveTask) btnSaveTask.addEventListener('click', saveTask);
+        if (btnSaveTask) btnSaveTask.addEventListener('click', saveTask);
 
         const btnCancelTask = document.querySelector('#modalTask .btn-cancel');
-        if(btnCancelTask) btnCancelTask.addEventListener('click', () => closeModal('modalTask'));
+        if (btnCancelTask) btnCancelTask.addEventListener('click', () => closeModal('modalTask'));
 
         const btnSaveCargo = document.querySelector('#modalCargo .btn-save');
-        if(btnSaveCargo) btnSaveCargo.addEventListener('click', saveCargo);
+        if (btnSaveCargo) btnSaveCargo.addEventListener('click', saveCargo);
 
         const btnCancelCargo = document.querySelector('#modalCargo .btn-cancel');
-        if(btnCancelCargo) btnCancelCargo.addEventListener('click', () => closeModal('modalCargo'));
+        if (btnCancelCargo) btnCancelCargo.addEventListener('click', () => closeModal('modalCargo'));
 
         loadOrgao();
     });

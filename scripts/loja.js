@@ -27,23 +27,7 @@
         window.location.href = 'login.html';
     }
 
-    function applyTheme(theme) {
-        const themeText = document.getElementById('themeText');
-        if (theme === 'light') {
-            document.body.classList.add('light-mode');
-            if (themeText) themeText.textContent = 'Modo Escuro';
-        } else {
-            document.body.classList.remove('light-mode');
-            if (themeText) themeText.textContent = 'Modo Claro';
-        }
-    }
 
-    function toggleTheme() {
-        const current = localStorage.getItem('dme_theme') || 'dark';
-        const next = current === 'dark' ? 'light' : 'dark';
-        localStorage.setItem('dme_theme', next);
-        applyTheme(next);
-    }
 
     // ══════════════════════════════════════════════════════════════════════════════
     // SISTEMA DE DRAGONAS
@@ -534,7 +518,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         // Tema
-        applyTheme(localStorage.getItem('dme_theme') || 'dark');
+        window.applyTheme(localStorage.getItem('dme_theme') || 'dark');
 
         // Usuário
         document.getElementById('navUserName').textContent = username;

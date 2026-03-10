@@ -376,3 +376,169 @@
         margin-bottom: 0;
     }
 }
+
+/* ── TAG INPUT (Gratificação) ────────────────────────── */
+.tag-input-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px 10px;
+    background: var(--bg-1);
+    border: 1px solid var(--b1);
+    border-radius: 10px;
+    min-height: 42px;
+    align-items: center;
+    cursor: text;
+    transition: border-color .2s;
+}
+
+.tag-input-container:focus-within {
+    border-color: var(--green);
+}
+
+.tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--green-muted);
+    color: var(--green);
+    padding: 4px 8px 4px 10px;
+    border-radius: 6px;
+    font-size: .78rem;
+    font-weight: 600;
+    animation: tagIn .15s ease;
+}
+
+@keyframes tagIn {
+    from {
+        transform: scale(.85);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.tag-chip button {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font-size: .9rem;
+    line-height: 1;
+    padding: 0 2px;
+    opacity: .7;
+    transition: opacity .15s;
+}
+
+.tag-chip button:hover {
+    opacity: 1;
+}
+
+.tag-input-field {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: .82rem;
+    color: var(--t1);
+    flex: 1;
+    min-width: 120px;
+    padding: 2px 0;
+}
+
+.tag-input-field::placeholder {
+    color: var(--t3);
+}
+
+/* ── LICENÇA TABLES ──────────────────────────────────── */
+.licenca-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.licenca-panel {
+    background: var(--bg-1);
+    border: 1px solid var(--b1);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.licenca-panel-header {
+    padding: 10px 16px;
+    font-size: .78rem;
+    font-weight: 700;
+    border-bottom: 1px solid var(--b1);
+}
+
+.licenca-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .76rem;
+}
+
+.licenca-table th {
+    text-align: left;
+    padding: 8px 12px;
+    font-size: .68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--t3);
+    border-bottom: 1px solid var(--b1);
+}
+
+.licenca-table td {
+    padding: 10px 12px;
+    color: var(--t1);
+    border-bottom: 1px solid var(--b1);
+}
+
+.licenca-table tr:last-child td {
+    border-bottom: none;
+}
+
+.licenca-table .btn-ver {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: .72rem;
+    font-weight: 600;
+    background: var(--green);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: opacity .2s;
+}
+
+.licenca-table .btn-ver:hover {
+    opacity: .85;
+}
+
+.licenca-status {
+    font-size: .65rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.licenca-status.acabou {
+    background: rgba(239, 68, 68, .12);
+    color: var(--red);
+}
+
+.licenca-status.ativa {
+    background: rgba(34, 197, 94, .12);
+    color: var(--green);
+}
+
+@media (max-width: 768px) {
+    .licenca-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,22 +1,8 @@
-/* ── theme IIFE ──────────────────────────── */
-; (function () {
-    const t = localStorage.getItem('dme_theme') || 'dark';
-    if (t === 'light') document.documentElement.classList.add('light-mode');
-})();
-
 /* ── auth guard ──────────────────────────── */
 const loggedUser = localStorage.getItem('dme_username');
 if (!loggedUser) location.href = 'login.html';
 
 function logout() { localStorage.removeItem('dme_username'); location.href = 'login.html'; }
-function toggleTheme() {
-    const cur = localStorage.getItem('dme_theme') || 'dark';
-    const nxt = cur === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('dme_theme', nxt);
-    document.body.classList.toggle('light-mode', nxt === 'light');
-    const el = document.getElementById('themeText');
-    if (el) el.textContent = nxt === 'light' ? 'Modo Escuro' : 'Modo Claro';
-}
 
 /* ── helpers ─────────────────────────────── */
 const avFull = (nick, dir = 2, hdir = 2) =>

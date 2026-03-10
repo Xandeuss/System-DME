@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
@@ -12,7 +12,7 @@
 
 <body>
 
-    <!-- ══ SIDEBAR ══════════════════════════════════════ -->
+    <!-- â•â• SIDEBAR â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <div class="mobile-sidebar" id="mobileSidebar">
         <div class="sidebar-header">
@@ -30,7 +30,7 @@
                     <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                     <polyline points="9 22 9 12 15 12 15 22" />
                 </svg>
-                Página Inicial
+                PÃ¡gina Inicial
             </a>
             <a href="listagens.html" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -62,7 +62,7 @@
                     <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
                     <polyline points="16 7 22 7 22 13" />
                 </svg>
-                Consultar Promoção
+                Consultar PromoÃ§Ã£o
             </a>
         </div>
         <div class="sidebar-section">
@@ -72,7 +72,7 @@
                     <circle cx="12" cy="12" r="10" />
                     <polyline points="12 6 12 12 16 14" />
                 </svg>
-                Ponto de Serviço
+                Ponto de ServiÃ§o
             </a>
             <a href="loja.html" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -93,7 +93,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 10v11M16 10v11M12 10v11" />
                 </svg>
-                Centros e Órgãos
+                Centros e Ã“rgÃ£os
             </a>
             <a href="recrutamentos.html" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -117,6 +117,13 @@
                     <path d="m14.5 4-5 16" />
                 </svg>
                 Setor Legislativo
+            </a>
+            <a href="postar_aula.html" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                </svg>
+                Postar Aula
             </a>
         </div>
     </div>
@@ -370,9 +377,43 @@
                             </select>
                         </div>
 
-                        <div class="g-form-group">
-                            <label class="g-label" id="label-selecao">Nova Patente</label>
+                        <!-- Nova Patente (readonly, auto-preenchida) -->
+                        <div class="g-form-group" id="grupo-nova-patente" style="display:none">
+                            <label class="g-label">Nova patente</label>
+                            <input type="text" id="input-nova-patente" class="g-input" readonly
+                                style="background:var(--bg-3);cursor:default">
+                        </div>
+
+                        <!-- Select genérico (para tipos que usam dropdown) -->
+                        <div class="g-form-group" id="grupo-select-opcoes" style="display:none">
+                            <label class="g-label" id="label-selecao">Opção</label>
                             <select id="select-opcoes" class="g-select"></select>
+                        </div>
+
+                        <!-- Banido até (exoneração) -->
+                        <div class="g-form-group" id="grupo-banido-ate" style="display:none">
+                            <label class="g-label">Banido até</label>
+                            <input type="datetime-local" id="input-banido-ate" class="g-input">
+                        </div>
+
+                        <!-- Anexo das Provas -->
+                        <div class="g-form-group" id="grupo-anexo-provas" style="display:none">
+                            <label class="g-label">Anexo das Provas</label>
+                            <input type="text" id="input-anexo-provas" class="g-input"
+                                placeholder="Cole o link das provas">
+                        </div>
+
+                        <!-- Valor (venda) -->
+                        <div class="g-form-group" id="grupo-valor" style="display:none">
+                            <label class="g-label">Valor</label>
+                            <input type="text" id="input-valor" class="g-input" placeholder="">
+                        </div>
+
+                        <!-- Nick do policial promovido (permissão) -->
+                        <div class="g-form-group" id="grupo-nick-promovido" style="display:none">
+                            <label class="g-label">Nick do policial promovido</label>
+                            <input type="text" id="input-nick-promovido" class="g-input"
+                                placeholder="Digite o nickname corretamente">
                         </div>
 
                         <div id="campos-aula" style="display:none">
@@ -396,18 +437,22 @@
                             </div>
                         </div>
 
-                        <div class="g-form-group">
+                        <!-- Permissor -->
+                        <div class="g-form-group" id="grupo-permissor">
                             <label class="g-label">Permissor (Opcional)</label>
-                            <input type="text" id="input-permissor" class="g-input" placeholder="Nickname do permissor">
+                            <input type="text" id="input-permissor" class="g-input"
+                                placeholder="Digite o nickname do Permissor">
                         </div>
 
-                        <div class="g-form-group">
-                            <label class="g-label">Observação</label>
+                        <!-- Observação -->
+                        <div class="g-form-group" id="grupo-observacao">
+                            <label class="g-label">Observação *</label>
                             <textarea id="input-observacao" class="g-textarea" rows="4"
-                                placeholder="Detalhes do requerimento..."></textarea>
+                                placeholder="Digite a sua observação"></textarea>
                         </div>
 
-                        <div class="g-form-group">
+                        <!-- Data e Hora -->
+                        <div class="g-form-group" id="grupo-datahora">
                             <label class="g-label">Data e Hora (Opcional)</label>
                             <input type="datetime-local" id="input-datahora" class="g-input">
                         </div>
@@ -418,8 +463,103 @@
                                 <polyline points="17 21 17 13 7 13 7 21" />
                                 <polyline points="7 3 7 8 15 8" />
                             </svg>
-                            Salvar Registro
+                            Salvar
                         </button>
+                    </div>
+
+                    <!-- ══ GRATIFICAÇÃO (multi-tag) ══ -->
+                    <div id="campos-gratificacao" style="display:none">
+                        <div class="g-form-group">
+                            <label class="g-label">Envolvidos *</label>
+                            <div class="tag-input-container" id="tag-container">
+                                <input type="text" id="input-tag-nick" class="tag-input-field"
+                                    placeholder="Digite o nick e pressione Tab ou Enter">
+                            </div>
+                        </div>
+
+                        <div class="g-form-group">
+                            <label class="g-label">Quantidade *</label>
+                            <input type="number" id="input-quantidade" class="g-input" placeholder="-400 a 3500"
+                                min="-400" max="3500">
+                        </div>
+
+                        <div class="g-form-group">
+                            <label class="g-label">Motivo *</label>
+                            <textarea id="input-motivo" class="g-textarea" rows="4"
+                                placeholder="Digite o motivo"></textarea>
+                        </div>
+
+                        <button class="btn-primary" id="btn-salvar-gratificacao"
+                            style="width:100%;justify-content:center">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                                <polyline points="17 21 17 13 7 13 7 21" />
+                                <polyline points="7 3 7 8 15 8" />
+                            </svg>
+                            Salvar
+                        </button>
+                    </div>
+
+                    <!-- ══ LICENÇA (dashboard) ══ -->
+                    <div id="campos-licenca" style="display:none">
+                        <div class="licenca-grid">
+                            <div class="licenca-panel">
+                                <div class="licenca-panel-header"
+                                    style="background:var(--yellow-muted,#fef3c7);color:var(--yellow,#d97706)">Licenças
+                                    Pendentes</div>
+                                <table class="licenca-table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Usuário</th>
+                                            <th>Data de Início</th>
+                                            <th>Dias</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="licenca-pendentes">
+                                        <tr>
+                                            <td colspan="5" style="text-align:center;color:var(--t3);padding:20px">
+                                                Nenhuma licença encontrada</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="licenca-panel">
+                                <div class="licenca-panel-header"
+                                    style="background:var(--green-muted,#dcfce7);color:var(--green,#16a34a)">Licenças em
+                                    Andamento</div>
+                                <table class="licenca-table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Usuário</th>
+                                            <th>Data de Início</th>
+                                            <th>Data de Fim</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="licenca-andamento"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="licenca-panel" style="margin-top:16px">
+                            <div class="licenca-panel-header">Todas as Licenças</div>
+                            <table class="licenca-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Usuário</th>
+                                        <th>Data de Início</th>
+                                        <th>Dias</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="licenca-todas"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 

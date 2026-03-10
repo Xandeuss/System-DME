@@ -410,19 +410,7 @@ function logout() {
     window.location.href = 'login.html';
 }
 
-function toggleTheme() {
-    const currentTheme = localStorage.getItem('dme_theme') || 'dark';
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('dme_theme', newTheme);
 
-    if (newTheme === 'light') {
-        document.documentElement.classList.add('light-mode');
-        document.getElementById('themeText').textContent = 'Modo Escuro';
-    } else {
-        document.documentElement.classList.remove('light-mode');
-        document.getElementById('themeText').textContent = 'Modo Claro';
-    }
-}
 
 function setupMobileSidebar() {
     const hamburger = document.getElementById('hamburger');

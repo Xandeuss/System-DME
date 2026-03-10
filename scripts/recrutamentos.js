@@ -28,23 +28,7 @@ function logout() {
     window.location.href = 'login.html';
 }
 
-function applyTheme(theme) {
-    const themeText = document.getElementById('themeText');
-    if (theme === 'light') {
-        document.body.classList.add('light-mode');
-        if (themeText) themeText.textContent = 'Modo Escuro';
-    } else {
-        document.body.classList.remove('light-mode');
-        if (themeText) themeText.textContent = 'Modo Claro';
-    }
-}
 
-function toggleTheme() {
-    const current = localStorage.getItem('dme_theme') || 'dark';
-    const next = current === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('dme_theme', next);
-    applyTheme(next);
-}
 
 function mudarAba(aba) {
     abaAtual = aba;
@@ -218,9 +202,6 @@ function acaoAdmin(acao) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('dme_theme') || 'dark';
-    applyTheme(savedTheme);
-
     document.getElementById('navUserName').textContent = usuarioLogado;
     document.getElementById('dropdownName').textContent = usuarioLogado;
 
