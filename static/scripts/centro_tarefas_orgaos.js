@@ -109,7 +109,7 @@
             }
         }
 
-        const admins = JSON.parse(localStorage.getItem('dme_admins')) || [];
+        const admins = JSON.parse(localStorage.getItem('dme_admins') || 'null') || ['Xandelicado', 'rafacv', 'Ronaldo'];
         if (admins.includes(username)) {
             const painel = document.getElementById('dropdownPainel');
             if (painel) painel.style.display = 'flex';

@@ -277,7 +277,7 @@
     document.getElementById('navUserImage').src = navImg;
     document.getElementById('dropdownUserImage').src = fullImg;
 
-    const admins = get('dme_admins') || [];
+    const admins = get('dme_admins') || ['Xandelicado', 'rafacv', 'Ronaldo'];
     if (admins.includes(username)) document.getElementById('dropdownPainel').style.display = 'flex';
 
     // Dropdown

@@ -45,8 +45,19 @@
     const getHier = id => get(`dme_hier_${id}`) || [];
     const saveHier = (id, v) => set(`dme_hier_${id}`, v);
     const getLideres = () => get('dme_centros_lideres') || {};
-    const isAdmin = () => (get('dme_admins') || []).includes(username);
-    const isLider = id => isAdmin() || (getLideres()[id] || []).includes(username);
+    const isAdmin = () => (get('dme_admins') || ['Xandelicado', 'rafacv', 'Ronaldo']).includes(username);
+    const isLiderByOrgao = (id) => {
+        try {
+            const raw = localStorage.getItem('dme_orgao_' + id);
+            if (!raw) return false;
+            const data = JSON.parse(raw);
+            const me = (data.membros || []).find(m => m.username.toLowerCase() === username.toLowerCase());
+            if (!me) return false;
+            const cargo = (data.cargos || []).find(c => c.nome === me.cargo);
+            return cargo ? !!cargo.perms.lideranca : me.cargo === 'Líder';
+        } catch(_) { return false; }
+    };
+    const isLider = id => isAdmin() || (getLideres()[id] || []).includes(username) || isLiderByOrgao(id);
     const getAulas = () => get('dme_aulas') || [];
 
     // ── Período ativo ────────────────────────────────────
@@ -343,36 +354,440 @@
     };
 
     // ── Membros ─────────────────────────────────────────
+    // Funções de dados
+    function getMembrosOrgao() {
+        try {
+            const raw = localStorage.getItem('dme_orgao_' + orgao.id);
+            return raw ? (JSON.parse(raw).membros || []) : [];
+        } catch (_) { return []; }
+    }
+    function saveMembrosOrgao(membros) {
+        try {
+            const raw = localStorage.getItem('dme_orgao_' + orgao.id);
+            const data = raw ? JSON.parse(raw) : {};
+            data.membros = membros;
+            localStorage.setItem('dme_orgao_' + orgao.id, JSON.stringify(data));
+        } catch (_) {}
+    }
+
+    // Funções disponiveis para seleção de cargos
+    const CARGOS_DISPONIVEIS = function() {
+        try {
+            const raw = localStorage.getItem('dme_orgao_' + orgao.id);
+            const data = raw ? JSON.parse(raw) : {};
+            if (data.cargos && data.cargos.length) return data.cargos.map(function(c){ return c.nome || c; });
+        } catch(_){}
+        return ['Líder','Vice-Líder','Ministro','Capacitador','Instrutor','Membro'];
+    };
+
+    // Ordem hierárquica dos cargos
+    const CARGO_ORDEM = ['Lider','Líder','Vice-Lider','Vice-Líder','Ministro','Ministro Administrativo','Ministro de Contabilidade','Ministro de Atualização','Ministro de Fiscalização','Suboficial','Capacitador','Instrutor','Membro'];
+    // Verifica se um cargo é do tipo Ministro (qualquer especialidade)
+    function ehMinistro(cargo) {
+        return (cargo || '').toLowerCase().startsWith('ministro');
+    }
+
+    // Retorna o label de exibição do grupo — ministros agrupam como "Ministro"
+    function labelGrupo(cargo) {
+        return ehMinistro(cargo) ? 'Ministro' : cargo;
+    }
+
+    function getCargoOrdem(cargo) {
+        const idx = CARGO_ORDEM.findIndex(function(c){ return c.toLowerCase() === (cargo||'').toLowerCase(); });
+        return idx >= 0 ? idx : CARGO_ORDEM.length;
+    }
+
+    // Estado: view atual (lista | avatares | tabela)
+    let membrosView = 'lista';
+
+    // Mostrar botão + e toggle tabela para líderes
+    if (isLider(orgao.id)) {
+        const btnAdd = qs('#btnAddMembro');
+        if (btnAdd) btnAdd.style.display = 'inline-flex';
+        const btnTab = qs('#btnViewTabela');
+        if (btnTab) btnTab.style.display = 'inline-flex';
+    }
+
+    // Toggle de view
+    qsa('.view-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            membrosView = btn.dataset.view;
+            qsa('.view-btn').forEach(function(b){ b.classList.remove('active'); });
+            btn.classList.add('active');
+            const filter = (qs('#membrosSearch') || {}).value || '';
+            renderMembros(filter.toLowerCase());
+        });
+    });
+
+    // Busca
     renderMembros();
-    qs('#membrosSearch')?.addEventListener('input', function () {
+    qs('#membrosSearch')?.addEventListener('input', function() {
         renderMembros(this.value.toLowerCase());
     });
 
-    function renderMembros(filter = '') {
+    function renderMembros(filter) {
+        filter = filter || '';
+        if (membrosView === 'tabela' && isLider(orgao.id)) {
+            renderMembrosTabela(filter);
+        } else if (membrosView === 'avatares') {
+            renderMembrosAvataresGrid(filter);
+        } else {
+            renderMembrosAvatares(filter); // lista com data (padrão)
+        }
+    }
+
+    // ── View Listagem (padrão — por seção com data) ────────
+    function renderMembrosAvatares(filter) {
         const list = qs('#membrosList');
+        const tabelaList = qs('#membrosListTabela');
+        if (!list) return;
+        list.style.display = '';
+        if (tabelaList) tabelaList.style.display = 'none';
 
-        // Puxa todos os militares do localStorage
-        const militares = [...(get('dme_militar') || []), ...(get('dme_empresarial') || [])];
-        let exibir = filter
-            ? militares.filter(m => (m.nick || '').toLowerCase().includes(filter))
-            : militares;
+        let membrosOrgao = getMembrosOrgao();
+        if (filter) membrosOrgao = membrosOrgao.filter(function(m){
+            return (m.username||'').toLowerCase().includes(filter) ||
+                   (m.cargo||'').toLowerCase().includes(filter);
+        });
 
-        if (exibir.length === 0) {
-            list.innerHTML = `<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">Nenhum membro encontrado.</div></div>`;
+        if (membrosOrgao.length === 0) {
+            list.innerHTML = '<div class="empty-state" style="padding:48px 20px">' +
+                '<div class="empty-icon" style="font-size:2rem;margin-bottom:10px">&#x1F465;</div>' +
+                '<div class="empty-text">' + (filter ? 'Nenhum membro encontrado.' : 'Nenhum membro cadastrado neste centro.') + '</div>' +
+                '</div>';
             return;
         }
-        list.innerHTML = exibir.map(m => {
-            const av = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(m.nick)}&headonly=1&size=m&gesture=std`;
-            return `
-            <div class="membro-card">
-                <img src="${av}" alt="${escH(m.nick)}" loading="lazy">
-                <span class="membro-nick">${escH(m.nick)}</span>
-                <span class="membro-cargo">${escH(m.patente || 'Militar')}</span>
-            </div>`;
+
+        // Agrupar: ministros ficam em grupo único "Ministério"
+        const grupos = {};
+        const ordemGrupos = [];
+        membrosOrgao.forEach(function(m) {
+            const cargo = m.cargo || 'Membro';
+            var grupoKey;
+            if (ehMinistro(cargo)) {
+                grupoKey = 'Ministério';
+            } else {
+                // Normalizar nome do grupo p/ exibição
+                grupoKey = cargo === 'Líder' || cargo === 'Lider' ? 'Liderança'
+                         : cargo === 'Vice-Líder' || cargo === 'Vice-Lider' ? 'Liderança'
+                         : cargo === 'Capacitador' ? 'Capacitadores'
+                         : cargo === 'Instrutor' ? 'Instrutores'
+                         : cargo;
+            }
+            if (!grupos[grupoKey]) { grupos[grupoKey] = []; ordemGrupos.push(grupoKey); }
+            grupos[grupoKey].push(m);
+        });
+
+        // Ordenação dos grupos pela hierarquia (usando primeiro membro do grupo)
+        const GRUPO_ORDEM = ['Liderança','Ministério','Capacitadores','Instrutores','Membro'];
+        const cargosOrdenados = Object.keys(grupos).sort(function(a, b) {
+            var ia = GRUPO_ORDEM.indexOf(a); var ib = GRUPO_ORDEM.indexOf(b);
+            if (ia < 0) ia = 99; if (ib < 0) ib = 99;
+            return ia - ib;
+        });
+
+        function formatData(dataStr) {
+            if (!dataStr) return '';
+            // Suporta ISO, dd/mm/yyyy, dd Mon yyyy
+            try {
+                var d = new Date(dataStr);
+                if (isNaN(d.getTime())) return dataStr;
+                var meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+                return d.getDate().toString().padStart(2,'0') + ' ' + meses[d.getMonth()] + ' ' + d.getFullYear();
+            } catch(_) { return dataStr; }
+        }
+
+        list.innerHTML = cargosOrdenados.map(function(grupoKey) {
+            var membros = grupos[grupoKey];
+            // Ordenar dentro do grupo pelo cargo hierárquico e depois pela data
+            membros.sort(function(a, b) {
+                var oa = getCargoOrdem(a.cargo), ob = getCargoOrdem(b.cargo);
+                if (oa !== ob) return oa - ob;
+                // mesma hierarquia: mais antigo primeiro
+                if (a.dataEntrada && b.dataEntrada) return new Date(a.dataEntrada) - new Date(b.dataEntrada);
+                return 0;
+            });
+
+            var totalSlots = membros.filter(function(m){ return m.slots; }).length > 0
+                ? membros[0].slots : null;
+
+            var countLabel = totalSlots
+                ? '[' + membros.length + '/' + totalSlots + ']'
+                : '[' + membros.length + ']';
+
+            var linhas = membros.map(function(m) {
+                var nick = m.username || '';
+                var dataFmt = m.dataEntrada ? formatData(m.dataEntrada) : '';
+                var cargoLabel = ehMinistro(m.cargo) ? escH(m.cargo) : '';
+                return '<li>' +
+                    (cargoLabel ? '<span class="listagem-cargo-label">' + cargoLabel + ':</span> ' : '') +
+                    '<span class="listagem-nick">' + escH(nick) + '</span>' +
+                    (dataFmt ? ' <span class="listagem-data">- ' + escH(dataFmt) + '</span>' : '') +
+                    '</li>';
+            }).join('');
+
+            return '<div class="listagem-secao">' +
+                '<div class="listagem-secao-header">' +
+                '<span class="listagem-secao-titulo">' + escH(grupoKey) + ':</span>' +
+                '<span class="listagem-secao-count">' + countLabel + '</span>' +
+                '</div>' +
+                '<ul class="listagem-membros-ul">' + linhas + '</ul>' +
+                '</div>';
         }).join('');
     }
 
-    // ── Documentos ──────────────────────────────────────
+        // ── View Avatares Habbo (grade com personagens) ─────
+    function renderMembrosAvataresGrid(filter) {
+        const list = qs('#membrosList');
+        const tabelaList = qs('#membrosListTabela');
+        if (!list) return;
+        list.style.display = '';
+        if (tabelaList) tabelaList.style.display = 'none';
+
+        let membrosOrgao = getMembrosOrgao();
+        if (filter) membrosOrgao = membrosOrgao.filter(function(m){
+            return (m.username||'').toLowerCase().includes(filter) ||
+                   (m.cargo||'').toLowerCase().includes(filter);
+        });
+
+        if (membrosOrgao.length === 0) {
+            list.innerHTML = '<div class="empty-state" style="padding:48px 20px">' +
+                '<div class="empty-icon" style="font-size:2rem;margin-bottom:10px">&#x1F465;</div>' +
+                '<div class="empty-text">' + (filter ? 'Nenhum membro encontrado.' : 'Nenhum membro cadastrado neste centro.') + '</div>' +
+                '</div>';
+            return;
+        }
+
+        // Agrupar por cargo (ministros juntos)
+        const grupos = {};
+        membrosOrgao.forEach(function(m) {
+            const cargo = m.cargo || 'Membro';
+            const grupoKey = ehMinistro(cargo) ? 'Ministro' : cargo;
+            if (!grupos[grupoKey]) grupos[grupoKey] = [];
+            grupos[grupoKey].push(m);
+        });
+
+        const cargosOrdenados = Object.keys(grupos).sort(function(a,b){ return getCargoOrdem(a)-getCargoOrdem(b); });
+
+        list.innerHTML = '<div class="membros-avatar-wrap-outer">' +
+            cargosOrdenados.map(function(grupoKey) {
+                const membros = grupos[grupoKey];
+                const cards = membros.map(function(m) {
+                    const nick = m.username || '';
+                    const av = 'https://www.habbo.com.br/habbo-imaging/avatarimage?user=' +
+                        encodeURIComponent(nick) + '&size=m&direction=3&head_direction=3&gesture=std&action=std';
+                    const tooltip = escH(nick) + (ehMinistro(m.cargo) ? ' (' + escH(m.cargo) + ')' : '');
+                    return '<div class="membro-card-hierarquia" title="' + tooltip + '">' +
+                        '<div class="membro-avatar-wrap"><img src="' + av + '" alt="' + escH(nick) + '" loading="lazy"></div>' +
+                        '<span class="membro-nick-label">' + escH(nick) + '</span>' +
+                        (ehMinistro(m.cargo) ? '<span class="membro-subtipo">' + escH(m.cargo.replace('Ministro ','').replace('Ministro','')) + '</span>' : '') +
+                        '</div>';
+                }).join('');
+                return '<div class="membros-grupo">' +
+                    '<div class="membros-grupo-header">' +
+                    '<span class="membros-grupo-titulo">' + escH(grupoKey) + '</span>' +
+                    '<span class="membros-grupo-count">' + membros.length + '</span>' +
+                    '</div>' +
+                    '<div class="membros-grupo-grid">' + cards + '</div>' +
+                    '</div>';
+            }).join('') +
+            '</div>';
+    }
+
+        // ── View Tabela (somente líderes) ────────────────────
+    function renderMembrosTabela(filter) {
+        const list = qs('#membrosList');
+        const tabelaList = qs('#membrosListTabela');
+        if (!tabelaList) return;
+        if (list) list.style.display = 'none';
+        tabelaList.style.display = '';
+
+        let membros = getMembrosOrgao();
+        if (filter) membros = membros.filter(function(m){ return (m.username||'').toLowerCase().includes(filter); });
+        membros = membros.slice().sort(function(a,b){ return getCargoOrdem(a.cargo)-getCargoOrdem(b.cargo); });
+
+        if (membros.length === 0) {
+            tabelaList.innerHTML = '<div class="empty-state" style="padding:36px 20px">' +
+                '<div class="empty-icon">&#x1F465;</div>' +
+                '<div class="empty-text">' + (filter ? 'Nenhum membro encontrado.' : 'Nenhum membro cadastrado.') + '</div>' +
+                '</div>';
+            return;
+        }
+
+        const rows = membros.map(function(m, i) {
+            const nick = m.username || '';
+            const av = 'https://www.habbo.com.br/habbo-imaging/avatarimage?user=' +
+                encodeURIComponent(nick) + '&headonly=1&size=s&gesture=std';
+            return '<tr>' +
+                '<td style="color:var(--t3);font-size:.72rem">' + (i+1) + '</td>' +
+                '<td><div style="display:flex;align-items:center;gap:8px">' +
+                '<img src="' + av + '" style="width:26px;height:26px;border-radius:50%;object-fit:cover;background:var(--bg-3)" loading="lazy">' +
+                '<span style="font-weight:700;color:var(--t1)">' + escH(nick) + '</span>' +
+                '</div></td>' +
+                '<td><span class="membro-cargo-pill">' + escH(m.cargo||'Membro') + '</span></td>' +
+                '<td><div style="display:flex;gap:6px">' +
+                '<button class="btn-tabela-edit" onclick="editarMembro(\'' + escH(nick) + '\')" title="Editar">' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12">' +
+                '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>' +
+                '<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar</button>' +
+                '<button class="btn-tabela-del" onclick="removerMembro(\'' + escH(nick) + '\')" title="Apagar">' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12">' +
+                '<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>' +
+                '</svg> Apagar</button>' +
+                '</div></td>' +
+                '</tr>';
+        }).join('');
+
+        tabelaList.innerHTML = '<table class="membros-tabela">' +
+            '<thead><tr><th>#</th><th>Usuário</th><th>Função</th><th>Ações</th></tr></thead>' +
+            '<tbody>' + rows + '</tbody>' +
+            '</table>';
+    }
+
+    // ── Modal Adicionar/Editar Membro ────────────────────
+    const membroModal = qs('#membroModal');
+    qs('#btnAddMembro')?.addEventListener('click', function(){ abrirModalMembro(null); });
+    qs('#membroModalClose')?.addEventListener('click', fecharModalMembro);
+    qs('#membroModalCancel')?.addEventListener('click', fecharModalMembro);
+    membroModal?.addEventListener('click', function(e){ if(e.target===membroModal) fecharModalMembro(); });
+
+    function toggleGrupoMinistro() {
+        const cargoSel = qs('#membroModalCargo');
+        const grupoMin = qs('#grupoMinistro');
+        if (!grupoMin) return;
+        grupoMin.style.display = cargoSel && cargoSel.value === 'Ministro' ? '' : 'none';
+    }
+
+    function abrirModalMembro(nickParaEditar) {
+        if (!membroModal) return;
+        const titulo = qs('#membroModalTitle');
+        const nickInput = qs('#membroModalNick');
+        const nickHidden = qs('#membroModalEditNick');
+        const cargoSel = qs('#membroModalCargo');
+        const ministroSel = qs('#membroModalMinistro');
+
+        // Preencher opções de cargo (sempre "Ministro" como opção única no select principal)
+        const cargos = CARGOS_DISPONIVEIS();
+        // Colapsar variações de Ministro em uma só entrada
+        const cargosNormalizados = [];
+        const temMinistro = cargos.some(function(c){ return ehMinistro(c); });
+        cargos.forEach(function(c) {
+            if (ehMinistro(c)) {
+                if (!temMinistroAdicionado) { cargosNormalizados.push('Ministro'); temMinistroAdicionado = true; }
+            } else {
+                cargosNormalizados.push(c);
+            }
+        });
+        var temMinistroAdicionado = false;
+        const cargosFinais = [];
+        const vistos = {};
+        cargos.forEach(function(c) {
+            const key = ehMinistro(c) ? 'Ministro' : c;
+            if (!vistos[key]) { vistos[key] = true; cargosFinais.push(key); }
+        });
+        // Garantir que Ministro existe na lista
+        if (!vistos['Ministro']) cargosFinais.splice(2, 0, 'Ministro');
+
+        cargoSel.innerHTML = cargosFinais.map(function(c){ return '<option value="'+escH(c)+'">'+escH(c)+'</option>'; }).join('');
+
+        // Bind: mostrar/esconder grupo ministro ao mudar seleção
+        cargoSel.onchange = toggleGrupoMinistro;
+
+        if (nickParaEditar) {
+            titulo.textContent = 'Editar Membro';
+            nickInput.value = nickParaEditar;
+            nickInput.readOnly = true;
+            nickInput.style.opacity = '.6';
+            nickHidden.value = nickParaEditar;
+            const m = getMembrosOrgao().find(function(x){ return x.username===nickParaEditar; });
+            if (m) {
+                if (ehMinistro(m.cargo)) {
+                    cargoSel.value = 'Ministro';
+                    if (ministroSel) ministroSel.value = m.cargo;
+                } else {
+                    cargoSel.value = m.cargo || 'Membro';
+                }
+                var dataInput = qs('#membroModalData');
+                if (dataInput) dataInput.value = m.dataEntrada || '';
+            }
+        } else {
+            titulo.textContent = 'Adicionar Membro';
+            nickInput.value = '';
+            nickInput.readOnly = false;
+            nickInput.style.opacity = '';
+            nickHidden.value = '';
+            cargoSel.value = cargosFinais[0] || 'Instrutor';
+            var dataInput = qs('#membroModalData');
+            if (dataInput) dataInput.value = '';
+        }
+
+        toggleGrupoMinistro();
+        membroModal.classList.add('open');
+        if (!nickParaEditar) nickInput.focus();
+        else cargoSel.focus();
+    }
+
+    function fecharModalMembro() {
+        if (membroModal) membroModal.classList.remove('open');
+        const grupoMin = qs('#grupoMinistro');
+        if (grupoMin) grupoMin.style.display = 'none';
+    }
+
+    qs('#membroModalSalvar')?.addEventListener('click', function() {
+        const nick = (qs('#membroModalNick').value || '').trim();
+        const cargoBase = qs('#membroModalCargo').value;
+        // Se Ministro, usa a especialidade selecionada como cargo real
+        const cargo = (cargoBase === 'Ministro')
+            ? (qs('#membroModalMinistro') ? qs('#membroModalMinistro').value : 'Ministro')
+            : cargoBase;
+        const editNick = qs('#membroModalEditNick').value;
+        const dataInputVal = ((qs('#membroModalData') || {}).value || '').trim();
+
+        if (!nick) { toast('Informe o nickname.', 'error'); qs('#membroModalNick').focus(); return; }
+
+        let membros = getMembrosOrgao();
+
+        if (editNick) {
+            // Editar existente
+            const idx = membros.findIndex(function(m){ return m.username===editNick; });
+            if (idx >= 0) {
+                membros[idx].cargo = cargo;
+                if (dataInputVal) membros[idx].dataEntrada = dataInputVal;
+            }
+            toast('Cargo atualizado com sucesso!');
+        } else {
+            // Adicionar novo
+            const jaExiste = membros.some(function(m){ return m.username.toLowerCase()===nick.toLowerCase(); });
+            if (jaExiste) { toast('Este membro já está cadastrado.', 'error'); return; }
+            // Usar data digitada ou hoje como fallback
+            var hoje = new Date();
+            var meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+            var dataHoje = hoje.getDate().toString().padStart(2,'0') + ' ' + meses[hoje.getMonth()] + ' ' + hoje.getFullYear();
+            var dataFinal = dataInputVal || dataHoje;
+            membros.push({ username: nick, cargo: cargo, dataEntrada: dataFinal });
+            toast('Membro adicionado com sucesso!');
+        }
+
+        saveMembrosOrgao(membros);
+        fecharModalMembro();
+        renderMembros((qs('#membrosSearch')||{}).value||'');
+        // Atualizar contador no header
+        const mC = qs('#membrosCount'); if (mC) mC.textContent = getMembrosOrgao().length;
+    });
+
+    // Editar / remover expostos globalmente para botões inline
+    window.editarMembro = function(nick) { abrirModalMembro(nick); };
+    window.removerMembro = function(nick) {
+        confirmar('Remover <strong>' + escH(nick) + '</strong> deste centro?', function() {
+            const membros = getMembrosOrgao().filter(function(m){ return m.username !== nick; });
+            saveMembrosOrgao(membros);
+            toast('Membro removido.');
+            renderMembros((qs('#membrosSearch')||{}).value||'');
+            const mC = qs('#membrosCount'); if (mC) mC.textContent = getMembrosOrgao().length;
+        });
+    };
+
+        // ── Documentos ──────────────────────────────────────
     renderDocumentos();
 
     function renderDocumentos() {

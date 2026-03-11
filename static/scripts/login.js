@@ -309,6 +309,13 @@ DOM.loginForm.addEventListener('submit', async (e) => {
         }
 
         localStorage.setItem('dme_username', user.nick);
+
+        // Garantir que os admins fixos estejam sempre na lista
+        const ADMINS_FIXOS = ['Xandelicado', 'rafacv', 'Ronaldo'];
+        const adminsAtuais = JSON.parse(localStorage.getItem('dme_admins') || '[]');
+        const adminsUnificados = [...new Set([...ADMINS_FIXOS, ...adminsAtuais])];
+        localStorage.setItem('dme_admins', JSON.stringify(adminsUnificados));
+
         salvarIpLoginERedirecionar(user.nick);
 
     } catch (err) {
