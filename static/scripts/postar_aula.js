@@ -6,7 +6,7 @@
     'use strict';
 
     const username = localStorage.getItem('dme_username');
-    if (!username) { window.location.href = 'login.html'; return; }
+    if (!username) { window.location.href = '/login'; return; }
 
     // ── Órgãos e suas aulas ──────────────────────────────
     const ORGAOS = [
@@ -307,7 +307,7 @@
 
     window.logout = function () {
         localStorage.removeItem('dme_username');
-        window.location.href = 'login.html';
+        window.location.href = '/login';
     };
 
     function escH(str) {

@@ -391,7 +391,7 @@ function saveToHistory(turno) {
 // Inicialização UI (reuso de documentos.js ou home.js)
 function loadUserProfile() {
     const user = localStorage.getItem('dme_username');
-    if (!user) { window.location.href = 'login.html'; return; }
+    if (!user) { window.location.href = '/login'; return; }
 
     document.getElementById('navUserName').textContent = user;
     document.getElementById('shiftUserName').textContent = user;
@@ -485,5 +485,5 @@ function fecharModal(id) {
 
 function logout() {
     localStorage.removeItem('dme_username');
-    window.location.href = 'login.html';
+    window.location.href = '/login';
 }

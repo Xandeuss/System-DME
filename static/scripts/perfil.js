@@ -1,8 +1,8 @@
 /* ── auth guard ──────────────────────────── */
 const loggedUser = localStorage.getItem('dme_username');
-if (!loggedUser) location.href = 'login.html';
+if (!loggedUser) location.href = '/login';
 
-function logout() { localStorage.removeItem('dme_username'); location.href = 'login.html'; }
+function logout() { localStorage.removeItem('dme_username'); location.href = '/login'; }
 
 /* ── helpers ─────────────────────────────── */
 const avFull = (nick, dir = 2, hdir = 2) =>
@@ -45,7 +45,7 @@ const found = todos.find(m => m.nick?.toLowerCase() === targetNick.toLowerCase()
 if (!targetNick || !found) {
     // Militar não encontrado — redireciona
     alert('Militar não encontrado. Voltando para a home.');
-    location.href = 'home.html';
+    location.href = '/home';
 }
 
 /* ── navbar ──────────────────────────────── */

@@ -40,7 +40,7 @@ function loadUserProfile() {
             document.getElementById('dropdownPainel').style.display = 'block';
         }
     } else {
-        window.location.href = 'login.html'; // Redireciona se não logado
+        window.location.href = '/login'; // Redireciona se não logado
     }
 
     // Toggle do dropdown
@@ -407,7 +407,7 @@ function checkAdminPermissions() {
 
 function logout() {
     localStorage.removeItem('dme_username');
-    window.location.href = 'login.html';
+    window.location.href = '/login';
 }
 
 

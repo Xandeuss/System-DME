@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Histórico de Turnos — DME System</title>
-    <link rel="stylesheet" href="../styles/global.css">
-    <link rel="stylesheet" href="../styles/todos_turnos.css">
-    <script src="../scripts/theme.js"></script>
+    <link rel="stylesheet" href="/styles/global.css">
+    <link rel="stylesheet" href="/styles/todos_turnos.css">
+    <script src="/scripts/theme.js"></script>
 </head>
 
 <body>
@@ -15,7 +15,7 @@
     <!-- ══ NAVBAR (simples, sem sidebar) ════════════════ -->
     <nav class="navbar">
         <div class="logo-section">
-            <a href="ponto_servico.html" class="btn-back">
+            <a href="/ponto_servico" class="btn-back">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="15 18 9 12 15 6" />
                 </svg>
@@ -138,7 +138,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             /* auth guard */
             const u = localStorage.getItem('dme_username');
-            if (!u) { window.location.href = 'login.html'; return; }
+            if (!u) { window.location.href = '/'; return; }
 
             /* dropdown */
             const img = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${u}&direction=2&head_direction=2&gesture=sml&size=s`;
@@ -252,10 +252,10 @@
 
         function logout() {
             localStorage.removeItem('dme_username');
-            window.location.href = 'login.html';
+            window.location.href = '/';
         }
     </script>
-    <script src="../scripts/notificacoes.js"></script>
+    <script src="/scripts/notificacoes.js"></script>
 </body>
 
 </html>

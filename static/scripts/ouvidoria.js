@@ -3,9 +3,9 @@
 // ══════════════════════════════════════════════════════
 
 const usuarioLogado = localStorage.getItem('dme_username');
-if (!usuarioLogado) window.location.href = 'login.html';
+if (!usuarioLogado) window.location.href = '/login';
 
-function logout() { localStorage.removeItem('dme_username'); window.location.href = 'login.html'; }
+function logout() { localStorage.removeItem('dme_username'); window.location.href = '/login'; }
 
 // ── Steps e progresso ─────────────────────────────────
 const STEPS_ORDER = ['step-intro', 'step-modalidade', 'step-projeto', 'step-sucesso'];

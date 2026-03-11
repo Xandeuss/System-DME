@@ -1,7 +1,7 @@
 (function () {
     const username = localStorage.getItem('dme_username');
     if (!username) {
-        window.location.href = 'login.html';
+        window.location.href = '/login';
         return;
     }
 
@@ -33,7 +33,7 @@
 
     function logout() {
         localStorage.removeItem('dme_username');
-        window.location.href = 'login.html';
+        window.location.href = '/login';
     }
 
     // Theme functions moved to theme.js
@@ -85,7 +85,7 @@
         if (!orgao) return;
         setOrgaoSelecionado({ id: orgao.id, title: orgao.title, sub: orgao.sub, icon: orgao.icon, desc: orgao.desc || '' });
         // Redirecionar para a página de detalhes do centro
-        window.location.href = 'centro_detalhe.html';
+        window.location.href = '/centro_detalhe';
     }
 
 

@@ -1,10 +1,10 @@
 // ── AUTH GUARD ────────────────────────────────────────
 const username = localStorage.getItem('dme_username');
-if (!username) window.location.href = 'login.html';
+if (!username) window.location.href = '/login';
 
 function logout() {
     localStorage.removeItem('dme_username');
-    window.location.href = 'login.html';
+    window.location.href = '/login';
 }
 
 // ── INIT UI ───────────────────────────────────────────

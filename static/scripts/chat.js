@@ -11,7 +11,7 @@
     // AUTH
     // ══════════════════════════════════════════════════════
     const username = localStorage.getItem('dme_username');
-    if (!username) { location.href = 'login.html'; return; }
+    if (!username) { location.href = '/login'; return; }
 
     const admins = () => JSON.parse(localStorage.getItem('dme_admins') || '[]');
     const isAdmin = () => admins().includes(username);
@@ -80,7 +80,7 @@
     window.logout = function () {
         if (confirm('Deseja realmente sair do sistema?')) {
             localStorage.removeItem('dme_username');
-            location.href = 'login.html';
+            location.href = '/login';
         }
     };
 

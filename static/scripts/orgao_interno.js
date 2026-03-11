@@ -1,7 +1,7 @@
 (function () {
     // ===== AUTH GUARD =====
     const username = localStorage.getItem('dme_username');
-    if (!username) { window.location.href = 'login.html'; return; }
+    if (!username) { window.location.href = '/login'; return; }
 
     // ===== ÓRGÃOS MAPEADOS =====
     const ORGAOS_MAP = {
@@ -617,7 +617,7 @@
     // ===== TEMA (delegado ao theme.js global) =====
     window.logout = function () {
         localStorage.removeItem('dme_username');
-        window.location.href = 'login.html';
+        window.location.href = '/login';
     };
 
     // ===== INIT =====
@@ -626,7 +626,7 @@
 
         let orgaoSel = null;
         try { orgaoSel = JSON.parse(localStorage.getItem('dme_orgao_selecionado') || 'null'); } catch (_) { }
-        if (!orgaoSel || !orgaoSel.id) { window.location.href = 'centro_tarefas_orgaos.html'; return; }
+        if (!orgaoSel || !orgaoSel.id) { window.location.href = '/centro_tarefas_orgaos'; return; }
 
         orgaoId = orgaoSel.id;
         const orgaoInfo = ORGAOS_MAP[orgaoId] || { title: orgaoSel.title || orgaoId };

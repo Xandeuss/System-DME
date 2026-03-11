@@ -7,7 +7,7 @@
 
     // ── Auth Guard ──────────────────────────────────────
     const username = localStorage.getItem('dme_username');
-    if (!username) { window.location.href = 'login.html'; return; }
+    if (!username) { window.location.href = '/login'; return; }
 
     // ── Órgãos (mesma lista do centro_tarefas_orgaos.js) ─
     const ORGAOS = [
@@ -106,7 +106,7 @@
 
     // ── Carregar Centro Atual ───────────────────────────
     const orgaoSel = get('dme_orgao_selecionado');
-    if (!orgaoSel || !orgaoSel.id) { window.location.href = 'centro_tarefas_orgaos.html'; return; }
+    if (!orgaoSel || !orgaoSel.id) { window.location.href = '/centro_tarefas_orgaos'; return; }
     const orgao = ORGAOS.find(o => o.id === orgaoSel.id) || { ...orgaoSel, icon: '🛡️', desc: '' };
 
     // ── Inicializar UI ──────────────────────────────────
@@ -688,7 +688,7 @@
     // Logout
     window.logout = function () {
         localStorage.removeItem('dme_username');
-        window.location.href = 'login.html';
+        window.location.href = '/login';
     };
 
     // ── STM: Projetos e Emendas ─────────────────────────

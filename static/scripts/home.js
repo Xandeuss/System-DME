@@ -1,10 +1,10 @@
 /* ── auth guard ─────────────────────────────── */
 const username = localStorage.getItem('dme_username');
-if (!username) location.href = 'login.html';
+if (!username) location.href = '/login';
 
 function logout() {
     localStorage.removeItem('dme_username');
-    location.href = 'login.html';
+    location.href = '/login';
 }
 
 /* ── helpers ─────────────────────────────────── */
@@ -189,7 +189,7 @@ function buscar() {
         document.getElementById('resultDesde').textContent = fromDate;
 
         // botão perfil
-        document.getElementById('resultPerfilBtn').href = `perfil.html?nick=${encodeURIComponent(nick)}`;
+        document.getElementById('resultPerfilBtn').href = `/perfil?nick=${encodeURIComponent(nick)}`;
 
         res.style.display = 'block';
     } else {

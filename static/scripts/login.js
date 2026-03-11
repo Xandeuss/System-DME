@@ -126,7 +126,7 @@ async function salvarIpLoginERedirecionar(username) {
         localStorage.setItem('dme_users', JSON.stringify(users));
     }
 
-    window.location.href = 'home.html';
+    window.location.href = '/home';
 }
 
 const validationRules = {
@@ -217,7 +217,7 @@ DOM.registerForm.addEventListener('submit', async (e) => {
     localStorage.setItem('dme_username', appState.formData.username);
 
     setTimeout(() => {
-        window.location.href = 'verificacao.html';
+        window.location.href = '/verificacao';
     }, 1000);
 });
 

@@ -1,11 +1,11 @@
 const usuarioLogado = localStorage.getItem('dme_username');
 if (!usuarioLogado) {
-    window.location.href = 'login.html';
+    window.location.href = '/login';
 }
 
 function logout() {
     localStorage.removeItem('dme_username');
-    window.location.href = 'login.html';
+    window.location.href = '/login';
 }
 
 const inputAplicador = document.getElementById('input-aplicador');

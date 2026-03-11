@@ -10,7 +10,7 @@
         if (document.getElementById('chatToggleBtn')) return;
 
         const chatBtn = document.createElement('a');
-        chatBtn.href = 'chat.html';
+        chatBtn.href = '/chat';
         chatBtn.className = 'chat-toggle-btn';
         chatBtn.id = 'chatToggleBtn';
         chatBtn.title = 'Chat Global DME';

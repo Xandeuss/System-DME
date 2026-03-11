@@ -10,7 +10,7 @@
     // ── AUTH GUARD ──
     const username = localStorage.getItem('dme_username');
     if (!username) {
-        window.location.href = 'login.html';
+        window.location.href = '/login';
         return;
     }
 
@@ -24,7 +24,7 @@
 
     function logout() {
         localStorage.removeItem('dme_username');
-        window.location.href = 'login.html';
+        window.location.href = '/login';
     }
 
 

@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DME System | Verificação</title>
-    <link rel="stylesheet" href="../styles/global.css">
-    <link rel="stylesheet" href="../styles/login.css">
+    <link rel="stylesheet" href="/styles/global.css">
+    <link rel="stylesheet" href="/styles/login.css">
 </head>
 
 <body>
@@ -66,7 +66,7 @@
         <div class="auth-sep">ou</div>
 
         <div class="auth-link-row">
-            <a onclick="window.location.href='login.html'">← Voltar ao login</a>
+            <a onclick="window.location.href='/'">← Voltar ao login</a>
         </div>
     </div>
 
@@ -139,7 +139,7 @@
                     toast('✅ Verificação concluída!', 'ok');
                     setTimeout(() => {
                         toast('Aguardando aprovação de um administrador...', 'info');
-                        setTimeout(() => window.location.href = 'login.html', 2000);
+                        setTimeout(() => window.location.href = '/', 2000);
                     }, 1200);
                 } else {
                     const missao = data.motto ? `"${data.motto}"` : '(vazia)';

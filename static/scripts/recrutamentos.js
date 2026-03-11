@@ -1,5 +1,5 @@
 const usuarioLogado = localStorage.getItem('dme_username');
-if (!usuarioLogado) window.location.href = 'login.html';
+if (!usuarioLogado) window.location.href = '/login';
 
 const STORAGE_KEY = 'dme_recrutamentos';
 const PER_PAGE = 10;
@@ -25,7 +25,7 @@ function isAdmin() {
 
 function logout() {
     localStorage.removeItem('dme_username');
-    window.location.href = 'login.html';
+    window.location.href = '/login';
 }
 
 

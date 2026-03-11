@@ -1,6 +1,6 @@
 (function () {
     const username = localStorage.getItem('dme_username');
-    if (!username) { window.location.href = 'login.html'; return; }
+    if (!username) { window.location.href = '/login'; return; }
 
     let orgao = null;
 
@@ -37,7 +37,7 @@
     // Gerenciamento de Usuário
     function logout() {
         localStorage.removeItem('dme_username');
-        window.location.href = 'login.html';
+        window.location.href = '/login';
     }
 
     // Carregamento de Dados
