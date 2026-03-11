@@ -62,7 +62,7 @@ body {
 /* ── NAVBAR ─────────────────────────────────────────── */
 .navbar {
     height: var(--navbar-h);
-    background: rgba(5, 8, 10, .92);
+    background: var(--navbar-bg, rgba(5, 8, 10, .92));
     border-bottom: 1px solid var(--b1);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -1646,4 +1646,115 @@ body {
 .sr-profile-btn svg {
     width: 14px;
     height: 14px;
+}
+
+/* ══ LIGHT MODE — Home específico ══════════════════════════════════════════ */
+html.light-mode .main-grid,
+body.light-mode .main-grid {
+    background: var(--bg);
+}
+
+html.light-mode .left-col,
+html.light-mode .right-col,
+body.light-mode .left-col,
+body.light-mode .right-col {
+    border-color: var(--b1);
+}
+
+html.light-mode .panel,
+body.light-mode .panel {
+    background: var(--bg-2);
+    border-color: var(--b1);
+}
+
+html.light-mode .panel-head,
+body.light-mode .panel-head {
+    border-bottom-color: var(--b1);
+}
+
+html.light-mode .rank-item,
+body.light-mode .rank-item {
+    background: var(--bg-3);
+    border-color: var(--b1);
+}
+
+html.light-mode .rank-item:hover,
+body.light-mode .rank-item:hover {
+    background: var(--bg-4);
+    border-color: var(--b2);
+}
+
+html.light-mode .rank-item.top1,
+body.light-mode .rank-item.top1 {
+    background: rgba(245,158,11,.08);
+    border-color: rgba(245,158,11,.30);
+}
+
+html.light-mode .rank-item.top2,
+body.light-mode .rank-item.top2 {
+    background: rgba(148,163,184,.10);
+    border-color: rgba(148,163,184,.35);
+}
+
+html.light-mode .rank-item.top3,
+body.light-mode .rank-item.top3 {
+    background: rgba(180,83,9,.07);
+    border-color: rgba(180,83,9,.25);
+}
+
+html.light-mode .search-wrap input,
+body.light-mode .search-wrap input {
+    background: #ffffff;
+    border-color: var(--b2);
+    color: var(--t1);
+}
+
+html.light-mode .search-wrap input::placeholder,
+body.light-mode .search-wrap input::placeholder {
+    color: var(--t3);
+}
+
+html.light-mode .sc-row,
+body.light-mode .sc-row {
+    background: var(--bg-3);
+    border-color: var(--b1);
+}
+
+html.light-mode .sc-row:hover,
+body.light-mode .sc-row:hover {
+    background: var(--bg-4);
+}
+
+html.light-mode .of-item,
+body.light-mode .of-item {
+    border-color: var(--b1);
+}
+
+html.light-mode .of-item:hover,
+body.light-mode .of-item:hover {
+    background: var(--bg-3);
+}
+
+html.light-mode .noticia,
+body.light-mode .noticia {
+    background: var(--bg-2);
+    border-color: var(--b1);
+}
+
+html.light-mode .noticia:hover,
+body.light-mode .noticia:hover {
+    border-color: var(--b2);
+    background: var(--bg-3);
+}
+
+html.light-mode .search-result,
+body.light-mode .search-result {
+    background: var(--bg-2);
+    border-color: var(--b1);
+}
+
+html.light-mode .ponto-btn,
+body.light-mode .ponto-btn {
+    background: var(--bg-3);
+    border-color: var(--b2);
 }

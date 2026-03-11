@@ -1,40 +1,52 @@
 (function() {
-    // Função para aplicar o tema
+    // ── Aplicar tema ─────────────────────────────────────────────────────────
     window.applyTheme = function(theme) {
+        const html = document.documentElement;
         const body = document.body;
         const themeText = document.getElementById('themeText');
 
-        // Salvar preferência
         localStorage.setItem('dme_theme', theme);
 
         if (theme === 'light') {
-            document.documentElement.classList.add('light-mode');
+            html.classList.add('light-mode');
             if (body) body.classList.add('light-mode');
             if (themeText) themeText.textContent = 'Modo Escuro';
         } else {
-            document.documentElement.classList.remove('light-mode');
+            html.classList.remove('light-mode');
             if (body) body.classList.remove('light-mode');
             if (themeText) themeText.textContent = 'Modo Claro';
         }
     };
 
-    // Função de alternância chamada pelo botão
+    // ── Alternar tema (chamado pelo botão) ───────────────────────────────────
     window.toggleTheme = function() {
-        const currentTheme = localStorage.getItem('dme_theme') || 'dark';
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        window.applyTheme(newTheme);
+        const current = localStorage.getItem('dme_theme') || 'dark';
+        window.applyTheme(current === 'dark' ? 'light' : 'dark');
     };
 
-    // Inicialização imediata para evitar "flicker"
-    const savedTheme = localStorage.getItem('dme_theme') || 'dark';
-    if (savedTheme === 'light') {
+    // ── Aplicar imediatamente para evitar flash ──────────────────────────────
+    // Adiciona transição suave ANTES de aplicar a classe para não piscar no carregamento
+    const saved = localStorage.getItem('dme_theme') || 'dark';
+
+    if (saved === 'light') {
+        // Aplicar no html ANTES do body existir (evita o "flash" de tema escuro)
         document.documentElement.classList.add('light-mode');
-        // Body pode não estar pronto ainda, mas tentamos
-        if (document.body) document.body.classList.add('light-mode');
     }
 
-    // Inicialização quando o DOM estiver pronto (garante que body e elementos existam)
+    // ── Adicionar transição de cores após o carregamento ─────────────────────
+    // Só ativa a transição depois do primeiro paint para evitar animação no carregamento
     document.addEventListener('DOMContentLoaded', () => {
-        window.applyTheme(savedTheme);
+        window.applyTheme(saved);
+
+        // Adicionar CSS de transição suave via style tag (somente após DOM pronto)
+        const style = document.createElement('style');
+        style.textContent = `
+            body, .navbar, .panel, .g-panel, .g-input, .g-select, .g-textarea,
+            .user-dropdown, .mobile-sidebar, .g-modal, .rank-item, .sc-row,
+            .perfil-card, .perfil-header, .hist-item, .tab-btn, .noticia {
+                transition: background-color 0.25s ease, border-color 0.25s ease, color 0.15s ease, box-shadow 0.25s ease !important;
+            }
+        `;
+        document.head.appendChild(style);
     });
 })();
