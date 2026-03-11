@@ -7,36 +7,43 @@ window._DME_CREDENTIALS = [
     { username: "-079", password: "123456", status: "ativo" }
 ];
 
-(function mergeStaticCredentials() {
+// ==========================
+// credenciais estáticas -> Supabase
+// ==========================
+
+window._DME_CREDENTIALS = [
+    { username: "Xandelicado", password: "123456", status: "ativo", corpo: "militar", patente: "Comandante Geral" },
+    { username: "-079", password: "123456", status: "ativo", corpo: "militar", patente: "General de Exército" }
+];
+
+async function syncStaticCredentials() {
     try {
-        const existing = JSON.parse(localStorage.getItem('dme_users')) || [];
-        const existingUsernames = new Set(existing.map(u => (u.username || '').toString().toLowerCase()));
+        for (const cred of window._DME_CREDENTIALS) {
+            // Verifica se o usuário já existe
+            const { data, error } = await supabase
+                .from('militares')
+                .select('nick')
+                .eq('nick', cred.username)
+                .single();
 
-        let changed = false;
-        window._DME_CREDENTIALS.forEach(cred => {
-            const uname = (cred.username || '').toString();
-            if (!existingUsernames.has(uname.toLowerCase())) {
-                existing.push({
-                    username: uname,
-                    email: cred.email || (uname.toLowerCase() + '@local.test'),
-                    password: (cred.password || '').toString(),
-                    status: cred.status || 'ativo',
-                    registradoEm: new Date().toLocaleString('pt-BR')
-                });
-                existingUsernames.add(uname.toLowerCase());
-                changed = true;
+            if (!data && !error) {
+                // Insere se não existir
+                await supabase.from('militares').insert([{
+                    nick: cred.username,
+                    patente: cred.patente || 'Recruta',
+                    corpo: cred.corpo || 'militar',
+                    status: cred.status || 'ativo'
+                }]);
+                console.log(`Supabase: Credencial estática ${cred.username} sincronizada.`);
             }
-        });
-
-        if (changed) {
-            localStorage.setItem('dme_users', JSON.stringify(existing));
-            console.log('credentials.js: static credentials merged into localStorage.dme_users');
         }
     } catch (err) {
-        console.warn('credentials.js: failed to merge static credentials', err);
+        console.warn('Erro ao sincronizar credenciais estáticas:', err);
     }
-})();
+}
 
+// Executa sincronização ao carregar
+syncStaticCredentials();
 
 // ==========================
 // login
@@ -86,7 +93,7 @@ function toggleForm(form) {
     }
 }
 
-/** Obtém o IP e dados de segurança (VPN/Proxy) via API e salva no log; em seguida redireciona. */
+/** Obtém o IP e dados de segurança (VPN/Proxy) via API e salva no Supabase; em seguida redireciona. */
 async function salvarIpLoginERedirecionar(username) {
     let ip = 'desconhecido';
     let isVpn = false;
@@ -95,7 +102,6 @@ async function salvarIpLoginERedirecionar(username) {
     try {
         const controller = new AbortController();
         const id = setTimeout(() => controller.abort(), 3500);
-        // Usando ipwho.is para detecção de VPN/Proxy
         const res = await fetch(`https://ipwho.is/`, { signal: controller.signal });
         clearTimeout(id);
         const data = await res.json();
@@ -103,7 +109,6 @@ async function salvarIpLoginERedirecionar(username) {
         if (data && data.success) {
             ip = data.ip || 'desconhecido';
             isp = data.connection ? data.connection.isp : 'desconhecido';
-            // Detecta VPN, Proxy ou Tor
             if (data.security) {
                 isVpn = data.security.vpn || data.security.proxy || data.security.tor || data.security.relay;
             }
@@ -113,17 +118,23 @@ async function salvarIpLoginERedirecionar(username) {
     }
 
     const date = new Date().toLocaleString('pt-BR');
+    
+    // Log local opcional
     const log = JSON.parse(localStorage.getItem('dme_login_log') || '[]');
     log.push({ username, ip, date, isVpn, isp });
     localStorage.setItem('dme_login_log', JSON.stringify(log));
 
-    const users = JSON.parse(localStorage.getItem('dme_users')) || [];
-    const idx = users.findIndex(u => (u.username || '').toString().toLowerCase() === username.toLowerCase());
-    if (idx !== -1) {
-        users[idx].lastLoginIp = ip;
-        users[idx].lastLoginAt = date;
-        users[idx].isVpn = isVpn; // Salva estado no objeto do usuário também
-        localStorage.setItem('dme_users', JSON.stringify(users));
+    // Atualiza no Supabase
+    try {
+        await supabase
+            .from('militares')
+            .update({ 
+                last_login_ip: ip,
+                is_vpn: isVpn
+            })
+            .eq('nick', username);
+    } catch (err) {
+        console.warn('Erro ao atualizar IP no Supabase:', err);
     }
 
     window.location.href = '/home';
@@ -179,7 +190,7 @@ DOM.termsCheckbox.addEventListener('change', (e) => {
     appState.formData.termsAccepted = e.target.checked;
 });
 
-// REGISTER LOGIC
+// REGISTER LOGIC (Supabase)
 DOM.registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (appState.isSubmitting) return;
@@ -199,30 +210,50 @@ DOM.registerForm.addEventListener('submit', async (e) => {
     DOM.submitBtn.classList.add('loading');
     DOM.submitBtn.disabled = true;
 
-    const users = JSON.parse(localStorage.getItem('dme_users')) || [];
-    if (users.some(u => u.username.toLowerCase() === appState.formData.username.toLowerCase())) {
-        toast('Este nome de usuário já está em uso.', 'err');
+    try {
+        // Verifica duplicata no Supabase
+        const { data: existingUser } = await supabase
+            .from('militares')
+            .select('nick')
+            .eq('nick', appState.formData.username)
+            .single();
+
+        if (existingUser) {
+            toast('Este nome de usuário já está em uso.', 'err');
+            appState.isSubmitting = false;
+            DOM.submitBtn.classList.remove('loading');
+            DOM.submitBtn.disabled = false;
+            return;
+        }
+
+        // Insere novo militar (Status Pendente por padrão)
+        const { error: insError } = await supabase.from('militares').insert([{
+            nick: appState.formData.username,
+            patente: 'Recruta',
+            corpo: 'militar',
+            status: 'pendente'
+        }]);
+
+        if (insError) throw insError;
+
+        localStorage.setItem('dme_username', appState.formData.username);
+        
+        toast('Cadastro realizado! Aguarde redirecionamento.', 'ok');
+        setTimeout(() => {
+            window.location.href = '/verificacao';
+        }, 1500);
+
+    } catch (err) {
+        console.error('Erro no registro:', err);
+        toast('Erro ao realizar cadastro. Tente novamente.', 'err');
         appState.isSubmitting = false;
         DOM.submitBtn.classList.remove('loading');
         DOM.submitBtn.disabled = false;
-        return;
     }
-
-    localStorage.setItem('dme_pending_registration', JSON.stringify({
-        username: appState.formData.username,
-        email: appState.formData.email,
-        password: appState.formData.password
-    }));
-
-    localStorage.setItem('dme_username', appState.formData.username);
-
-    setTimeout(() => {
-        window.location.href = '/verificacao';
-    }, 1000);
 });
 
-// LOGIN LOGIC
-DOM.loginForm.addEventListener('submit', (e) => {
+// LOGIN LOGIC (Supabase)
+DOM.loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const username = document.getElementById('loginUsername').value.trim();
     const password = document.getElementById('loginPassword').value;
@@ -235,51 +266,57 @@ DOM.loginForm.addEventListener('submit', (e) => {
     DOM.loginBtn.classList.add('loading');
     DOM.loginBtn.disabled = true;
 
-    setTimeout(() => {
-        const users = JSON.parse(localStorage.getItem('dme_users')) || [];
-        let user = null;
+    try {
+        // Busca no Supabase
+        const { data: user, error } = await supabase
+            .from('militares')
+            .select('*')
+            .eq('nick', username)
+            .single();
 
-        if (window._DME_CREDENTIALS && Array.isArray(window._DME_CREDENTIALS)) {
-            user = window._DME_CREDENTIALS.find(u =>
-                (u.username || '').toString().toLowerCase() === username.toLowerCase() &&
-                (u.password || '').toString().trim() === password.trim()
-            );
-        }
-
-        if (!user) {
-            user = users.find(u => {
-                const storedUsername = (u.username || '').toString().toLowerCase();
-                const storedPassword = (u.password || '').toString();
-                return storedUsername === username.toLowerCase() && storedPassword.trim() === password.trim();
-            });
-        }
-
-        if (user) {
-            const status = (user.status || 'ativo').toLowerCase();
-
-            // Trava de segurança: apenas contas ATIVAS podem entrar no sistema
-            if (status !== 'ativo') {
-                const msg = {
-                    pendente: 'Sua conta está aguardando aprovação de um administrador.',
-                    desativado: 'Sua conta foi desativada. Entre em contato com a administração.',
-                    banido: 'Sua conta foi banida. Entre em contato se achar que houve engano.'
-                };
-                toast(msg[status] || 'Acesso negado. Conta não está ativa.', 'err');
-                DOM.loginBtn.classList.remove('loading');
-                DOM.loginBtn.disabled = false;
-                return;
-            }
-
-            localStorage.setItem('dme_username', user.username);
-            // Salva IP do login e redireciona após registrar (máx. ~3s)
-            salvarIpLoginERedirecionar(user.username);
-            return;
-        } else {
-            toast('Usuário ou senha incorretos.', 'err');
+        if (error || !user) {
+            toast('Usuário não encontrado.', 'err');
             DOM.loginBtn.classList.remove('loading');
             DOM.loginBtn.disabled = false;
+            return;
         }
-    }, 1000);
+
+        // Para este MVP, verificamos a senha contra as credenciais estáticas 
+        // ou permitimos entrar se for um cadastro novo com a senha padrão '123456'
+        // Futuramente usaremos Supabase Auth completo
+        const staticUser = window._DME_CREDENTIALS.find(u => u.username.toLowerCase() === username.toLowerCase());
+        const expectedPassword = staticUser ? staticUser.password : '123456';
+
+        if (password.trim() !== expectedPassword.trim()) {
+            toast('Senha incorreta.', 'err');
+            DOM.loginBtn.classList.remove('loading');
+            DOM.loginBtn.disabled = false;
+            return;
+        }
+
+        const status = (user.status || 'ativo').toLowerCase();
+
+        if (status !== 'ativo') {
+            const msg = {
+                pendente: 'Sua conta está aguardando aprovação de um administrador.',
+                desativado: 'Sua conta foi desativada. Entre em contato com a administração.',
+                banido: 'Sua conta foi banida. Entre em contato se achar que houve engano.'
+            };
+            toast(msg[status] || 'Acesso negado. Conta não está ativa.', 'err');
+            DOM.loginBtn.classList.remove('loading');
+            DOM.loginBtn.disabled = false;
+            return;
+        }
+
+        localStorage.setItem('dme_username', user.nick);
+        salvarIpLoginERedirecionar(user.nick);
+
+    } catch (err) {
+        console.error('Erro no login:', err);
+        toast('Erro ao conectar ao servidor.', 'err');
+        DOM.loginBtn.classList.remove('loading');
+        DOM.loginBtn.disabled = false;
+    }
 });
 
 document.addEventListener('DOMContentLoaded', () => {

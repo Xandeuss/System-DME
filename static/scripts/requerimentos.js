@@ -19,6 +19,13 @@ const CORPO_MILITAR = [
     "Aspirante a Oficial", "Subtenente", "Sargento", "Cabo", "Soldado"
 ];
 
+// Ordem ascendente (menor → maior) para uso em selects de contrato/reintegração
+const CORPO_MILITAR_ASC = [
+    "Soldado", "Cabo", "Sargento", "Subtenente", "Aspirante a Oficial",
+    "Tenente", "Capitão", "Major", "Tenente-Coronel", "Coronel",
+    "General", "Marechal", "Subcomandante", "Comandante", "Comandante-Geral"
+];
+
 const CORPO_EMPRESARIAL = [
     "Chanceler", "Presidente", "Vice-Presidente", "Ministro", "Comissário",
     "Delegado", "Executivo", "Diretor", "Coordenador", "Supervisor",
@@ -58,7 +65,9 @@ const fieldConfig = {
     exoneracao: { novaPatente: false, selectOpcoes: false, anexoProvas: true, banidoAte: true, permissor: false, datahora: false },
     contrato: { novaPatente: false, selectOpcoes: true, anexoProvas: false, banidoAte: false, permissor: false, datahora: false, labelOpcao: "Nova patente" },
     venda: { novaPatente: false, selectOpcoes: true, anexoProvas: false, banidoAte: false, permissor: false, datahora: false, valor: true, labelOpcao: "Nova patente" },
-    permissao: { novaPatente: false, selectOpcoes: false, anexoProvas: false, banidoAte: false, permissor: false, datahora: false, nickPromovido: true },
+    permissao: { novaPatente: false, selectOpcoes: false, anexoProvas: false, banidoAte: false, permissor: false, datahora: false, nickAutorizado: true, nickPromovido: true },
+    transferencia: { novaPatente: true, selectOpcoes: false, anexoProvas: false, banidoAte: false, permissor: false, datahora: false },
+    cadetes: { novaPatente: true, selectOpcoes: false, anexoProvas: false, banidoAte: false, permissor: false, datahora: false, patenteFixa: "Cadete" },
 };
 // Padrão para tipos que não possuem config específica (contrato, venda, licença, etc.)
 const defaultFieldConfig = { novaPatente: false, selectOpcoes: true, anexoProvas: false, banidoAte: false, permissor: true, datahora: true };
@@ -100,9 +109,9 @@ const configForm = {
     },
     contrato: {
         titulo: "Contrato e Reintegração",
-        label: "Tipo",
+        label: "Nova patente",
         tipoForm: "rh",
-        getOpcoes: () => ["Contrato Novo", "Renovação de Contrato", "Reintegração", "Suspensão Temporária"]
+        getOpcoes: () => CORPO_MILITAR_ASC
     },
     venda: {
         titulo: "Aplicar Vendas",
@@ -205,6 +214,18 @@ function mudarTipo(tipo) {
     document.getElementById('grupo-valor').style.display = fc.valor ? 'block' : 'none';
     document.getElementById('grupo-nick-promovido').style.display = fc.nickPromovido ? 'block' : 'none';
 
+    // Novo: campo nick autorizado (permissão)
+    const grupoNickAutorizado = document.getElementById('grupo-nick-autorizado');
+    if (grupoNickAutorizado) grupoNickAutorizado.style.display = fc.nickAutorizado ? 'block' : 'none';
+
+    // Novo: patente fixa (cadetes)
+    if (fc.patenteFixa) {
+        document.getElementById('input-nova-patente').value = fc.patenteFixa;
+        document.getElementById('input-nova-patente').readOnly = true;
+    } else {
+        document.getElementById('input-nova-patente').readOnly = false;
+    }
+
     // Reset new fields
     document.getElementById('input-nova-patente').value = '';
     document.getElementById('input-anexo-provas').value = '';
@@ -264,6 +285,26 @@ function mudarAba(aba) {
 
     if (aba !== 'aplicar') {
         carregarHistorico(aba);
+    }
+}
+
+async function verificarNickAutorizado() {
+    const nick = document.getElementById('input-nick-autorizado').value.trim();
+    const statusDiv = document.getElementById('status-nick-autorizado');
+    if (nick.length < 3) { alert('Nick muito curto!'); return; }
+
+    statusDiv.textContent = 'Consultando...';
+    statusDiv.style.display = 'block';
+    statusDiv.style.color = 'var(--text-gray)';
+
+    try {
+        const response = await fetch(`https://www.habbo.com.br/api/public/users?name=${encodeURIComponent(nick)}`);
+        if (!response.ok) throw new Error('Usuário não encontrado');
+        statusDiv.textContent = '✓ Usuário encontrado';
+        statusDiv.style.color = 'var(--primary-green,#22c55e)';
+    } catch (err) {
+        statusDiv.textContent = '✗ Usuário não encontrado';
+        statusDiv.style.color = '#ef4444';
     }
 }
 
@@ -335,14 +376,19 @@ function mostrarCampos(dados, corpoNome) {
         let novaPatente = '';
 
         if (tipoAtual === 'promocao') {
-            // Promoção: next rank (index - 1, lower index = higher rank)
             novaPatente = idx > 0 ? lista[idx - 1] : lista[0];
         } else if (tipoAtual === 'rebaixamento') {
-            // Rebaixamento: previous rank (index + 1, higher index = lower rank)
             novaPatente = idx < lista.length - 1 ? lista[idx + 1] : lista[lista.length - 1];
         } else if (tipoAtual === 'demissao') {
-            // Demissão: always lowest rank
             novaPatente = corpoAtual === 'militar' ? 'Recruta' : 'Agente';
+        } else if (tipoAtual === 'transferencia') {
+            // Transferência: mostra a patente atual do militar (readonly)
+            novaPatente = dados.patente || '';
+            document.getElementById('input-nova-patente').readOnly = true;
+        } else if (tipoAtual === 'cadetes') {
+            // Cadetes: sempre "Cadete" (fixo)
+            novaPatente = 'Cadete';
+            document.getElementById('input-nova-patente').readOnly = true;
         }
 
         document.getElementById('input-nova-patente').value = novaPatente;
@@ -368,7 +414,7 @@ function preencherSelect(opcoes) {
     });
 }
 
-function finalizar() {
+async function finalizar() {
     const config = configForm[tipoAtual];
     const fc = getFieldConfig(tipoAtual);
     const observacao = document.getElementById('input-observacao').value.trim();
@@ -387,27 +433,27 @@ function finalizar() {
         acao = document.getElementById('select-opcoes').value;
         if (!acao) { alert('Selecione uma opção!'); return; }
     } else if (fc.nickPromovido) {
-        acao = "Permissão para: " + document.getElementById('input-nick-promovido').value;
+        const nickAutorizado = fc.nickAutorizado ? document.getElementById('input-nick-autorizado').value : '';
+        const nickPromovido = document.getElementById('input-nick-promovido').value;
+        acao = nickAutorizado
+            ? `Autorizado: ${nickAutorizado} | Promovido: ${nickPromovido}`
+            : `Permissão para: ${nickPromovido}`;
     } else {
         acao = tipoAtual;
     }
 
-    let historico = JSON.parse(localStorage.getItem('dme_historico_req')) || [];
-
     const registro = {
-        id: Date.now().toString(36) + Math.random().toString(36).substr(2),
-        timestamp: Date.now(),
-        data: new Date().toLocaleString('pt-BR'),
         tipo: tipoAtual,
         acao: acao,
         aplicador: usuarioLogado,
-        permissor: fc.permissor ? document.getElementById('input-permissor').value : '',
+        permissor: fc.permissor ? document.getElementById('input-permissor').value : null,
         observacao: observacao,
-        dataHora: fc.datahora ? document.getElementById('input-datahora').value : '',
-        anexoProvas: fc.anexoProvas ? document.getElementById('input-anexo-provas').value : '',
-        banidoAte: fc.banidoAte ? document.getElementById('input-banido-ate').value : '',
-        valor: fc.valor ? document.getElementById('input-valor').value : '',
-        nickPromovido: fc.nickPromovido ? document.getElementById('input-nick-promovido').value : '',
+        data_hora: fc.datahora ? document.getElementById('input-datahora').value : new Date().toISOString(),
+        anexo_provas: fc.anexoProvas ? document.getElementById('input-anexo-provas').value : null,
+        banido_ate: fc.banidoAte ? document.getElementById('input-banido-ate').value || null : null,
+        valor: fc.valor ? document.getElementById('input-valor').value : null,
+        nick_promovido: fc.nickPromovido ? document.getElementById('input-nick-promovido').value : null,
+        nick_autorizado: fc.nickAutorizado ? document.getElementById('input-nick-autorizado').value : null,
         status: 'pendente'
     };
 
@@ -417,55 +463,45 @@ function finalizar() {
             alert('Nick do envolvido é obrigatório!');
             return;
         }
-        registro.militar = nick;
-        registro.corpo = corpoAtual;
+        registro.tags_envolvidos = [nick];
     } else {
+        // Para tipos de aula/outros, podemos guardar os aprovados/reprovados em tags ou observação
         const aprovados = document.getElementById('input-aprovados').value;
         const reprovados = document.getElementById('input-reprovados').value;
-        const semAlunos = document.getElementById('check-sem-alunos').checked;
-
-        registro.aprovados = aprovados;
-        registro.reprovados = reprovados;
-        registro.semAlunos = semAlunos;
-
-        if (config.mostrarCentro) {
-            const centro = document.getElementById('select-centro').value;
-            if (!centro) {
-                alert('Selecione o Centro de Tarefas!');
-                return;
-            }
-            registro.centro = centro;
-        }
+        registro.observacao += ` | Aprovados: ${aprovados} | Reprovados: ${reprovados}`;
     }
 
-    historico.push(registro);
-    localStorage.setItem('dme_historico_req', JSON.stringify(historico));
+    try {
+        const { error } = await supabase
+            .from('requerimentos')
+            .insert([registro]);
 
-    alert('Solicitação enviada para APROVAÇÃO do CRH!');
+        if (error) throw error;
 
-    mudarAba('minhas');
+        alert('Solicitação enviada para APROVAÇÃO do CRH!');
+        mudarAba('minhas');
 
-    // Reset fields
-    document.getElementById('input-permissor').value = '';
-    document.getElementById('input-observacao').value = '';
-    document.getElementById('input-datahora').value = '';
-    document.getElementById('input-nova-patente').value = '';
-    document.getElementById('input-anexo-provas').value = '';
-    document.getElementById('input-banido-ate').value = '';
+        // Reset fields
+        document.getElementById('input-permissor').value = '';
+        document.getElementById('input-observacao').value = '';
+        if (document.getElementById('input-datahora')) document.getElementById('input-datahora').value = '';
+        document.getElementById('input-nova-patente').value = '';
+        document.getElementById('input-anexo-provas').value = '';
+        document.getElementById('input-banido-ate').value = '';
 
-    if (config.tipoForm === 'rh') {
-        document.getElementById('nick-envolvido').value = '';
-        document.getElementById('campos-dinamicos').style.display = 'none';
-        document.getElementById('status-nick').style.display = 'none';
-        document.getElementById('corpo-badge').style.display = 'none';
-    } else {
-        document.getElementById('input-aprovados').value = '';
-        document.getElementById('input-reprovados').value = '';
-        document.getElementById('check-sem-alunos').checked = false;
-        if (config.mostrarCentro) {
-            document.getElementById('select-centro').value = '';
-            document.getElementById('select-opcoes').innerHTML = '<option value="">Primeiro selecione o Centro</option>';
+        if (config.tipoForm === 'rh') {
+            document.getElementById('nick-envolvido').value = '';
+            document.getElementById('campos-dinamicos').style.display = 'none';
+            document.getElementById('status-nick').style.display = 'none';
+            document.getElementById('corpo-badge').style.display = 'none';
+        } else {
+            document.getElementById('input-aprovados').value = '';
+            document.getElementById('input-reprovados').value = '';
+            document.getElementById('check-sem-alunos').checked = false;
         }
+    } catch (err) {
+        console.error('Erro ao salvar requerimento:', err);
+        alert('Erro ao enviar solicitação para o Supabase.');
     }
 }
 
@@ -481,71 +517,63 @@ function atualizarListagem(nick, novaPatente, corpo) {
     }
 }
 
-function carregarHistorico(tipo) {
-    let historico = [];
-    try {
-        historico = JSON.parse(localStorage.getItem('dme_historico_req')) || [];
-    } catch (e) {
-        historico = [];
-    }
+let cacheHistorico = [];
 
+async function carregarHistorico(aba) {
     const container = document.getElementById('lista-historico');
     const tituloDiv = document.getElementById('historico-title');
 
-    let historicoFiltrado = historico.filter(h => h.tipo === tipoAtual);
+    container.innerHTML = '<div class="loading-historico">Carregando dados do Supabase...</div>';
 
-    if (tipo === 'minhas') {
-        const userNorm = usuarioLogado.trim().toLowerCase();
-        historicoFiltrado = historicoFiltrado.filter(h => h.aplicador && h.aplicador.trim().toLowerCase() === userNorm);
-        tituloDiv.textContent = 'Minhas Ações - ' + configForm[tipoAtual].titulo;
-    } else {
-        tituloDiv.textContent = 'Todas as Ações - ' + configForm[tipoAtual].titulo;
-    }
+    try {
+        let query = supabase
+            .from('requerimentos')
+            .select('*')
+            .eq('tipo', tipoAtual)
+            .order('data_hora', { ascending: false });
 
-    if (historicoFiltrado.length === 0) {
-        container.innerHTML = `
-            <div class="empty-historico">
-                <div class="empty-historico-icon">Histórico</div>
-                <div>Nenhuma ação encontrada</div>
-            </div>
-        `;
-        return;
-    }
+        if (aba === 'minhas') {
+            query = query.eq('aplicador', usuarioLogado);
+            tituloDiv.textContent = 'Minhas Ações - ' + configForm[tipoAtual].titulo;
+        } else {
+            tituloDiv.textContent = 'Todas as Ações - ' + configForm[tipoAtual].titulo;
+        }
 
-    historicoFiltrado.sort((a, b) => {
-        if (a.timestamp && b.timestamp) return b.timestamp - a.timestamp;
-        return parseDataBR(b.data) - parseDataBR(a.data);
-    });
+        const { data, error } = await query;
 
-    container.innerHTML = historicoFiltrado.map(h => {
-        const realIndex = historico.indexOf(h);
-        return criarCardHistorico(h, realIndex);
-    }).join('');
+        if (error) throw error;
 
-    const inputFiltro = document.getElementById('filtro-historico');
-    if (inputFiltro) {
-        inputFiltro.oninput = (e) => {
-            const termo = e.target.value.toLowerCase();
-            document.querySelectorAll('.historico-card').forEach(card => {
-                const texto = card.textContent.toLowerCase();
-                card.style.display = texto.includes(termo) ? 'block' : 'none';
-            });
-        };
+        cacheHistorico = data || [];
+
+        if (cacheHistorico.length === 0) {
+            container.innerHTML = `
+                <div class="empty-historico">
+                    <div class="empty-historico-icon">Histórico</div>
+                    <div>Nenhuma ação encontrada no banco de dados</div>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = cacheHistorico.map((h, index) => criarCardHistorico(h, index)).join('');
+
+        const inputFiltro = document.getElementById('filtro-historico');
+        if (inputFiltro) {
+            inputFiltro.oninput = (e) => {
+                const termo = e.target.value.toLowerCase();
+                document.querySelectorAll('.hist-item').forEach((card, idx) => {
+                    const texto = JSON.stringify(cacheHistorico[idx]).toLowerCase();
+                    card.style.display = texto.includes(termo) ? 'flex' : 'none';
+                });
+            };
+        }
+    } catch (err) {
+        console.error('Erro ao carregar histórico:', err);
+        container.innerHTML = '<div class="error-historico">Erro ao carregar dados do Supabase.</div>';
     }
 }
 
-function parseDataBR(dataString) {
-    if (!dataString) return new Date(0);
-    const [data, hora] = dataString.split(',');
-    if (!data) return new Date(0);
-
-    const [dia, mes, ano] = data.trim().split('/');
-    const [h, m, s] = (hora || '00:00:00').trim().split(':');
-
-    return new Date(ano, mes - 1, dia, h || 0, m || 0, s || 0);
-}
-
-function criarCardHistorico(registro, realIndex) {
+function criarCardHistorico(registro, index) {
     const config = configForm[registro.tipo];
 
     let iconSvg = '';
@@ -556,22 +584,24 @@ function criarCardHistorico(registro, realIndex) {
 
     let principalInfo = '';
     if (config.tipoForm === 'rh') {
-        principalInfo = `${registro.militar} (${registro.acao})`;
+        const militar = (registro.tags_envolvidos && registro.tags_envolvidos[0]) || 'N/A';
+        principalInfo = `${militar} (${registro.acao})`;
     } else {
-        principalInfo = `${registro.acao} (${registro.centro ? registro.centro.toUpperCase() : 'N/A'})`;
+        principalInfo = `${registro.acao}`;
     }
 
     const statusClass = registro.status === 'pendente' ? 'pendente' : (registro.status === 'aprovado' ? 'aprovado' : 'reprovado');
     const statusText = registro.status.toUpperCase();
+    const dataFormatada = new Date(registro.data_hora).toLocaleString('pt-BR');
 
     return `
-        <div class="hist-item" onclick="verDetalhes(${realIndex})">
+        <div class="hist-item" onclick="verDetalhes(${index})">
             <div class="hist-content">
                 <div class="hist-icon">${iconSvg}</div>
                 <div class="hist-info">
                     <span class="hist-title">${principalInfo}</span>
                     <div class="hist-meta">
-                        <span>${registro.data}</span>
+                        <span>${dataFormatada}</span>
                         <span>&bull;</span>
                         <span>por ${registro.aplicador}</span>
                     </div>
@@ -588,24 +618,23 @@ function criarCardHistorico(registro, realIndex) {
 let indexAtualModal = -1;
 
 function verDetalhes(index) {
-    const historico = JSON.parse(localStorage.getItem('dme_historico_req')) || [];
-    const req = historico[index];
+    const req = cacheHistorico[index];
     if (!req) return;
 
     indexAtualModal = index;
 
-    document.getElementById('modal-titulo').textContent = `Detalhes - ${tipoNome[req.tipo]} (${req.id || 'N/A'})`;
+    document.getElementById('modal-titulo').textContent = `Detalhes - ${tipoNome[req.tipo]} (${req.id.substring(0,8)})`;
     document.getElementById('modal-obs').value = req.observacao || '';
-    document.getElementById('modal-data').value = req.data || '';
-    document.getElementById('modal-motivo').value = req.motivoReprovacao || '';
+    document.getElementById('modal-data').value = new Date(req.data_hora).toLocaleString('pt-BR');
+    document.getElementById('modal-motivo').value = req.motivo_reprovacao || '';
 
     const logsDiv = document.getElementById('modal-logs');
     logsDiv.innerHTML = req.aprovador ?
-        `<p class="modal-label">Aprovado por: ${req.aprovador} em ${req.dataAprovacao}</p>` :
-        (req.reprovador ? `<p class="modal-label">Reprovado por: ${req.reprovador} em ${req.dataReprovacao}</p>` : '<p class="modal-label">Nenhum LOG encontrado</p>');
+        `<p class="modal-label">Aprovado por: ${req.aprovador}</p>` :
+        (req.reprovador ? `<p class="modal-label">Reprovado por: ${req.reprovador}</p>` : '<p class="modal-label">Aguardando análise</p>');
 
     const username = localStorage.getItem('dme_username');
-    const admins = JSON.parse(localStorage.getItem('dme_admins')) || [];
+    const admins = ["Xandelicado", "rafacv", "Ronaldo"]; // Mock admin check
     const isAdmin = admins.includes(username);
 
     const actionsDiv = document.getElementById('modal-actions');
@@ -629,57 +658,85 @@ function confirmarAcaoAdmin() {
     acaoModal(acao);
 }
 
-function acaoModal(acao) {
+async function acaoModal(acao) {
     if (indexAtualModal === -1) return;
-    const historico = JSON.parse(localStorage.getItem('dme_historico_req')) || [];
-    const req = historico[indexAtualModal];
+    const req = cacheHistorico[indexAtualModal];
     const username = localStorage.getItem('dme_username');
 
-    if (acao === 'aceitar') {
-        if (!confirm('Confirmar aprovação?')) return;
-        req.status = 'aprovado';
-        req.aprovador = username;
-        req.dataAprovacao = new Date().toLocaleString('pt-BR');
+    try {
+        if (acao === 'aceitar') {
+            if (!confirm('Confirmar aprovação?')) return;
+            
+            const { error: updateError } = await supabase
+                .from('requerimentos')
+                .update({ 
+                    status: 'aprovado',
+                    aprovador: username
+                })
+                .eq('id', req.id);
 
-        if ((req.tipo === 'promocao' || req.tipo === 'rebaixamento' || req.tipo === 'demissao') && req.militar) {
-            if (req.tipo === 'demissao') {
-                atualizarListagemRemocao(req.militar, req.corpo);
-            } else {
-                atualizarListagem(req.militar, req.acao, req.corpo);
+            if (updateError) throw updateError;
+
+            // Se for promoção/rebaixamento/demissão, atualiza a patente do militar no Supabase
+            if ((req.tipo === 'promocao' || req.tipo === 'rebaixamento' || req.tipo === 'demissao') && req.tags_envolvidos && req.tags_envolvidos[0]) {
+                const militarNick = req.tags_envolvidos[0];
+                const novaPatente = req.acao;
+
+                if (req.tipo === 'demissao') {
+                    await supabase.from('militares').update({ status: 'desativado' }).eq('nick', militarNick);
+                } else {
+                    await supabase.from('militares').update({ patente: novaPatente }).eq('nick', militarNick);
+                }
             }
+        } else if (acao === 'negar') {
+            const motivo = document.getElementById('modal-motivo').value;
+            if (!motivo) return alert('Preencha o motivo da negação!');
+
+            const { error: updateError } = await supabase
+                .from('requerimentos')
+                .update({ 
+                    status: 'reprovado',
+                    reprovador: username,
+                    motivo_reprovacao: motivo
+                })
+                .eq('id', req.id);
+
+            if (updateError) throw updateError;
+        } else if (acao === 'cancelar') {
+            if (!confirm('Confirmar cancelamento da solicitação?')) return;
+            const { error: updateError } = await supabase
+                .from('requerimentos')
+                .update({ status: 'cancelado' })
+                .eq('id', req.id);
+            if (updateError) throw updateError;
+        } else if (acao === 'apagar') {
+            if (!confirm('Confirmar exclusão? Esta ação é irreversível.')) return;
+            const { error: delError } = await supabase
+                .from('requerimentos')
+                .delete()
+                .eq('id', req.id);
+            if (delError) throw delError;
+            
+            fecharModal();
+            carregarHistorico(abaAtual);
+            return;
+        } else if (acao === 'editar') {
+            const obs = document.getElementById('modal-obs').value;
+            const { error: updateError } = await supabase
+                .from('requerimentos')
+                .update({ observacao: obs })
+                .eq('id', req.id);
+            if (updateError) throw updateError;
+            alert('Observação atualizada!');
         }
-    } else if (acao === 'negar') {
-        const motivo = document.getElementById('modal-motivo').value;
-        if (!motivo) return alert('Preencha o motivo da negação!');
 
-        req.status = 'reprovado';
-        req.reprovador = username;
-        req.motivoReprovacao = motivo;
-        req.dataReprovacao = new Date().toLocaleString('pt-BR');
-    } else if (acao === 'cancelar') {
-        if (!confirm('Confirmar cancelamento da solicitação?')) return;
-        req.status = 'cancelado';
-        req.cancelador = username;
-        req.dataCancelamento = new Date().toLocaleString('pt-BR');
-    } else if (acao === 'apagar') {
-        if (!confirm('Confirmar exclusão? Esta ação é irreversível.')) return;
-        historico.splice(indexAtualModal, 1);
-        localStorage.setItem('dme_historico_req', JSON.stringify(historico));
+        alert('Ação realizada com sucesso!');
         fecharModal();
-        const abaAtiva = document.querySelector('.nav-btn.active').getAttribute('data-aba');
-        if (abaAtiva !== 'aplicar') carregarHistorico(abaAtiva);
-        return;
-    } else if (acao === 'editar') {
-        req.observacao = document.getElementById('modal-obs').value;
-        alert('Observação atualizada!');
+        carregarHistorico(abaAtual);
+    } catch (err) {
+        console.error('Erro na ação admin:', err);
+        alert('Erro ao processar ação no Supabase.');
     }
-
-    historico[indexAtualModal] = req;
-    localStorage.setItem('dme_historico_req', JSON.stringify(historico));
-    alert('Ação realizada com sucesso!');
-    fecharModal();
-    const abaAtiva = document.querySelector('.nav-btn.active').getAttribute('data-aba');
-    if (abaAtiva !== 'aplicar') carregarHistorico(abaAtiva);
 }
 
 function atualizarListagemRemocao(nick, corpo) {
@@ -1049,17 +1106,224 @@ document.getElementById('input-tag-nick')?.addEventListener('keydown', (e) => {
 });
 
 // ── Lógica de Licença ──
-function renderizarLicencas() {
-    // Mock ou busca do localStorage (exemplo simplificado)
-    const historico = JSON.parse(localStorage.getItem('dme_historico_req')) || [];
-    const licencas = historico.filter(h => h.tipo === 'licenca');
-
+async function renderizarLicencas() {
     const pendentes = document.getElementById('licenca-pendentes');
     const andamento = document.getElementById('licenca-andamento');
     const todas = document.getElementById('licenca-todas');
 
-    // Aqui você renderizaria as tabelas baseado no status
-    // Por enquanto deixamos o feedback visual do print
+    if (pendentes) pendentes.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--t3);padding:16px">Carregando...</td></tr>';
+    if (andamento) andamento.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t3);padding:16px">Carregando...</td></tr>';
+    if (todas) todas.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t3);padding:16px">Carregando...</td></tr>';
+
+    try {
+        const { data, error } = await supabase
+            .from('requerimentos')
+            .select('*')
+            .eq('tipo', 'licenca')
+            .order('data_hora', { ascending: false });
+
+        if (error) throw error;
+
+        const licencas = data || [];
+        const hoje = new Date();
+
+        const listaPendentes = licencas.filter(l => l.status === 'pendente');
+        const listaAndamento = licencas.filter(l => {
+            if (l.status !== 'aprovado') return false;
+            const fim = l.banido_ate ? new Date(l.banido_ate) : null;
+            return fim ? fim >= hoje : true;
+        });
+        const listaTodasFmt = licencas;
+
+        // Renderizar pendentes
+        if (pendentes) {
+            if (listaPendentes.length === 0) {
+                pendentes.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--primary-green);padding:16px">Nenhuma licença pendente</td></tr>';
+            } else {
+                pendentes.innerHTML = listaPendentes.map((l, i) => {
+                    const nick = (l.tags_envolvidos && l.tags_envolvidos[0]) || l.aplicador;
+                    const inicio = l.data_hora ? new Date(l.data_hora).toLocaleDateString('pt-BR') : '—';
+                    const dias = l.acao || '—';
+                    return `<tr>
+                        <td>${i + 1}</td>
+                        <td>${nick}</td>
+                        <td>${inicio}</td>
+                        <td>${dias}</td>
+                        <td><button class="btn-ver-licenca" onclick="verLicenca('${l.id}')">Ver</button></td>
+                    </tr>`;
+                }).join('');
+            }
+        }
+
+        // Renderizar em andamento
+        if (andamento) {
+            if (listaAndamento.length === 0) {
+                andamento.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t3);padding:16px">Nenhuma licença em andamento</td></tr>';
+            } else {
+                andamento.innerHTML = listaAndamento.map((l, i) => {
+                    const nick = (l.tags_envolvidos && l.tags_envolvidos[0]) || l.aplicador;
+                    const inicio = l.data_hora ? new Date(l.data_hora).toLocaleDateString('pt-BR') : '—';
+                    const fim = l.banido_ate ? new Date(l.banido_ate).toLocaleDateString('pt-BR') : '—';
+                    const dias = l.acao || '—';
+                    return `<tr>
+                        <td>${i + 1}</td>
+                        <td>${nick}</td>
+                        <td>${inicio}<br><small style="color:var(--t3)">${dias} dias</small></td>
+                        <td>${fim}</td>
+                        <td><button class="btn-ver-licenca" onclick="verLicenca('${l.id}')">Ver</button></td>
+                    </tr>`;
+                }).join('');
+            }
+        }
+
+        // Renderizar todas
+        if (todas) {
+            if (listaTodasFmt.length === 0) {
+                todas.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t3);padding:16px">Nenhuma licença registrada</td></tr>';
+            } else {
+                todas.innerHTML = listaTodasFmt.map((l, i) => {
+                    const nick = (l.tags_envolvidos && l.tags_envolvidos[0]) || l.aplicador;
+                    const inicio = l.data_hora ? new Date(l.data_hora).toLocaleDateString('pt-BR') : '—';
+                    const dias = l.acao || '—';
+                    const statusClass = l.status === 'aprovado' ? 'aprovado' : l.status === 'pendente' ? 'pendente' : 'reprovado';
+                    return `<tr>
+                        <td>${i + 1}</td>
+                        <td>${nick}</td>
+                        <td>${inicio}</td>
+                        <td>${dias}</td>
+                        <td><span class="status-pill ${statusClass}">${(l.status || 'pendente').toUpperCase()}</span></td>
+                        <td><button class="btn-ver-licenca" onclick="verLicenca('${l.id}')">Ver</button></td>
+                    </tr>`;
+                }).join('');
+            }
+        }
+    } catch (err) {
+        console.error('Erro ao carregar licenças:', err);
+        if (pendentes) pendentes.innerHTML = '<tr><td colspan="4" style="color:#e74c3c;text-align:center;padding:16px">Erro ao carregar dados</td></tr>';
+    }
+}
+
+// Abrir modal para postar nova licença
+function abrirPostLicenca() {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+    wrap.innerHTML = `
+        <div style="background:var(--bg-2,#0d1a0d);border:1px solid var(--b2,#1e3a1e);border-radius:16px;padding:28px;max-width:460px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.6)">
+            <h3 style="font-size:.95rem;font-weight:700;color:var(--t1,#fff);margin-bottom:18px">📋 Registrar Licença</h3>
+            <div class="g-form-group" style="margin-bottom:14px">
+                <label class="g-label" style="font-size:.78rem;font-weight:600;color:var(--t2,#ccc);display:block;margin-bottom:6px">Nick do Militar <span style="color:#ef4444">*</span></label>
+                <input type="text" class="g-input" id="_licNick" placeholder="Digite o nick" style="width:100%;padding:9px 12px;border-radius:8px;background:var(--bg-3,#0a120a);border:1px solid var(--b1,#1a2e1a);color:var(--t1,#fff);font-size:.84rem">
+            </div>
+            <div class="g-form-group" style="margin-bottom:14px">
+                <label class="g-label" style="font-size:.78rem;font-weight:600;color:var(--t2,#ccc);display:block;margin-bottom:6px">Quantidade de Dias <span style="color:#ef4444">*</span></label>
+                <input type="number" class="g-input" id="_licDias" min="1" max="365" placeholder="Ex: 15" style="width:100%;padding:9px 12px;border-radius:8px;background:var(--bg-3,#0a120a);border:1px solid var(--b1,#1a2e1a);color:var(--t1,#fff);font-size:.84rem">
+            </div>
+            <div class="g-form-group" style="margin-bottom:14px">
+                <label class="g-label" style="font-size:.78rem;font-weight:600;color:var(--t2,#ccc);display:block;margin-bottom:6px">Data de Início <span style="color:#ef4444">*</span></label>
+                <input type="date" class="g-input" id="_licInicio" style="width:100%;padding:9px 12px;border-radius:8px;background:var(--bg-3,#0a120a);border:1px solid var(--b1,#1a2e1a);color:var(--t1,#fff);font-size:.84rem">
+            </div>
+            <div class="g-form-group" style="margin-bottom:20px">
+                <label class="g-label" style="font-size:.78rem;font-weight:600;color:var(--t2,#ccc);display:block;margin-bottom:6px">Motivo / Observação <span style="color:#ef4444">*</span></label>
+                <textarea class="g-input" id="_licObs" placeholder="Motivo da licença..." style="width:100%;padding:9px 12px;border-radius:8px;background:var(--bg-3,#0a120a);border:1px solid var(--b1,#1a2e1a);color:var(--t1,#fff);font-size:.84rem;min-height:80px;resize:vertical"></textarea>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end">
+                <button id="_licCancelar" style="padding:8px 20px;border-radius:8px;border:1px solid var(--b2,#1e3a1e);background:var(--bg-3,#0a120a);color:var(--t2,#ccc);font-size:.82rem;font-weight:600;cursor:pointer">Cancelar</button>
+                <button id="_licSalvar" style="padding:8px 20px;border-radius:8px;border:none;background:var(--green,#22c55e);color:#fff;font-size:.82rem;font-weight:700;cursor:pointer">Registrar Licença</button>
+            </div>
+        </div>`;
+    document.body.appendChild(wrap);
+
+    // Pré-preencher data de hoje
+    wrap.querySelector('#_licInicio').value = new Date().toISOString().split('T')[0];
+
+    wrap.querySelector('#_licCancelar').onclick = () => wrap.remove();
+    wrap.addEventListener('click', e => { if (e.target === wrap) wrap.remove(); });
+
+    wrap.querySelector('#_licSalvar').onclick = async () => {
+        const nick = wrap.querySelector('#_licNick').value.trim();
+        const dias = wrap.querySelector('#_licDias').value.trim();
+        const inicio = wrap.querySelector('#_licInicio').value;
+        const obs = wrap.querySelector('#_licObs').value.trim();
+
+        if (!nick || !dias || !inicio || !obs) {
+            alert('Preencha todos os campos obrigatórios!');
+            return;
+        }
+
+        // Calcular data de fim
+        const dataInicio = new Date(inicio);
+        const dataFim = new Date(dataInicio);
+        dataFim.setDate(dataFim.getDate() + parseInt(dias));
+
+        const registro = {
+            tipo: 'licenca',
+            acao: dias,
+            aplicador: usuarioLogado,
+            tags_envolvidos: [nick],
+            observacao: obs,
+            data_hora: dataInicio.toISOString(),
+            banido_ate: dataFim.toISOString(),
+            status: 'aprovado'
+        };
+
+        try {
+            const btn = wrap.querySelector('#_licSalvar');
+            btn.disabled = true;
+            btn.textContent = 'Salvando...';
+
+            const { error } = await supabase.from('requerimentos').insert([registro]);
+            if (error) throw error;
+
+            wrap.remove();
+            renderizarLicencas();
+            alert('Licença registrada com sucesso!');
+        } catch (err) {
+            console.error('Erro ao salvar licença:', err);
+            alert('Erro ao salvar licença.');
+            const btn = wrap.querySelector('#_licSalvar');
+            if (btn) { btn.disabled = false; btn.textContent = 'Registrar Licença'; }
+        }
+    };
+}
+
+// Ver detalhes de uma licença pelo ID
+async function verLicenca(id) {
+    try {
+        const { data, error } = await supabase
+            .from('requerimentos')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (error || !data) { alert('Licença não encontrada.'); return; }
+
+        const nick = (data.tags_envolvidos && data.tags_envolvidos[0]) || data.aplicador;
+        const inicio = data.data_hora ? new Date(data.data_hora).toLocaleDateString('pt-BR') : '—';
+        const fim = data.banido_ate ? new Date(data.banido_ate).toLocaleDateString('pt-BR') : '—';
+
+        const wrap = document.createElement('div');
+        wrap.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+        wrap.innerHTML = `
+            <div style="background:var(--bg-2,#0d1a0d);border:1px solid var(--b2,#1e3a1e);border-radius:16px;padding:28px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.6)">
+                <h3 style="font-size:.95rem;font-weight:700;color:var(--t1,#fff);margin-bottom:18px">📋 Detalhes da Licença</h3>
+                <div style="display:flex;flex-direction:column;gap:10px;font-size:.84rem">
+                    <div style="display:flex;justify-content:space-between"><span style="color:var(--t3)">Militar</span><strong style="color:var(--t1)">${nick}</strong></div>
+                    <div style="display:flex;justify-content:space-between"><span style="color:var(--t3)">Dias</span><strong style="color:var(--t1)">${data.acao || '—'}</strong></div>
+                    <div style="display:flex;justify-content:space-between"><span style="color:var(--t3)">Início</span><strong style="color:var(--t1)">${inicio}</strong></div>
+                    <div style="display:flex;justify-content:space-between"><span style="color:var(--t3)">Fim</span><strong style="color:var(--t1)">${fim}</strong></div>
+                    <div style="display:flex;justify-content:space-between"><span style="color:var(--t3)">Aplicador</span><strong style="color:var(--t1)">${data.aplicador}</strong></div>
+                    <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--t3)">Status</span><span class="status-pill ${data.status}">${(data.status||'').toUpperCase()}</span></div>
+                    <div style="border-top:1px solid var(--b1,#1a2e1a);padding-top:10px"><span style="color:var(--t3);font-size:.75rem">Observação</span><p style="color:var(--t2);margin-top:4px">${data.observacao || '—'}</p></div>
+                </div>
+                <div style="display:flex;justify-content:flex-end;margin-top:20px">
+                    <button onclick="this.closest('[style]').remove()" style="padding:8px 20px;border-radius:8px;border:1px solid var(--b2);background:var(--bg-3);color:var(--t2);font-size:.82rem;font-weight:600;cursor:pointer">Fechar</button>
+                </div>
+            </div>`;
+        document.body.appendChild(wrap);
+        wrap.addEventListener('click', e => { if (e.target === wrap) wrap.remove(); });
+    } catch (err) {
+        console.error('Erro ao buscar licença:', err);
+    }
 }
 
 document.getElementById('btn-salvar-gratificacao')?.addEventListener('click', () => {

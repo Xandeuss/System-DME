@@ -1,66 +1,73 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 
+
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DME System � Postar Aula</title>
+
+    <title>DME System  Postar Aula</title>
+
     <link rel="stylesheet" href="/styles/global.css">
+
     <link rel="stylesheet" href="/styles/postar_aula.css">
+
     <script src="/scripts/theme.js"></script>
+
 </head>
 
+
+
 <body>
+
+
+
+    <!-- ââ SIDEBAR ââââââââââââââââââââââââââââââââââââââ -->
 
     <!-- ══ SIDEBAR ══════════════════════════════════════ -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <div class="mobile-sidebar" id="mobileSidebar">
         <div class="sidebar-header">
             <span class="sidebar-title">DME System</span>
-            <button class="sidebar-close" id="sidebarClose">
+            <div class="sidebar-close" id="sidebarClose">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M18 6 6 18M6 6l12 12" />
                 </svg>
-            </button>
+            </div>
         </div>
         <div class="sidebar-section">
             <div class="sidebar-section-label">Principal</div>
             <a href="/home" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                    <polyline points="9 22 9 12 15 12 15 22" />
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
                 </svg>
                 Página Inicial
             </a>
             <a href="/listagens" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="8" y1="6" x2="21" y2="6" />
-                    <line x1="8" y1="12" x2="21" y2="12" />
-                    <line x1="8" y1="18" x2="21" y2="18" />
-                    <line x1="3" y1="6" x2="3.01" y2="6" />
-                    <line x1="3" y1="12" x2="3.01" y2="12" />
-                    <line x1="3" y1="18" x2="3.01" y2="18" />
+                    <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
                 </svg>
                 Listagens
             </a>
             <a href="/requerimentos" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    <polyline points="14 2 14 8 20 8" />
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
                 </svg>
                 Requerimentos
             </a>
             <a href="/sabatina" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
                 </svg>
                 Sabatina
             </a>
             <a href="/consulta_promocao" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-                    <polyline points="16 7 22 7 22 13" />
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
                 </svg>
                 Consultar Promoção
             </a>
@@ -69,239 +76,414 @@
             <div class="sidebar-section-label">Ferramentas</div>
             <a href="/ponto_servico" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <polyline points="12 6 12 12 16 14" />
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                 </svg>
                 Ponto de Serviço
             </a>
             <a href="/loja" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                    <line x1="3" y1="6" x2="21" y2="6" />
-                    <path d="M16 10a4 4 0 0 1-8 0" />
+                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
                 </svg>
                 Loja
             </a>
             <a href="/documentos" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
                 </svg>
                 Documentos
             </a>
             <a href="/centro_tarefas_orgaos" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 10v11M16 10v11M12 10v11" />
+                    <path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 10v11M16 10v11M12 10v11"/>
                 </svg>
                 Centros e Órgãos
             </a>
             <a href="/recrutamentos" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                 </svg>
                 Recrutamentos
             </a>
             <a href="/ouvidoria" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                 </svg>
                 Ouvidoria
             </a>
             <a href="/setor_legislativo" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="m18 16 4-4-4-4" />
-                    <path d="m6 8-4 4 4 4" />
-                    <path d="m14.5 4-5 16" />
+                    <path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/>
                 </svg>
                 Setor Legislativo
             </a>
             <a href="/postar_aula" class="sidebar-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
                 </svg>
                 Postar Aula
             </a>
         </div>
     </div>
-
-    <!-- -- NAVBAR ------------------------------------------ -->
+    <!-- ══ NAVBAR ════════════════════════════════════════ -->
     <nav class="navbar">
         <div class="logo-section">
-            <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+            <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
             <div class="logo-mark">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5">
                     <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                 </svg>
             </div>
             <div class="logo-text">DME<em>System</em></div>
         </div>
-        <div class="user-profile" id="userProfileBtn">
-            <div class="user-avatar"><img id="navUserImage" src="" alt=""></div>
-            <span class="user-name" id="navUserName">Usu�rio</span>
-            <div class="user-dropdown" id="userDropdown">
-                <div class="dropdown-header">
-                    <div class="dropdown-user-info">
-                        <div class="dropdown-avatar"><img id="dropdownUserImage" src="" alt=""></div>
-                        <div class="dropdown-user-details">
-                            <h4 id="dropdownName">Usu�rio</h4>
-                            <p id="dropdownCargo">Militar DME</p>
+
+        <!-- Nav links centrais -->
+        <div class="nav-links">
+            <a href="/home" class="nav-link active">Home</a>
+            <a href="/listagens" class="nav-link">Listagens</a>
+            <a href="/ponto_servico" class="nav-link">Ponto</a>
+            <a href="/requerimentos" class="nav-link">Requerimentos</a>
+        </div>
+
+        <div class="nav-actions">
+            <div class="user-profile" id="userProfileBtn">
+                <div class="user-avatar"><img id="navUserImage" src="" alt=""></div>
+                <span class="user-name" id="navUserName">Usuário</span>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-info">
+                            <div class="dropdown-avatar"><img id="dropdownUserImage" src="" alt=""></div>
+                            <div class="dropdown-user-details">
+                                <h4 id="dropdownName">Usuário</h4>
+                                <p>Militar DME</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="dropdown-menu">
-                    <a href="/painel" class="dropdown-item" id="dropdownPainel" style="display:none">Painel
-                        Admin</a>
-                    <a onclick="toggleTheme()" class="dropdown-item"><span id="themeText">Modo Claro</span></a>
-                    <div class="dropdown-divider"></div>
-                    <a onclick="logout()" class="dropdown-item danger">Sair</a>
+                    <div class="dropdown-menu">
+                        <a href="/painel" class="dropdown-item" id="dropdownPainel" style="display:none">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14">
+                                <rect x="3" y="3" width="7" height="7" />
+                                <rect x="14" y="3" width="7" height="7" />
+                                <rect x="14" y="14" width="7" height="7" />
+                                <rect x="3" y="14" width="7" height="7" />
+                            </svg>
+                            Painel Admin
+                        </a>
+                        <a href="/configuracao" class="dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14">
+                                <circle cx="12" cy="12" r="3" />
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                            </svg>
+                            Configurações
+                        </a>
+                        <a onclick="toggleTheme()" class="dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14">
+                                <circle cx="12" cy="12" r="5" />
+                                <line x1="12" y1="1" x2="12" y2="3" />
+                                <line x1="12" y1="21" x2="12" y2="23" />
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                                <line x1="1" y1="12" x2="3" y2="12" />
+                                <line x1="21" y1="12" x2="23" y2="12" />
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                            </svg>
+                            <span id="themeText">Modo Claro</span>
+                        </a>
+                        <div class="dropdown-divider" id="dropdownDivider" style="display:none"></div>
+                        <a onclick="logout()" class="dropdown-item danger">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                <polyline points="16 17 21 12 16 7" />
+                                <line x1="21" y1="12" x2="9" y2="12" />
+                            </svg>
+                            Sair
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </nav>
-
     <!-- -- BREADCRUMB -------------------------------------- -->
+
     <div class="breadcrumb-bar">
+
         <a href="/home" class="breadcrumb-link">
+
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+
             </svg>
-            In�cio
+
+            Início
+
         </a>
+
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="breadcrumb-sep">
+
             <polyline points="9 18 15 12 9 6" />
+
         </svg>
+
         <span class="breadcrumb-current">Postar Aula</span>
+
     </div>
 
 
+
+
+
     <!-- -- MAIN -------------------------------------------- -->
+
     <main class="aula-main">
+
         <div class="aula-card">
+
             <!-- Header -->
+
             <div class="aula-card-header">
+
                 <div class="aula-header-icon">
+
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
                         <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+
                         <path d="M6 12v5c3 3 9 3 12 0v-5" />
+
                     </svg>
+
                 </div>
+
                 <div>
+
                     <h1 class="aula-header-title">Postar Aula</h1>
+
                     <p class="aula-header-sub">Selecione o centro e o tipo de aula</p>
+
                 </div>
+
             </div>
+
+
 
             <!-- Alertas -->
+
             <div id="aula-alert" class="aula-alert" style="display:none"></div>
 
-            <!-- Formul�rio -->
+
+
+            <!-- Formulário -->
+
             <div class="aula-form">
 
-                <!-- Centro (auto-detectado ou selecion�vel) -->
+
+
+                <!-- Centro (auto-detectado ou selecionável) -->
+
                 <div class="g-form-group">
+
                     <label class="g-label">Centro de Tarefas</label>
+
                     <select class="g-input" id="aula-select-centro">
+
                         <option value="">Selecione o centro...</option>
+
                     </select>
+
                 </div>
+
+
 
                 <!-- Tipo de Aula -->
+
                 <div class="g-form-group">
+
                     <label class="g-label">Tipo de Aula <span class="req-star">*</span></label>
+
                     <select class="g-input" id="aula-select-tipo">
+
                         <option value="">Primeiro selecione o centro</option>
+
                     </select>
+
                 </div>
+
+
 
                 <!-- Aplicador (readonly) -->
+
                 <div class="g-form-group">
+
                     <label class="g-label">Instrutor Aplicador</label>
+
                     <input type="text" class="g-input" id="aula-aplicador" readonly>
+
                 </div>
+
+
 
                 <!-- Data e Hora -->
+
                 <div class="g-form-row">
+
                     <div class="g-form-group">
+
                         <label class="g-label">Data e Hora da Aula <span class="req-star">*</span></label>
+
                         <input type="datetime-local" class="g-input" id="aula-datahora">
+
                     </div>
+
                     <div class="g-form-group">
+
                         <label class="g-label">Permissor / Autorizou</label>
+
                         <input type="text" class="g-input" id="aula-permissor" placeholder="Nick de quem autorizou">
+
                     </div>
+
                 </div>
+
+
 
                 <!-- Alunos -->
+
                 <div class="g-form-row">
+
                     <div class="g-form-group">
+
                         <label class="g-label">Aprovados</label>
+
                         <textarea class="g-input" id="aula-aprovados" style="min-height:80px;resize:vertical"
-                            placeholder="Um nick por linha ou separados por v�rgula..."></textarea>
+
+                            placeholder="Um nick por linha ou separados por vírgula..."></textarea>
+
                     </div>
+
                     <div class="g-form-group">
+
                         <label class="g-label">Reprovados</label>
+
                         <textarea class="g-input" id="aula-reprovados" style="min-height:80px;resize:vertical"
-                            placeholder="Um nick por linha ou separados por v�rgula..."></textarea>
+
+                            placeholder="Um nick por linha ou separados por vírgula..."></textarea>
+
                     </div>
+
                 </div>
+
+
 
                 <!-- Sem alunos -->
+
                 <div class="g-form-group">
+
                     <label class="aula-check-label">
+
                         <input type="checkbox" id="aula-sem-alunos">
+
                         <span class="aula-check-box"></span>
-                        Aula sem alunos / demonstra��o
+
+                        Aula sem alunos / demonstração
+
                     </label>
+
                 </div>
 
-                <!-- Observa��o -->
+
+
+                <!-- Observação -->
+
                 <div class="g-form-group">
-                    <label class="g-label">Observa��o <span class="req-star">*</span></label>
+
+                    <label class="g-label">Observação <span class="req-star">*</span></label>
+
                     <textarea class="g-input" id="aula-observacao" style="min-height:90px;resize:vertical"
+
                         placeholder="Descreva brevemente como foi a aula..."></textarea>
+
                 </div>
 
-                <!-- A��es -->
+
+
+                <!-- Ações -->
+
                 <div class="aula-form-actions">
+
                     <a href="/home" class="btn-secondary">Cancelar</a>
+
                     <button class="btn-primary" id="aula-btn-salvar" type="button">
+
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15">
+
                             <polyline points="20 6 9 17 4 12" />
+
                         </svg>
+
                         Confirmar Postagem
+
                     </button>
+
                 </div>
+
             </div>
+
         </div>
 
-        <!-- Hist�rico pessoal -->
+
+
+        <!-- Histórico pessoal -->
+
         <div class="aula-card aula-hist-card">
+
             <div class="aula-card-header"
+
                 style="border-bottom:1px solid var(--b1);padding-bottom:16px;margin-bottom:16px">
+
                 <div class="aula-header-icon" style="background:var(--bg-3)">
+
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
                         <circle cx="12" cy="12" r="10" />
+
                         <polyline points="12 6 12 12 16 14" />
+
                     </svg>
+
                 </div>
+
                 <div>
+
                     <h2 class="aula-header-title" style="font-size:1rem">Minhas Aulas</h2>
-                    <p class="aula-header-sub" id="aula-hist-periodo">Per�odo atual</p>
+
+                    <p class="aula-header-sub" id="aula-hist-periodo">Período atual</p>
+
                 </div>
+
             </div>
+
             <div id="aula-hist-list" class="aula-hist-list"></div>
+
         </div>
+
     </main>
 
+
+
     <!-- -- TOAST ------------------------------------------= -->
+
     <div id="toast-container" class="toast-container"></div>
 
+
+
     <script src="/scripts/notificacoes.js"></script>
+
     <script src="/scripts/postar_aula.js"></script>
+
 </body>
 
+
+
 </html>
+

@@ -7,36 +7,500 @@
     <title>Setor Legislativo — DME System</title>
     <link rel="stylesheet" href="/styles/global.css">
     <link rel="stylesheet" href="/styles/centro_detalhe.css">
-    <link rel="stylesheet" href="/styles/setor_legislativo.css">
     <script src="/scripts/theme.js"></script>
-    <style>
-        /* Ajustes específicos para o mural dentro do novo layout */
-        .tab-content {
-            padding: 0;
-        }
-
-        .pub-card {
-            margin-bottom: 24px;
-        }
-
-        .mural-title {
-            margin: 24px 0 16px;
-            font-size: 1.1rem;
-        }
-    </style>
 </head>
 
 <body>
 
-    <!-- ══ MODAL: CONFIGURAÇÃO DO MURAL ═══════════════ -->
+    <!-- ══ SIDEBAR ══════════════════════════════════════ -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="mobile-sidebar" id="mobileSidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-title">DME System</span>
+            <div class="sidebar-close" id="sidebarClose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+            </div>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Principal</div>
+            <a href="/home" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                Página Inicial
+            </a>
+            <a href="/listagens" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+                </svg>
+                Listagens
+            </a>
+            <a href="/requerimentos" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                </svg>
+                Requerimentos
+            </a>
+            <a href="/sabatina" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                </svg>
+                Sabatina
+            </a>
+            <a href="/consulta_promocao" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+                </svg>
+                Consultar Promoção
+            </a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Ferramentas</div>
+            <a href="/ponto_servico" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+                Ponto de Serviço
+            </a>
+            <a href="/loja" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+                </svg>
+                Loja
+            </a>
+            <a href="/documentos" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                </svg>
+                Documentos
+            </a>
+            <a href="/centro_tarefas_orgaos" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 10v11M16 10v11M12 10v11"/>
+                </svg>
+                Centros e Órgãos
+            </a>
+            <a href="/recrutamentos" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                Recrutamentos
+            </a>
+            <a href="/ouvidoria" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                Ouvidoria
+            </a>
+            <a href="/setor_legislativo" class="sidebar-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/>
+                </svg>
+                Setor Legislativo
+            </a>
+            <a href="/postar_aula" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                </svg>
+                Postar Aula
+            </a>
+        </div>
+    </div>
+    <!-- ══ NAVBAR ════════════════════════════════════════ -->
+    <nav class="navbar">
+        <div class="logo-section">
+            <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+            <div class="logo-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+            </div>
+            <div class="logo-text">DME<em>System</em></div>
+        </div>
+
+        <!-- Nav links centrais -->
+        <div class="nav-links">
+            <a href="/home" class="nav-link active">Home</a>
+            <a href="/listagens" class="nav-link">Listagens</a>
+            <a href="/ponto_servico" class="nav-link">Ponto</a>
+            <a href="/requerimentos" class="nav-link">Requerimentos</a>
+        </div>
+
+        <div class="nav-actions">
+            <div class="user-profile" id="userProfileBtn">
+                <div class="user-avatar"><img id="navUserImage" src="" alt=""></div>
+                <span class="user-name" id="navUserName">Usuário</span>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-info">
+                            <div class="dropdown-avatar"><img id="dropdownUserImage" src="" alt=""></div>
+                            <div class="dropdown-user-details">
+                                <h4 id="dropdownName">Usuário</h4>
+                                <p>Militar DME</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="/painel" class="dropdown-item" id="dropdownPainel" style="display:none">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14">
+                                <rect x="3" y="3" width="7" height="7" />
+                                <rect x="14" y="3" width="7" height="7" />
+                                <rect x="14" y="14" width="7" height="7" />
+                                <rect x="3" y="14" width="7" height="7" />
+                            </svg>
+                            Painel Admin
+                        </a>
+                        <a href="/configuracao" class="dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14">
+                                <circle cx="12" cy="12" r="3" />
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                            </svg>
+                            Configurações
+                        </a>
+                        <a onclick="toggleTheme()" class="dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14">
+                                <circle cx="12" cy="12" r="5" />
+                                <line x1="12" y1="1" x2="12" y2="3" />
+                                <line x1="12" y1="21" x2="12" y2="23" />
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                                <line x1="1" y1="12" x2="3" y2="12" />
+                                <line x1="21" y1="12" x2="23" y2="12" />
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                            </svg>
+                            <span id="themeText">Modo Claro</span>
+                        </a>
+                        <div class="dropdown-divider" id="dropdownDivider" style="display:none"></div>
+                        <a onclick="logout()" class="dropdown-item danger">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                <polyline points="16 17 21 12 16 7" />
+                                <line x1="21" y1="12" x2="9" y2="12" />
+                            </svg>
+                            Sair
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- ══ BREADCRUMB ═══════════════════════════════════ -->
+    <div class="breadcrumb-bar">
+        <a href="/centro_tarefas_orgaos" class="breadcrumb-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 21h18M3 10h18M3 7l9-4 9 4" />
+            </svg>
+            Centros e Órgãos
+        </a>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="breadcrumb-sep">
+            <polyline points="9 18 15 12 9 6" />
+        </svg>
+        <span class="breadcrumb-current">Setor Legislativo</span>
+    </div>
+
+    <!-- ══ MAIN LAYOUT ═══════════════════════════════════ -->
+    <div class="centro-layout">
+
+        <!-- ── CONTEÚDO PRINCIPAL ─────────────────────── -->
+        <main class="centro-main">
+
+            <!-- Cabeçalho -->
+            <div class="centro-header-card">
+                <div class="centro-header-icon">⚖️</div>
+                <div class="centro-header-info">
+                    <h1 class="centro-header-title">Setor Legislativo</h1>
+                    <p class="centro-header-sub">Coordena a elaboração de projetos, emendas e diretrizes institucionais.</p>
+                    <div class="centro-header-meta">
+                        <span class="centro-meta-badge" id="membrosBadge">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+                            </svg>
+                            <span id="membrosCount">0</span> membros
+                        </span>
+                        <span class="centro-meta-badge lider-badge" id="liderBadge" style="display:none">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                            Você é Líder
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="centro-tabs">
+                <button class="centro-tab active" data-tab="inicio">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <polyline points="9 22 9 12 15 12 15 22" />
+                    </svg>
+                    Início
+                </button>
+                <button class="centro-tab" data-tab="membros">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+                    </svg>
+                    Membros
+                </button>
+                <button class="centro-tab" data-tab="forum">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                    Fórum
+                </button>
+                <button class="centro-tab" data-tab="hierarquia">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="6" y1="3" x2="6" y2="15" /><circle cx="18" cy="6" r="3" />
+                        <circle cx="6" cy="18" r="3" /><path d="M18 9a9 9 0 0 1-9 9" />
+                    </svg>
+                    Hierarquia
+                </button>
+                <button class="centro-tab" data-tab="stm-painel">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                    Projetos e Emendas
+                </button>
+            </div>
+
+            <!-- ABA: INÍCIO -->
+            <div class="tab-content active" id="tab-inicio">
+                <div class="inicio-content">
+                    <div class="inicio-welcome-icon">⚖️</div>
+                    <h3>Bem-vindo ao Setor Legislativo</h3>
+                    <p class="inicio-desc">Aqui você encontra toda a documentação legal e propostas em andamento no DME.</p>
+                    <div class="inicio-stats">
+                        <div class="inicio-stat-card">
+                            <span class="stat-num" id="statProjetos">0</span>
+                            <span class="stat-lbl">Projetos</span>
+                        </div>
+                        <div class="inicio-stat-card">
+                            <span class="stat-num" id="statEmendas">0</span>
+                            <span class="stat-lbl">Emendas</span>
+                        </div>
+                        <div class="inicio-stat-card">
+                            <span class="stat-num" id="statMembros">0</span>
+                            <span class="stat-lbl">Membros</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-card" style="margin-top:16px">
+                    <div class="panel-card-header">
+                        <span class="panel-card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                <polyline points="22,6 12,13 2,6" />
+                            </svg>
+                            Publicações Recentes
+                        </span>
+                        <button class="btn-primary btn-sm" id="btnAbrirMural" style="display:none" onclick="abrirMuralModal()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                            Postar Notícia
+                        </button>
+                    </div>
+                    <div id="mural-posts-list"></div>
+                </div>
+            </div>
+
+            <!-- ABA: MEMBROS -->
+            <div class="tab-content" id="tab-membros">
+                <div class="panel-card">
+                    <div class="panel-card-header">
+                        <span class="panel-card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+                            </svg>
+                            Lista de Membros
+                        </span>
+                    </div>
+                    <div id="membros-list">
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+                            </svg>
+                            <p>Nenhum membro registrado ainda.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA: FÓRUM -->
+            <div class="tab-content" id="tab-forum">
+                <div class="panel-card">
+                    <div class="panel-card-header">
+                        <span class="panel-card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                            </svg>
+                            Sub-Fóruns
+                        </span>
+                        <button class="btn-primary btn-sm" id="btnNovoForum" style="display:none">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                            Novo Sub-Fórum
+                        </button>
+                    </div>
+                    <div id="forum-list">
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                            </svg>
+                            <p>Nenhum sub-fórum criado ainda.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA: HIERARQUIA -->
+            <div class="tab-content" id="tab-hierarquia">
+                <div class="panel-card">
+                    <div class="panel-card-header">
+                        <span class="panel-card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="6" y1="3" x2="6" y2="15" /><circle cx="18" cy="6" r="3" />
+                                <circle cx="6" cy="18" r="3" /><path d="M18 9a9 9 0 0 1-9 9" />
+                            </svg>
+                            Estrutura Hierárquica
+                        </span>
+                        <button class="btn-primary btn-sm" id="btnNovoNivel" style="display:none">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                            Novo Nível
+                        </button>
+                    </div>
+                    <div id="hierarquia-list">
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <line x1="6" y1="3" x2="6" y2="15" /><circle cx="18" cy="6" r="3" />
+                                <circle cx="6" cy="18" r="3" /><path d="M18 9a9 9 0 0 1-9 9" />
+                            </svg>
+                            <p>Nenhum nível hierárquico definido.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA: PROJETOS E EMENDAS -->
+            <div class="tab-content" id="tab-stm-painel">
+                <div class="panel-card">
+                    <div class="panel-card-header">
+                        <span class="panel-card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                            </svg>
+                            Projetos e Emendas
+                        </span>
+                        <button class="btn-primary btn-sm" id="btnNovoProjeto" style="display:none">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                            Novo Projeto
+                        </button>
+                    </div>
+                    <div id="projetos-list">
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                            </svg>
+                            <p>Nenhum projeto registrado ainda.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- ── MENU LATERAL RÁPIDO ════════════════════ -->
+        <aside class="centro-quick-menu">
+            <div class="quick-menu-section">
+                <div class="quick-menu-label">Menu Rápido</div>
+                <button class="quick-menu-item active" data-tab="inicio">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <polyline points="9 22 9 12 15 12 15 22" />
+                    </svg>
+                    Início
+                </button>
+                <button class="quick-menu-item" data-tab="membros">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+                    </svg>
+                    Membros
+                </button>
+                <button class="quick-menu-item" data-tab="forum">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                    Fórum
+                </button>
+                <button class="quick-menu-item" data-tab="hierarquia">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="6" y1="3" x2="6" y2="15" /><circle cx="18" cy="6" r="3" />
+                        <circle cx="6" cy="18" r="3" /><path d="M18 9a9 9 0 0 1-9 9" />
+                    </svg>
+                    Hierarquia
+                </button>
+                <button class="quick-menu-item" data-tab="stm-painel">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                    Projetos e Emendas
+                </button>
+            </div>
+
+            <!-- Seção Liderança (apenas líder/admin) -->
+            <div class="quick-menu-section lider-section" id="liderSection" style="display:none">
+                <div class="quick-menu-label lider-label">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                    Liderança
+                </div>
+                <button class="quick-menu-item" data-action="publicacao" onclick="abrirMuralModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                        <polyline points="22,6 12,13 2,6" />
+                    </svg>
+                    Publicação
+                </button>
+                <button class="quick-menu-item" data-action="membros-lider">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                    Controle de Membros
+                </button>
+                <button class="quick-menu-item" data-action="configuracao">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3" />
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg>
+                    Configuração
+                </button>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- ══ MODAL: POSTAR NO MURAL ════════════════════════ -->
     <div class="modal-wrap" id="muralModal">
-        <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-content" style="max-width:500px">
             <div class="modal-header">
                 <h3>Postar no Mural</h3>
                 <button class="modal-close" onclick="fecharMuralModal()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
+                        <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
                     </svg>
                 </button>
             </div>
@@ -66,376 +530,316 @@
         </div>
     </div>
 
-    <!-- ══ NAVBAR ════════════════════════════════════════ -->
-    <nav class="navbar">
-        <div class="logo-section">
-            <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
-            <div class="logo-mark">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                </svg>
+    <!-- ══ MODAL: NOVO SUB-FÓRUM ════════════════════════ -->
+    <div class="modal-wrap" id="forumModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="forumModalTitle">Novo Sub-Fórum</h3>
+                <button class="modal-close" id="forumModalClose">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
             </div>
-            <div class="logo-text">DME<em>System</em></div>
+            <div class="modal-body">
+                <input type="hidden" id="forumModalId">
+                <div class="g-form-group">
+                    <label class="g-label">Nome do Sub-Fórum <span style="color:var(--red)">*</span></label>
+                    <input type="text" class="g-input" id="forumModalNome" placeholder="Ex: [STM] Deliberações">
+                </div>
+                <div class="g-form-group">
+                    <label class="g-label">Descrição (opcional)</label>
+                    <textarea class="g-input" id="forumModalDesc" style="min-height:80px;resize:vertical"
+                        placeholder="Descreva o propósito deste sub-fórum..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="forumModalCancel">Cancelar</button>
+                <button class="btn-primary" id="forumModalSalvar">Salvar</button>
+            </div>
         </div>
-        <div class="nav-links">
-            <a href="/home" class="nav-link">Home</a>
-            <a href="/listagens" class="nav-link">Listagens</a>
-            <a href="/requerimentos" class="nav-link">Requerimentos</a>
-            <a href="/setor_legislativo" class="nav-link active">Legislação</a>
-        </div>
-        <div class="user-profile" id="userProfileBtn">
-            <div class="user-avatar"><img id="navUserImage" src="" alt=""></div>
-            <span class="user-name" id="navUserName">Usuário</span>
-        </div>
-    </nav>
-
-    <!-- ══ BREADCRUMB ═══════════════════════════════════ -->
-    <div class="breadcrumb-bar">
-        <a href="/centro_tarefas_orgaos" class="breadcrumb-link">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 21h18M3 10h18M3 7l9-4 9 4" />
-            </svg>
-            Centros e Órgãos
-        </a>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="breadcrumb-sep">
-            <polyline points="9 18 15 12 9 6" />
-        </svg>
-        <span class="breadcrumb-current">Setor Legislativo</span>
     </div>
 
-    <!-- ══ MAIN LAYOUT ═══════════════════════════════════ -->
-    <div class="centro-layout">
-
-        <!-- ── CONTEÚDO PRINCIPAL ─────────────────────── -->
-        <main class="centro-main">
-
-            <!-- Cabeçalho do Card (Padrão Profissional) -->
-            <div class="centro-header-card">
-                <div class="centro-header-icon">⚖️</div>
-                <div class="centro-header-info">
-                    <h1 class="centro-header-title">Setor Legislativo</h1>
-                    <p class="centro-header-sub">Coordena a elaboração de projetos, emendas e diretrizes institucionais.
-                    </p>
-                    <div class="centro-header-meta">
-                        <span class="centro-meta-badge">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                                <circle cx="9" cy="7" r="4" />
-                            </svg>
-                            20 membros
-                        </span>
-                        <span class="centro-meta-badge lider-badge">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polygon
-                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                            </svg>
-                            Você é Líder
-                        </span>
-                    </div>
+    <!-- ══ MODAL: NOVO NÍVEL HIERÁRQUICO ════════════════ -->
+    <div class="modal-wrap" id="hierModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="hierModalTitle">Novo Nível</h3>
+                <button class="modal-close" id="hierModalClose">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="hierModalId">
+                <div class="g-form-group">
+                    <label class="g-label">Cargo / Nível <span style="color:var(--red)">*</span></label>
+                    <input type="text" class="g-input" id="hierModalCargo"
+                        placeholder="Ex: Ministro, Relator, Assessor...">
+                </div>
+                <div class="g-form-group">
+                    <label class="g-label">Subtópicos (um por linha)</label>
+                    <textarea class="g-input" id="hierModalSubs" style="min-height:100px;resize:vertical"
+                        placeholder="Ex: Ministro Presidente&#10;Ministro Relator&#10;Assessor Jurídico"></textarea>
+                </div>
+                <div class="g-form-group">
+                    <label class="g-label">Responsável</label>
+                    <input type="text" class="g-input" id="hierModalResp" placeholder="Nick do responsável (opcional)">
                 </div>
             </div>
-
-            <!-- Tabs de Navegação -->
-            <div class="centro-tabs">
-                <button class="centro-tab active" data-tab="mural">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                    </svg>
-                    Mural
-                </button>
-                <button class="centro-tab" data-tab="projetos">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                        <polyline points="14 2 14 8 20 8" />
-                    </svg>
-                    Projetos
-                </button>
-                <button class="centro-tab" data-tab="membros">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                        <circle cx="9" cy="7" r="4" />
-                    </svg>
-                    Membros
-                </button>
-                <button class="centro-tab" data-tab="hierarquia">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="6" y1="3" x2="6" y2="15" />
-                        <circle cx="18" cy="6" r="3" />
-                        <circle cx="6" cy="18" r="3" />
-                        <path d="M18 9a9 9 0 0 1-9 9" />
-                    </svg>
-                    Hierarquia
-                </button>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="hierModalCancel">Cancelar</button>
+                <button class="btn-primary" id="hierModalSalvar">Salvar</button>
             </div>
-
-            <!-- ── ABA: MURAL (PUBLICAÇÕES) ────────────────── -->
-            <div class="tab-content active" id="tab-mural">
-                <div class="panel-card" style="padding: 24px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                        <h2 class="mural-title" style="margin:0">Publicações Recentes</h2>
-                        <button class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem;"
-                            onclick="abrirMuralModal()">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                style="width:14px; height:14px; margin-right:4px;">
-                                <line x1="12" y1="5" x2="12" y2="19" />
-                                <line x1="5" y1="12" x2="19" y2="12" />
-                            </svg>
-                            Postar Notícia
-                        </button>
-                    </div>
-
-                    <!-- Mural de Publicações (Reutilizando os estilos que criamos) -->
-                    <article class="pub-card">
-                        <div class="pub-header">
-                            <div class="pub-author-av">
-                                <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Xande&direction=2&head_direction=2&gesture=sml&size=m"
-                                    alt="Autor">
-                            </div>
-                            <div class="pub-meta">
-                                <span class="pub-tag">[STM] Guia</span>
-                            </div>
-                        </div>
-                        <div class="pub-image">
-                            <img src="https://media.discordapp.net/attachments/1114294474747068487/1114294475149721660/guia_elaboracao.png"
-                                alt="Guia">
-                        </div>
-                        <div class="pub-content">
-                            <h2>Guia de Elaboração de Projetos do DME</h2>
-                            <p>Neste guia, você vai aprender como fazer um projeto completo e pronto para usar. Um
-                                projeto não é só ter uma ideia, ele precisa estar detalhado, explicado e com tudo pronto
-                                para aplicação.</p>
-                        </div>
-                    </article>
-
-                    <!-- Central Welcome Banner (Similar ao centro_detalhe) -->
-                    <div class="inicio-content" style="border-top: 1px solid var(--b1); margin-top:20px">
-                        <div class="inicio-welcome-icon">📜</div>
-                        <h3>Bem-vindo ao Setor Legislativo</h3>
-                        <p class="inicio-desc">Aqui você encontra toda a documentação legal e propostas em andamento no
-                            DME.</p>
-                        <div class="inicio-stats">
-                            <div class="inicio-stat-card">
-                                <span class="stat-num">12</span>
-                                <span class="stat-lbl">Projetos</span>
-                            </div>
-                            <div class="inicio-stat-card">
-                                <span class="stat-num">05</span>
-                                <span class="stat-lbl">Emendas</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Outras abas (vazias por enquanto) -->
-            <div class="tab-content" id="tab-projetos">
-                <div class="panel-card" style="padding:40px; text-align:center; color:var(--t3)">
-                    Seção de Projetos em desenvolvimento.
-                </div>
-            </div>
-
-        </main>
-
-        <!-- ── MENU LATERAL RÁPIDO ════════════════════ -->
-        <aside class="centro-quick-menu">
-            <div class="quick-menu-section">
-                <div class="quick-menu-label">Menu Rápido</div>
-                <button class="quick-menu-item active" data-tab="mural">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                    </svg>
-                    Início
-                </button>
-                <button class="quick-menu-item" data-tab="membros">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                        <circle cx="9" cy="7" r="4" />
-                    </svg>
-                    Membros
-                </button>
-                <button class="quick-menu-item" data-tab="documentos">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    </svg>
-                    Documentos
-                </button>
-                <button class="quick-menu-item" data-tab="forum">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                    </svg>
-                    Fórum
-                </button>
-            </div>
-
-            <div class="quick-menu-section">
-                <div class="quick-menu-label" style="color:#fbbf24">LIDERANÇA</div>
-                <button class="quick-menu-item" onclick="abrirMuralModal()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="3" />
-                        <path
-                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                    </svg>
-                    Configuração
-                </button>
-                <button class="quick-menu-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                        <circle cx="9" cy="7" r="4" />
-                    </svg>
-                    Controle de Membros
-                </button>
-            </div>
-        </aside>
-
+        </div>
     </div>
 
-
-    <!-- Scripts (Hamburger, Tabs, user info, Mural Logic) -->
+    <script src="/scripts/notificacoes.js"></script>
+    <script src="/scripts/chat_global.js"></script>
     <script>
-        const MURAL_STORAGE_KEY = 'dme_legis_mural';
+    (function () {
+        'use strict';
+        const ORGAO_ID = 'setor-legislativo';
+        const MURAL_KEY = 'dme_legis_mural';
+        const username = localStorage.getItem('dme_username');
+        if (!username) { window.location.href = '/login'; return; }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const user = JSON.parse(localStorage.getItem('dme_user_logged'));
-            if (user) {
-                document.getElementById('navUserName').innerText = user.nickname;
-                document.getElementById('navUserImage').src = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${user.nickname}&direction=2&head_direction=2&gesture=sml&size=m`;
+        const get = k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch { return null; } };
+        const set = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+        const getLideres = () => get('dme_centros_lideres') || {};
+        const isAdmin = () => (get('dme_admins') || []).includes(username);
+        const isLider = () => isAdmin() || (getLideres()[ORGAO_ID] || []).includes(username);
+        const getMembros = () => get('dme_membros_' + ORGAO_ID) || [];
+        const getForums = () => get('dme_forum_' + ORGAO_ID) || [];
+        const getHier = () => get('dme_hier_' + ORGAO_ID) || [];
+        const getProjetos = () => get('dme_projetos_' + ORGAO_ID) || [];
+        const getMural = () => get(MURAL_KEY) || [];
+
+        function toast(msg, tipo) {
+            tipo = tipo || 'success';
+            var tc = document.getElementById('toastContainer');
+            if (!tc) {
+                tc = document.createElement('div');
+                tc.id = 'toastContainer';
+                tc.style.cssText = 'position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:8px;z-index:9999;pointer-events:none';
+                document.body.appendChild(tc);
             }
+            var color = tipo === 'success' ? 'var(--green)' : 'var(--red)';
+            var t = document.createElement('div');
+            t.style.cssText = 'background:var(--bg2);border:1px solid ' + color + ';color:var(--t1);padding:10px 16px;border-radius:8px;font-size:.85rem;box-shadow:0 4px 12px rgba(0,0,0,.3);pointer-events:auto';
+            t.textContent = msg;
+            tc.appendChild(t);
+            setTimeout(function() { t.remove(); }, 3000);
+        }
 
-            // Tabs logic - Usando addEventListener para não sobrepor outros eventos
-            const tabs = document.querySelectorAll('.centro-tab, .quick-menu-item[data-tab]');
-            const contents = document.querySelectorAll('.tab-content');
+        document.addEventListener('DOMContentLoaded', function() {
+            // User info
+            var user = get('dme_user_logged') || {};
+            var nick = user.nickname || username;
+            var av = 'https://www.habbo.com.br/habbo-imaging/avatarimage?user=' + nick + '&direction=2&head_direction=2&gesture=sml&size=m';
+            document.getElementById('navUserName').textContent = nick;
+            document.getElementById('navUserImage').src = av;
+            document.getElementById('dropdownUserImage').src = av;
+            document.getElementById('dropdownName').textContent = nick;
+            if (isAdmin()) document.getElementById('dropdownPainel').style.display = '';
+            var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+            document.getElementById('themeText').textContent = isDark ? 'Modo Claro' : 'Modo Escuro';
 
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const target = tab.dataset.tab;
+            // Dropdown
+            document.getElementById('userProfileBtn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                document.getElementById('userDropdown').classList.toggle('active');
+            });
+            document.addEventListener('click', function() {
+                document.getElementById('userDropdown').classList.remove('active');
+            });
+
+            // Sidebar hamburger
+            var hamburger = document.getElementById('hamburger');
+            var mobileSidebar = document.getElementById('mobileSidebar');
+            var sidebarOverlay = document.getElementById('sidebarOverlay');
+            var sidebarClose = document.getElementById('sidebarClose');
+            hamburger.addEventListener('click', function() { mobileSidebar.classList.toggle('active'); sidebarOverlay.classList.toggle('active'); });
+            sidebarClose.addEventListener('click', function() { mobileSidebar.classList.toggle('active'); sidebarOverlay.classList.toggle('active'); });
+            sidebarOverlay.addEventListener('click', function() { mobileSidebar.classList.toggle('active'); sidebarOverlay.classList.toggle('active'); });
+
+            // Tabs
+            var allTabs = document.querySelectorAll('.centro-tab, .quick-menu-item[data-tab]');
+            var allContents = document.querySelectorAll('.tab-content');
+            allTabs.forEach(function(tab) {
+                tab.addEventListener('click', function() {
+                    var target = tab.dataset.tab;
                     if (!target) return;
-
-                    tabs.forEach(t => t.classList.remove('active'));
-                    contents.forEach(c => c.classList.remove('active'));
-
-                    document.querySelectorAll(`[data-tab="${target}"]`).forEach(t => t.classList.add('active'));
-                    const targetEl = document.getElementById(`tab-${target}`);
-                    if (targetEl) targetEl.classList.add('active');
+                    allTabs.forEach(function(t) { t.classList.remove('active'); });
+                    allContents.forEach(function(c) { c.classList.remove('active'); });
+                    document.querySelectorAll('[data-tab="' + target + '"]').forEach(function(t) { t.classList.add('active'); });
+                    var el = document.getElementById('tab-' + target);
+                    if (el) el.classList.add('active');
                 });
             });
 
-            // Carregar Mural Inicial
-            carregarMural();
+            // Liderança
+            if (isLider()) {
+                document.getElementById('liderBadge').style.display = '';
+                document.getElementById('liderSection').style.display = '';
+                document.getElementById('btnAbrirMural').style.display = '';
+                document.getElementById('btnNovoForum').style.display = '';
+                document.getElementById('btnNovoNivel').style.display = '';
+                document.getElementById('btnNovoProjeto').style.display = '';
+            }
+
+            // Contadores
+            var membros = getMembros();
+            document.getElementById('membrosCount').textContent = membros.length;
+            document.getElementById('statMembros').textContent = membros.length;
+            var proj = getProjetos();
+            document.getElementById('statProjetos').textContent = proj.filter(function(p) { return p.tipo === 'projeto'; }).length;
+            document.getElementById('statEmendas').textContent = proj.filter(function(p) { return p.tipo === 'emenda'; }).length;
+
+            renderMural(); renderMembros(); renderForum(); renderHierarquia(); renderProjetos();
+
+            document.getElementById('btnNovoForum').addEventListener('click', function() { abrirForumModal(); });
+            document.getElementById('forumModalClose').addEventListener('click', fecharForumModal);
+            document.getElementById('forumModalCancel').addEventListener('click', fecharForumModal);
+            document.getElementById('forumModalSalvar').addEventListener('click', salvarForum);
+            document.getElementById('hierModalClose').addEventListener('click', fecharHierModal);
+            document.getElementById('hierModalCancel').addEventListener('click', fecharHierModal);
+            document.getElementById('hierModalSalvar').addEventListener('click', salvarHier);
+            document.getElementById('btnNovoNivel').addEventListener('click', function() { abrirHierModal(); });
+            document.getElementById('btnNovoProjeto').addEventListener('click', abrirProjetoModal);
         });
 
-        // Lógica do Mural
-        function carregarMural() {
-            const muralContainer = document.getElementById('tab-mural');
-            // Mantém o título fixo se existir
-            const muralTitle = muralContainer.querySelector('.mural-title');
-            const muralData = JSON.parse(localStorage.getItem(MURAL_STORAGE_KEY)) || [];
+        window.logout = function() {
+            localStorage.removeItem('dme_username');
+            localStorage.removeItem('dme_user_logged');
+            window.location.href = '/login';
+        };
 
-            // Limpa posts antigos, mas mantém o título e o banner de boas-vindas se quiserem ser fixos
-            // Aqui vamos reconstruir a lista de posts dinamicamente em uma div dedicada
-            let muralList = document.getElementById('mural-posts-list');
-            if (!muralList) {
-                muralList = document.createElement('div');
-                muralList.id = 'mural-posts-list';
-                muralContainer.insertBefore(muralList, muralContainer.querySelector('.inicio-content'));
+        function renderMural() {
+            var container = document.getElementById('mural-posts-list');
+            var posts = getMural();
+            if (!posts.length) {
+                container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><p>Nenhuma publicação ainda.</p></div>';
+                return;
             }
-
-            muralList.innerHTML = '';
-
-            if (muralData.length === 0) {
-                // Posts iniciais (fallback caso esteja vazio)
-                const defaultPosts = [
-                    {
-                        titulo: 'Guia de Elaboração de Projetos do DME',
-                        tag: '[STM] Guia',
-                        imagem: 'https://media.discordapp.net/attachments/1114294474747068487/1114294475149721660/guia_elaboracao.png',
-                        conteudo: 'Neste guia, você vai aprender como fazer um projeto completo e pronto para usar. Um projeto não é só ter uma ideia, ele precisa estar detalhado, explicado e com tudo pronto para aplicação.',
-                        autor: 'Xande'
-                    }
-                ];
-                localStorage.setItem(MURAL_STORAGE_KEY, JSON.stringify(defaultPosts));
-                return carregarMural();
-            }
-
-            muralData.forEach((post, index) => {
-                const article = document.createElement('article');
-                article.className = 'pub-card';
-                article.innerHTML = `
-                    <div class="pub-header">
-                        <div class="pub-author-av">
-                            <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=${post.autor}&direction=2&head_direction=2&gesture=sml&size=m" alt="Autor">
-                        </div>
-                        <div class="pub-meta">
-                            <span class="pub-tag">${post.tag}</span>
-                        </div>
-                        <button class="btn-danger" style="padding:4px; border-radius:6px; font-size:10px;" onclick="deletarPost(${index})">Deletar</button>
-                    </div>
-                    ${post.imagem ? `<div class="pub-image"><img src="${post.imagem}" alt="Imagem"></div>` : ''}
-                    <div class="pub-content">
-                        <h2>${post.titulo}</h2>
-                        <p>${post.conteudo}</p>
-                    </div>
-                `;
-                muralList.appendChild(article);
+            container.innerHTML = '';
+            posts.forEach(function(post, index) {
+                var el = document.createElement('article');
+                el.className = 'pub-card';
+                el.innerHTML = '<div class="pub-header"><div class="pub-author-av"><img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=' + post.autor + '&direction=2&head_direction=2&gesture=sml&size=m" alt="' + post.autor + '"></div><div class="pub-meta"><span class="pub-tag">' + (post.tag || '[STM] Comunicado') + '</span><span style="font-size:.75rem;color:var(--t3)">' + post.autor + '</span></div>' + (isLider() ? '<button class="btn-danger" style="margin-left:auto;padding:4px 8px;font-size:.75rem;border-radius:6px" onclick="deletarPost(' + index + ')">Deletar</button>' : '') + '</div>' + (post.imagem ? '<div class="pub-image"><img src="' + post.imagem + '" alt="Imagem"></div>' : '') + '<div class="pub-content"><h2>' + post.titulo + '</h2><p>' + post.conteudo + '</p></div>';
+                container.appendChild(el);
             });
         }
 
-        function abrirMuralModal() {
-            console.log('Abrindo modal do mural...');
-            const modal = document.getElementById('muralModal');
-            if (modal) {
-                modal.classList.add('active');
-            } else {
-                console.error('Erro: Elemento #muralModal não encontrado no DOM!');
-            }
-        }
-
-        function fecharMuralModal() {
-            document.getElementById('muralModal').classList.remove('active');
-        }
-
-        function salvarPostagem() {
-            const titulo = document.getElementById('muralTitulo').value;
-            const tag = document.getElementById('muralTag').value;
-            const imagem = document.getElementById('muralImagem').value;
-            const conteudo = document.getElementById('muralConteudo').value;
-            const user = JSON.parse(localStorage.getItem('dme_user_logged'));
-
-            if (!titulo || !conteudo) {
-                alert('Título e Conteúdo são obrigatórios!');
-                return;
-            }
-
-            const novoPost = {
-                titulo,
-                tag: tag || '[DME] Comunicado',
-                imagem,
-                conteudo,
-                autor: user ? user.nickname : 'Sistema',
-                data: new Date().toISOString()
-            };
-
-            const muralData = JSON.parse(localStorage.getItem(MURAL_STORAGE_KEY)) || [];
-            muralData.unshift(novoPost); // Adiciona no início
-            localStorage.setItem(MURAL_STORAGE_KEY, JSON.stringify(muralData));
-
-            // Limpar campos
+        window.abrirMuralModal = function() { document.getElementById('muralModal').classList.add('active'); };
+        window.fecharMuralModal = function() { document.getElementById('muralModal').classList.remove('active'); };
+        window.salvarPostagem = function() {
+            var titulo = document.getElementById('muralTitulo').value.trim();
+            var tag = document.getElementById('muralTag').value.trim();
+            var imagem = document.getElementById('muralImagem').value.trim();
+            var conteudo = document.getElementById('muralConteudo').value.trim();
+            if (!titulo || !conteudo) { toast('Título e Conteúdo são obrigatórios!', 'error'); return; }
+            var posts = getMural();
+            posts.unshift({ titulo: titulo, tag: tag || '[STM] Comunicado', imagem: imagem, conteudo: conteudo, autor: username, data: new Date().toISOString() });
+            set(MURAL_KEY, posts);
             document.getElementById('muralTitulo').value = '';
             document.getElementById('muralTag').value = '';
             document.getElementById('muralImagem').value = '';
             document.getElementById('muralConteudo').value = '';
+            fecharMuralModal(); renderMural(); toast('Publicação postada!');
+        };
+        window.deletarPost = function(index) {
+            if (!confirm('Apagar esta publicação?')) return;
+            var posts = getMural(); posts.splice(index, 1); set(MURAL_KEY, posts); renderMural(); toast('Publicação removida.');
+        };
 
-            fecharMuralModal();
-            carregarMural();
+        function renderMembros() {
+            var container = document.getElementById('membros-list');
+            var membros = getMembros();
+            if (!membros.length) { container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p>Nenhum membro registrado ainda.</p></div>'; return; }
+            container.innerHTML = membros.map(function(m) { return '<div class="member-row"><div class="member-av"><img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=' + m.nick + '&direction=2&head_direction=2&gesture=sml&size=m" alt="' + m.nick + '"></div><div class="member-info"><span class="member-nick">' + m.nick + '</span><span class="member-cargo">' + (m.cargo || 'Membro') + '</span></div></div>'; }).join('');
         }
 
-        function deletarPost(index) {
-            if (!confirm('Deseja realmente apagar esta publicação?')) return;
-            const muralData = JSON.parse(localStorage.getItem(MURAL_STORAGE_KEY)) || [];
-            muralData.splice(index, 1);
-            localStorage.setItem(MURAL_STORAGE_KEY, JSON.stringify(muralData));
-            carregarMural();
+        function renderForum() {
+            var container = document.getElementById('forum-list');
+            var forums = getForums();
+            if (!forums.length) { container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>Nenhum sub-fórum criado ainda.</p></div>'; return; }
+            container.innerHTML = forums.map(function(f, i) { return '<div class="forum-row"><div class="forum-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="forum-info"><span class="forum-nome">' + f.nome + '</span>' + (f.desc ? '<span class="forum-desc">' + f.desc + '</span>' : '') + '</div>' + (isLider() ? '<button class="btn-danger" style="padding:4px 8px;font-size:.75rem;border-radius:6px" onclick="deletarForum(' + i + ')">Remover</button>' : '') + '</div>'; }).join('');
         }
+
+        function abrirForumModal(id) {
+            id = (id !== undefined) ? id : null;
+            document.getElementById('forumModalId').value = id !== null ? id : '';
+            document.getElementById('forumModalTitle').textContent = id !== null ? 'Editar Sub-Fórum' : 'Novo Sub-Fórum';
+            if (id !== null) { var f = getForums()[id]; document.getElementById('forumModalNome').value = f.nome; document.getElementById('forumModalDesc').value = f.desc || ''; }
+            else { document.getElementById('forumModalNome').value = ''; document.getElementById('forumModalDesc').value = ''; }
+            document.getElementById('forumModal').classList.add('active');
+        }
+        function fecharForumModal() { document.getElementById('forumModal').classList.remove('active'); }
+        function salvarForum() {
+            var nome = document.getElementById('forumModalNome').value.trim();
+            if (!nome) { toast('Nome é obrigatório!', 'error'); return; }
+            var desc = document.getElementById('forumModalDesc').value.trim();
+            var id = document.getElementById('forumModalId').value;
+            var forums = getForums();
+            if (id !== '') forums[parseInt(id)] = { nome: nome, desc: desc };
+            else forums.push({ nome: nome, desc: desc });
+            set('dme_forum_' + ORGAO_ID, forums);
+            fecharForumModal(); renderForum(); toast('Sub-fórum salvo!');
+        }
+        window.deletarForum = function(i) { if (!confirm('Remover este sub-fórum?')) return; var forums = getForums(); forums.splice(i, 1); set('dme_forum_' + ORGAO_ID, forums); renderForum(); toast('Sub-fórum removido.'); };
+
+        function renderHierarquia() {
+            var container = document.getElementById('hierarquia-list');
+            var hier = getHier();
+            if (!hier.length) { container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg><p>Nenhum nível hierárquico definido.</p></div>'; return; }
+            container.innerHTML = hier.map(function(h, i) { return '<div class="hier-row"><div class="hier-cargo">' + h.cargo + '</div>' + (h.resp ? '<div class="hier-resp">' + h.resp + '</div>' : '') + (h.subs && h.subs.length ? '<ul class="hier-subs">' + h.subs.map(function(s) { return '<li>' + s + '</li>'; }).join('') + '</ul>' : '') + (isLider() ? '<button class="btn-danger" style="margin-top:6px;padding:4px 8px;font-size:.75rem;border-radius:6px" onclick="deletarHier(' + i + ')">Remover</button>' : '') + '</div>'; }).join('');
+        }
+        function abrirHierModal(id) {
+            id = (id !== undefined) ? id : null;
+            document.getElementById('hierModalId').value = id !== null ? id : '';
+            document.getElementById('hierModalTitle').textContent = id !== null ? 'Editar Nível' : 'Novo Nível';
+            if (id !== null) { var h = getHier()[id]; document.getElementById('hierModalCargo').value = h.cargo; document.getElementById('hierModalSubs').value = (h.subs || []).join('\n'); document.getElementById('hierModalResp').value = h.resp || ''; }
+            else { document.getElementById('hierModalCargo').value = ''; document.getElementById('hierModalSubs').value = ''; document.getElementById('hierModalResp').value = ''; }
+            document.getElementById('hierModal').classList.add('active');
+        }
+        function fecharHierModal() { document.getElementById('hierModal').classList.remove('active'); }
+        function salvarHier() {
+            var cargo = document.getElementById('hierModalCargo').value.trim();
+            if (!cargo) { toast('Cargo é obrigatório!', 'error'); return; }
+            var subs = document.getElementById('hierModalSubs').value.split('\n').map(function(s) { return s.trim(); }).filter(Boolean);
+            var resp = document.getElementById('hierModalResp').value.trim();
+            var id = document.getElementById('hierModalId').value;
+            var hier = getHier();
+            if (id !== '') hier[parseInt(id)] = { cargo: cargo, subs: subs, resp: resp };
+            else hier.push({ cargo: cargo, subs: subs, resp: resp });
+            set('dme_hier_' + ORGAO_ID, hier);
+            fecharHierModal(); renderHierarquia(); toast('Nível salvo!');
+        }
+        window.deletarHier = function(i) { if (!confirm('Remover este nível?')) return; var hier = getHier(); hier.splice(i, 1); set('dme_hier_' + ORGAO_ID, hier); renderHierarquia(); toast('Nível removido.'); };
+
+        function renderProjetos() {
+            var container = document.getElementById('projetos-list');
+            var projetos = getProjetos();
+            if (!projetos.length) { container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><p>Nenhum projeto registrado ainda.</p></div>'; return; }
+            container.innerHTML = projetos.map(function(p, i) { return '<div class="forum-row"><div class="forum-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="forum-info"><span class="forum-nome">' + p.titulo + '</span><span class="forum-desc">' + (p.tipo === 'emenda' ? '📝 Emenda' : '📄 Projeto') + ' · ' + p.autor + '</span></div>' + (isLider() ? '<button class="btn-danger" style="padding:4px 8px;font-size:.75rem;border-radius:6px" onclick="deletarProjeto(' + i + ')">Remover</button>' : '') + '</div>'; }).join('');
+        }
+        window.abrirProjetoModal = function() {
+            var titulo = prompt('Título do Projeto/Emenda:');
+            if (!titulo) return;
+            var tipo = confirm('É uma Emenda?\nOK = Emenda   |   Cancelar = Projeto') ? 'emenda' : 'projeto';
+            var proj = getProjetos();
+            proj.push({ titulo: titulo, tipo: tipo, autor: username, data: new Date().toISOString() });
+            set('dme_projetos_' + ORGAO_ID, proj);
+            renderProjetos();
+            document.getElementById('statProjetos').textContent = proj.filter(function(p) { return p.tipo === 'projeto'; }).length;
+            document.getElementById('statEmendas').textContent = proj.filter(function(p) { return p.tipo === 'emenda'; }).length;
+            toast('Projeto adicionado!');
+        };
+        window.deletarProjeto = function(i) { if (!confirm('Remover este projeto?')) return; var proj = getProjetos(); proj.splice(i, 1); set('dme_projetos_' + ORGAO_ID, proj); renderProjetos(); toast('Projeto removido.'); };
+
+    })();
     </script>
 </body>
-
 </html>

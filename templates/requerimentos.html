@@ -1,66 +1,74 @@
 <!DOCTYPE html>
+
 <html lang="pt-br">
 
+
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Requerimentos � DME System</title>
+
+    <title>Requerimentos  DME System</title>
+
     <link rel="stylesheet" href="/styles/global.css">
+
     <link rel="stylesheet" href="/styles/requerimentos.css">
+
     <script src="/scripts/theme.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/scripts/supabase-client.js"></script>
 </head>
 
+
+
 <body>
+
+
+
+    <!-- ââ SIDEBAR ââââââââââââââââââââââââââââââââââââââ -->
 
     <!-- ══ SIDEBAR ══════════════════════════════════════ -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <div class="mobile-sidebar" id="mobileSidebar">
         <div class="sidebar-header">
             <span class="sidebar-title">DME System</span>
-            <button class="sidebar-close" id="sidebarClose">
+            <div class="sidebar-close" id="sidebarClose">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M18 6 6 18M6 6l12 12" />
                 </svg>
-            </button>
+            </div>
         </div>
         <div class="sidebar-section">
             <div class="sidebar-section-label">Principal</div>
             <a href="/home" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                    <polyline points="9 22 9 12 15 12 15 22" />
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
                 </svg>
                 Página Inicial
             </a>
             <a href="/listagens" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="8" y1="6" x2="21" y2="6" />
-                    <line x1="8" y1="12" x2="21" y2="12" />
-                    <line x1="8" y1="18" x2="21" y2="18" />
-                    <line x1="3" y1="6" x2="3.01" y2="6" />
-                    <line x1="3" y1="12" x2="3.01" y2="12" />
-                    <line x1="3" y1="18" x2="3.01" y2="18" />
+                    <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
                 </svg>
                 Listagens
             </a>
             <a href="/requerimentos" class="sidebar-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    <polyline points="14 2 14 8 20 8" />
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
                 </svg>
                 Requerimentos
             </a>
             <a href="/sabatina" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
                 </svg>
                 Sabatina
             </a>
             <a href="/consulta_promocao" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-                    <polyline points="16 7 22 7 22 13" />
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
                 </svg>
                 Consultar Promoção
             </a>
@@ -69,70 +77,58 @@
             <div class="sidebar-section-label">Ferramentas</div>
             <a href="/ponto_servico" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <polyline points="12 6 12 12 16 14" />
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                 </svg>
                 Ponto de Serviço
             </a>
             <a href="/loja" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                    <line x1="3" y1="6" x2="21" y2="6" />
-                    <path d="M16 10a4 4 0 0 1-8 0" />
+                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
                 </svg>
                 Loja
             </a>
             <a href="/documentos" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
                 </svg>
                 Documentos
             </a>
             <a href="/centro_tarefas_orgaos" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 10v11M16 10v11M12 10v11" />
+                    <path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 10v11M16 10v11M12 10v11"/>
                 </svg>
                 Centros e Órgãos
             </a>
             <a href="/recrutamentos" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                 </svg>
                 Recrutamentos
             </a>
             <a href="/ouvidoria" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                 </svg>
                 Ouvidoria
             </a>
             <a href="/setor_legislativo" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="m18 16 4-4-4-4" />
-                    <path d="m6 8-4 4 4 4" />
-                    <path d="m14.5 4-5 16" />
+                    <path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/>
                 </svg>
                 Setor Legislativo
             </a>
             <a href="/postar_aula" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
                 </svg>
                 Postar Aula
             </a>
         </div>
     </div>
-
-
-    <!-- -- NAVBAR ---------------------------------------- -->
+    <!-- ══ NAVBAR ════════════════════════════════════════ -->
     <nav class="navbar">
         <div class="logo-section">
-            <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+            <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
             <div class="logo-mark">
                 <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5">
                     <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
@@ -140,492 +136,965 @@
             </div>
             <div class="logo-text">DME<em>System</em></div>
         </div>
+
+        <!-- Nav links centrais -->
         <div class="nav-links">
             <a href="/home" class="nav-link">Home</a>
             <a href="/listagens" class="nav-link">Listagens</a>
             <a href="/ponto_servico" class="nav-link">Ponto</a>
             <a href="/requerimentos" class="nav-link active">Requerimentos</a>
         </div>
-        <div class="user-profile" id="userProfileBtn">
-            <div class="user-avatar"><img id="navUserImage" src="" alt=""></div>
-            <span class="user-name" id="navUserName">Usu�rio</span>
-            <div class="user-dropdown" id="userDropdown">
-                <div class="dropdown-header">
-                    <div class="dropdown-user-info">
-                        <div class="dropdown-avatar"><img id="dropdownUserImage" src="" alt=""></div>
-                        <div class="dropdown-user-details">
-                            <h4 id="dropdownName">Usu�rio</h4>
-                            <p>Militar DME</p>
+
+        <div class="nav-actions">
+            <div class="user-profile" id="userProfileBtn">
+                <div class="user-avatar"><img id="navUserImage" src="" alt=""></div>
+                <span class="user-name" id="navUserName">Usuário</span>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-info">
+                            <div class="dropdown-avatar"><img id="dropdownUserImage" src="" alt=""></div>
+                            <div class="dropdown-user-details">
+                                <h4 id="dropdownName">Usuário</h4>
+                                <p>Militar DME</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="dropdown-menu">
-                    <a href="/painel" class="dropdown-item" id="dropdownPainel" style="display:none">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="7" height="7" />
-                            <rect x="14" y="3" width="7" height="7" />
-                            <rect x="14" y="14" width="7" height="7" />
-                            <rect x="3" y="14" width="7" height="7" />
-                        </svg>
-                        Painel Admin
-                    </a>
-                    <a onclick="toggleTheme()" class="dropdown-item">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="5" />
-                            <line x1="12" y1="1" x2="12" y2="3" />
-                            <line x1="12" y1="21" x2="12" y2="23" />
-                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                            <line x1="1" y1="12" x2="3" y2="12" />
-                            <line x1="21" y1="12" x2="23" y2="12" />
-                        </svg>
-                        <span id="themeText">Modo Claro</span>
-                    </a>
-                    <div class="dropdown-divider" id="dropdownDivider" style="display:none"></div>
-                    <a onclick="logout()" class="dropdown-item danger">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                            <polyline points="16 17 21 12 16 7" />
-                            <line x1="21" y1="12" x2="9" y2="12" />
-                        </svg>
-                        Sair
-                    </a>
+                    <div class="dropdown-menu">
+                        <a href="/painel" class="dropdown-item" id="dropdownPainel" style="display:none">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14">
+                                <rect x="3" y="3" width="7" height="7" />
+                                <rect x="14" y="3" width="7" height="7" />
+                                <rect x="14" y="14" width="7" height="7" />
+                                <rect x="3" y="14" width="7" height="7" />
+                            </svg>
+                            Painel Admin
+                        </a>
+                        <a href="/configuracao" class="dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14">
+                                <circle cx="12" cy="12" r="3" />
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                            </svg>
+                            Configurações
+                        </a>
+                        <a onclick="toggleTheme()" class="dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14">
+                                <circle cx="12" cy="12" r="5" />
+                                <line x1="12" y1="1" x2="12" y2="3" />
+                                <line x1="12" y1="21" x2="12" y2="23" />
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                                <line x1="1" y1="12" x2="3" y2="12" />
+                                <line x1="21" y1="12" x2="23" y2="12" />
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                            </svg>
+                            <span id="themeText">Modo Claro</span>
+                        </a>
+                        <div class="dropdown-divider" id="dropdownDivider" style="display:none"></div>
+                        <a onclick="logout()" class="dropdown-item danger">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                <polyline points="16 17 21 12 16 7" />
+                                <line x1="21" y1="12" x2="9" y2="12" />
+                            </svg>
+                            Sair
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </nav>
+    <!-- -- CONTEÚDO ------------------------------------ -->
 
-    <!-- -- CONTE�DO ------------------------------------ -->
     <div class="req-wrapper">
 
-        <!-- Sidebar de navega��o de tipos -->
+
+
+        <!-- Sidebar de navegação de tipos -->
+
         <div class="req-nav">
+
             <div class="req-nav-group">
+
                 <div class="req-nav-label">
+
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12">
+
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+
                         <circle cx="9" cy="7" r="4" />
+
                     </svg>
+
                     Recursos Humanos
+
                 </div>
+
                 <div class="req-nav-item active" data-tipo="promocao">
+
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
                         <polyline points="18 15 12 9 6 15" />
+
                     </svg>
-                    Promo��o
+
+                    Promoção
+
                 </div>
+
                 <div class="req-nav-item" data-tipo="advertencia">
+
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
                         <path
+
                             d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+
                         <line x1="12" y1="9" x2="12" y2="13" />
+
                         <line x1="12" y1="17" x2="12.01" y2="17" />
+
                     </svg>
-                    Advert�ncia
+
+                    Advertência
+
                 </div>
+
                 <div class="req-nav-item" data-tipo="rebaixamento">
+
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
                         <polyline points="6 9 12 15 18 9" />
+
                     </svg>
+
                     Rebaixamento
+
                 </div>
+
                 <div class="req-nav-item" data-tipo="demissao">
+
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+
                         <polyline points="16 17 21 12 16 7" />
+
                         <line x1="21" y1="12" x2="9" y2="12" />
+
                     </svg>
-                    Demiss�o
+
+                    Demissão
+
                 </div>
+
                 <div class="req-nav-item" data-tipo="exoneracao">
+
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
                         <circle cx="12" cy="12" r="10" />
+
                         <line x1="15" y1="9" x2="9" y2="15" />
+
                         <line x1="9" y1="9" x2="15" y2="15" />
+
                     </svg>
-                    Exonera��o
+
+                    Exoneração
+
                 </div>
+
                 <div class="req-nav-item" data-tipo="contrato">
+
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+
                         <polyline points="14 2 14 8 20 8" />
+
                         <line x1="16" y1="13" x2="8" y2="13" />
+
                         <line x1="16" y1="17" x2="8" y2="17" />
+
                     </svg>
-                    Contrato e Reintegra��o
+
+                    Contrato e Reintegração
+
                 </div>
+
                 <div class="req-nav-item" data-tipo="venda">
+
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
                         <line x1="12" y1="1" x2="12" y2="23" />
+
                         <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+
                     </svg>
+
                     Venda
+
                 </div>
+
                 <div class="req-nav-item" data-tipo="licenca">
+
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+
                         <line x1="16" y1="2" x2="16" y2="6" />
+
                         <line x1="8" y1="2" x2="8" y2="6" />
+
                         <line x1="3" y1="10" x2="21" y2="10" />
+
                     </svg>
-                    Licen�a
+
+                    Licença
+
                 </div>
+
                 <div class="req-nav-item" data-tipo="gratificacao">
+
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
                         <circle cx="12" cy="8" r="7" />
+
                         <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+
                     </svg>
-                    Gratifica��o
+
+                    Gratificação
+
                 </div>
+
                 <div class="req-nav-item" data-tipo="permissao">
+
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
                         <polyline points="20 6 9 17 4 12" />
+
                     </svg>
-                    Permiss�o
+
+                    Permissão
+
                 </div>
+
                 <div class="req-nav-item" data-tipo="transferencia">
+
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
                         <polyline points="17 1 21 5 17 9" />
+
                         <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+
                         <polyline points="7 23 3 19 7 15" />
+
                         <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+
                     </svg>
-                    Transfer�ncia
+
+                    Transferência
+
                 </div>
+
                 <div class="req-nav-item" data-tipo="cadetes">
+
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+
                         <circle cx="9" cy="7" r="4" />
+
                         <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+
                         <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+
                     </svg>
+
                     Cadetes
+
                 </div>
+
             </div>
+
+
 
             <!-- Tipos customizados (criados pelo admin) -->
+
             <div class="req-nav-group" id="grupoCustom" style="display:none">
+
                 <div class="req-nav-label">Personalizados</div>
+
                 <div id="customNavItems"></div>
+
             </div>
 
-            <!-- Bot�o de cria��o � s� admin -->
+
+
+            <!-- Botão de criação  só admin -->
+
             <div class="req-nav-group" id="grupoAdminAdd" style="display:none">
+
                 <button class="req-btn-add" id="btnAdicionarTipo">
+
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14">
+
                         <path d="M12 5v14M5 12h14" />
+
                     </svg>
+
                     Criar Requerimento
+
                 </button>
+
                 <button class="req-btn-add" id="btnRestaurarOcultos"
+
                     style="margin-top:6px;color:var(--t2);background:var(--bg-3);border:1px dashed var(--b2)">
+
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14">
+
                         <path d="M1 4v6h6" />
+
                         <path d="M3.51 15a9 9 0 1 0 .49-4" />
+
                     </svg>
+
                     Restaurar Ocultos
+
                 </button>
+
             </div>
+
         </div>
+
+
+
+
+
 
 
 
 
         <div class="req-main">
+
             <div class="req-card">
+
                 <!-- Nav tabs do card -->
+
                 <div class="req-tabs">
+
                     <div class="req-tab active" data-aba="aplicar">Aplicar</div>
-                    <div class="req-tab" data-aba="minhas">Minhas A��es</div>
-                    <div class="req-tab" data-aba="todas">Todas as A��es</div>
+
+                    <div class="req-tab" data-aba="minhas">Minhas Ações</div>
+
+                    <div class="req-tab" data-aba="todas">Todas as Ações</div>
+
                 </div>
 
-                <!-- Formul�rio -->
+
+
+                <!-- Formulário -->
+
                 <div class="req-form-area" id="form-area">
-                    <h2 id="form-title" class="req-form-title">Aplicar Promo��o</h2>
+
+                    <h2 id="form-title" class="req-form-title">Aplicar Promoção</h2>
+
                     <div class="req-divider"></div>
 
+
+
                     <div class="g-form-group">
+
                         <label class="g-label">Aplicador</label>
+
                         <input type="text" id="input-aplicador" class="g-input" disabled>
+
                     </div>
+
+
 
                     <div class="g-form-group" id="group-nick">
+
                         <label class="g-label">Nick do Envolvido</label>
+
                         <div class="req-nick-row">
+
                             <input type="text" id="nick-envolvido" class="g-input" placeholder="Digite o nickname">
+
                             <button class="btn-primary" id="btn-verificar">
+
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
                                     <circle cx="11" cy="11" r="8" />
+
                                     <line x1="21" y1="21" x2="16.65" y2="16.65" />
+
                                 </svg>
+
                                 Verificar
+
                             </button>
+
                         </div>
+
                         <div id="status-nick" class="user-found"></div>
+
                         <div id="corpo-badge" style="display:none" class="info-badge"></div>
+
                     </div>
+
+
 
                     <div id="campos-dinamicos">
+
                         <div class="g-form-group" id="campo-centro" style="display:none">
+
                             <label class="g-label">Centro de Tarefas</label>
+
                             <select id="select-centro" class="g-select">
+
                                 <option value="">Selecione o Centro</option>
-                                <option value="ci">Centro de Instru��o (CI)</option>
+
+                                <option value="ci">Centro de Instrução (CI)</option>
+
                                 <option value="ct">Centro de Treinamento (CT)</option>
-                                <option value="cs">Centro de Supervis�o (CS)</option>
+
+                                <option value="cs">Centro de Supervisão (CS)</option>
+
                             </select>
+
                         </div>
+
+
 
                         <!-- Nova Patente (readonly, auto-preenchida) -->
+
                         <div class="g-form-group" id="grupo-nova-patente" style="display:none">
+
                             <label class="g-label">Nova patente</label>
+
                             <input type="text" id="input-nova-patente" class="g-input" readonly
+
                                 style="background:var(--bg-3);cursor:default">
+
                         </div>
 
-                        <!-- Select gen�rico (para tipos que usam dropdown) -->
+
+
+                        <!-- Select genérico (para tipos que usam dropdown) -->
+
                         <div class="g-form-group" id="grupo-select-opcoes" style="display:none">
-                            <label class="g-label" id="label-selecao">Op��o</label>
+
+                            <label class="g-label" id="label-selecao">Opção</label>
+
                             <select id="select-opcoes" class="g-select"></select>
+
                         </div>
 
-                        <!-- Banido at� (exonera��o) -->
+
+
+                        <!-- Banido até (exoneração) -->
+
                         <div class="g-form-group" id="grupo-banido-ate" style="display:none">
-                            <label class="g-label">Banido at�</label>
+
+                            <label class="g-label">Banido até</label>
+
                             <input type="datetime-local" id="input-banido-ate" class="g-input">
+
                         </div>
+
+
 
                         <!-- Anexo das Provas -->
+
                         <div class="g-form-group" id="grupo-anexo-provas" style="display:none">
+
                             <label class="g-label">Anexo das Provas</label>
+
                             <input type="text" id="input-anexo-provas" class="g-input"
+
                                 placeholder="Cole o link das provas">
+
                         </div>
+
+
 
                         <!-- Valor (venda) -->
+
                         <div class="g-form-group" id="grupo-valor" style="display:none">
+
                             <label class="g-label">Valor</label>
+
                             <input type="text" id="input-valor" class="g-input" placeholder="">
+
                         </div>
 
-                        <!-- Nick do policial promovido (permiss�o) -->
-                        <div class="g-form-group" id="grupo-nick-promovido" style="display:none">
-                            <label class="g-label">Nick do policial promovido</label>
-                            <input type="text" id="input-nick-promovido" class="g-input"
-                                placeholder="Digite o nickname corretamente">
+
+
+                        <!-- Nick do policial autorizado (permissão) -->
+
+                        <div class="g-form-group" id="grupo-nick-autorizado" style="display:none">
+
+                            <label class="g-label">Nick do policial autorizado <span style="color:var(--red,#ef4444)">*</span></label>
+
+                            <div style="display:flex;gap:8px;align-items:flex-start">
+                                <input type="text" id="input-nick-autorizado" class="g-input" style="flex:1"
+                                    placeholder="Digite o nickname do autorizador">
+                                <button type="button" class="btn-verificar-small" onclick="verificarNickAutorizado()"
+                                    style="padding:9px 14px;border-radius:8px;background:var(--green,#22c55e);color:#fff;border:none;font-size:.78rem;font-weight:700;cursor:pointer;white-space:nowrap">
+                                    ✓ Verificar
+                                </button>
+                            </div>
+                            <span id="status-nick-autorizado" style="display:none;font-size:.75rem;margin-top:4px;color:var(--primary-green)"></span>
+
                         </div>
+
+                        <!-- Nick do policial promovido (permissão) -->
+
+                        <div class="g-form-group" id="grupo-nick-promovido" style="display:none">
+
+                            <label class="g-label">Nick do policial promovido</label>
+
+                            <input type="text" id="input-nick-promovido" class="g-input"
+
+                                placeholder="Digite o nickname corretamente">
+
+                        </div>
+
+
 
                         <div id="campos-aula" style="display:none">
+
                             <div class="g-form-group">
+
                                 <label class="g-label">Aprovados</label>
+
                                 <textarea id="input-aprovados" class="g-textarea" rows="3"
+
                                     placeholder="Lista dos aprovados (um por linha)"></textarea>
+
                             </div>
+
                             <div class="g-form-group">
+
                                 <label class="g-label">Reprovados</label>
+
                                 <textarea id="input-reprovados" class="g-textarea" rows="3"
+
                                     placeholder="Lista dos reprovados (um por linha)"></textarea>
+
                             </div>
+
                             <div class="g-form-group">
+
                                 <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+
                                     <input type="checkbox" id="check-sem-alunos"
+
                                         style="width:auto;margin:0;accent-color:var(--green)">
-                                    <span style="font-size:.82rem;text-transform:none;font-weight:500">Essa aula n�o tem
+
+                                    <span style="font-size:.82rem;text-transform:none;font-weight:500">Essa aula não tem
+
                                         alunos</span>
+
                                 </label>
+
                             </div>
+
                         </div>
+
+
 
                         <!-- Permissor -->
+
                         <div class="g-form-group" id="grupo-permissor">
+
                             <label class="g-label">Permissor (Opcional)</label>
+
                             <input type="text" id="input-permissor" class="g-input"
+
                                 placeholder="Digite o nickname do Permissor">
+
                         </div>
 
-                        <!-- Observa��o -->
+
+
+                        <!-- Observação -->
+
                         <div class="g-form-group" id="grupo-observacao">
-                            <label class="g-label">Observa��o *</label>
+
+                            <label class="g-label">Observação *</label>
+
                             <textarea id="input-observacao" class="g-textarea" rows="4"
-                                placeholder="Digite a sua observa��o"></textarea>
+
+                                placeholder="Digite a sua observação"></textarea>
+
                         </div>
+
+
 
                         <!-- Data e Hora -->
+
                         <div class="g-form-group" id="grupo-datahora">
+
                             <label class="g-label">Data e Hora (Opcional)</label>
+
                             <input type="datetime-local" id="input-datahora" class="g-input">
+
                         </div>
+
+
 
                         <button class="btn-primary" id="btn-salvar" style="width:100%;justify-content:center">
+
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
                                 <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+
                                 <polyline points="17 21 17 13 7 13 7 21" />
+
                                 <polyline points="7 3 7 8 15 8" />
+
                             </svg>
+
                             Salvar
+
                         </button>
+
                     </div>
 
-                    <!-- -- GRATIFICA��O (multi-tag) -- -->
+
+
+                    <!-- -- GRATIFICAÇÃO (multi-tag) -- -->
+
                     <div id="campos-gratificacao" style="display:none">
+
                         <div class="g-form-group">
+
                             <label class="g-label">Envolvidos *</label>
+
                             <div class="tag-input-container" id="tag-container">
+
                                 <input type="text" id="input-tag-nick" class="tag-input-field"
+
                                     placeholder="Digite o nick e pressione Tab ou Enter">
+
                             </div>
+
                         </div>
 
+
+
                         <div class="g-form-group">
+
                             <label class="g-label">Quantidade *</label>
+
                             <input type="number" id="input-quantidade" class="g-input" placeholder="-400 a 3500"
+
                                 min="-400" max="3500">
+
                         </div>
 
+
+
                         <div class="g-form-group">
+
                             <label class="g-label">Motivo *</label>
+
                             <textarea id="input-motivo" class="g-textarea" rows="4"
+
                                 placeholder="Digite o motivo"></textarea>
+
                         </div>
+
+
 
                         <button class="btn-primary" id="btn-salvar-gratificacao"
+
                             style="width:100%;justify-content:center">
+
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
                                 <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+
                                 <polyline points="17 21 17 13 7 13 7 21" />
+
                                 <polyline points="7 3 7 8 15 8" />
+
                             </svg>
+
                             Salvar
+
                         </button>
+
                     </div>
 
-                    <!-- -- LICEN�A (dashboard) -- -->
+
+
+                    <!-- -- LICENÇA (dashboard) -- -->
+
                     <div id="campos-licenca" style="display:none">
-                        <div class="licenca-grid">
-                            <div class="licenca-panel">
-                                <div class="licenca-panel-header"
-                                    style="background:var(--yellow-muted,#fef3c7);color:var(--yellow,#d97706)">Licen�as
-                                    Pendentes</div>
-                                <table class="licenca-table">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Usu�rio</th>
-                                            <th>Data de In�cio</th>
-                                            <th>Dias</th>
-                                            <th>A��es</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="licenca-pendentes">
-                                        <tr>
-                                            <td colspan="5" style="text-align:center;color:var(--t3);padding:20px">
-                                                Nenhuma licen�a encontrada</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="licenca-panel">
-                                <div class="licenca-panel-header"
-                                    style="background:var(--green-muted,#dcfce7);color:var(--green,#16a34a)">Licen�as em
-                                    Andamento</div>
-                                <table class="licenca-table">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Usu�rio</th>
-                                            <th>Data de In�cio</th>
-                                            <th>Data de Fim</th>
-                                            <th>A��es</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="licenca-andamento"></tbody>
-                                </table>
-                            </div>
+
+                        <!-- Botão para registrar nova licença -->
+                        <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+                            <button onclick="abrirPostLicenca()" style="display:flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;border:none;background:var(--green,#22c55e);color:#fff;font-size:.8rem;font-weight:700;cursor:pointer">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Nova Licença
+                            </button>
                         </div>
+
+                        <div class="licenca-grid">
+
+                            <div class="licenca-panel">
+
+                                <div class="licenca-panel-header"
+
+                                    style="background:var(--yellow-muted,#fef3c7);color:var(--yellow,#d97706)">Licenças
+
+                                    Pendentes</div>
+
+                                <table class="licenca-table">
+
+                                    <thead>
+
+                                        <tr>
+
+                                            <th>#</th>
+
+                                            <th>Usuário</th>
+
+                                            <th>Data de Início</th>
+
+                                            <th>Dias</th>
+
+                                            <th>Ações</th>
+
+                                        </tr>
+
+                                    </thead>
+
+                                    <tbody id="licenca-pendentes">
+
+                                        <tr>
+
+                                            <td colspan="5" style="text-align:center;color:var(--t3);padding:20px">
+
+                                                Nenhuma licença encontrada</td>
+
+                                        </tr>
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                            <div class="licenca-panel">
+
+                                <div class="licenca-panel-header"
+
+                                    style="background:var(--green-muted,#dcfce7);color:var(--green,#16a34a)">Licenças em
+
+                                    Andamento</div>
+
+                                <table class="licenca-table">
+
+                                    <thead>
+
+                                        <tr>
+
+                                            <th>#</th>
+
+                                            <th>Usuário</th>
+
+                                            <th>Data de Início</th>
+
+                                            <th>Data de Fim</th>
+
+                                            <th>Ações</th>
+
+                                        </tr>
+
+                                    </thead>
+
+                                    <tbody id="licenca-andamento"></tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+
 
                         <div class="licenca-panel" style="margin-top:16px">
-                            <div class="licenca-panel-header">Todas as Licen�as</div>
+
+                            <div class="licenca-panel-header">Todas as Licenças</div>
+
                             <table class="licenca-table">
+
                                 <thead>
+
                                     <tr>
+
                                         <th>#</th>
-                                        <th>Usu�rio</th>
-                                        <th>Data de In�cio</th>
+
+                                        <th>Usuário</th>
+
+                                        <th>Data de Início</th>
+
                                         <th>Dias</th>
+
                                         <th>Status</th>
-                                        <th>A��es</th>
+
+                                        <th>Ações</th>
+
                                     </tr>
+
                                 </thead>
+
                                 <tbody id="licenca-todas"></tbody>
+
                             </table>
+
                         </div>
+
                     </div>
+
                 </div>
 
-                <!-- Hist�rico -->
+
+
+                <!-- Histórico -->
+
                 <div class="req-form-area" id="historico-area" style="display:none">
-                    <h2 id="historico-title" class="req-form-title">Minhas A��es</h2>
+
+                    <h2 id="historico-title" class="req-form-title">Minhas Ações</h2>
+
                     <div class="req-divider"></div>
+
                     <div class="g-form-group">
+
                         <input type="text" id="filtro-historico" class="g-input"
+
                             placeholder="Filtrar por militar ou aplicador...">
+
                     </div>
+
                     <div id="lista-historico"></div>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
+
+
 
     <!-- -- MODAL DETALHES -------------------------------- -->
+
     <div id="modal-detalhes" class="g-modal-backdrop">
+
         <div class="g-modal">
+
             <div class="g-modal-head">
-                <span class="g-modal-title" id="modal-titulo">Detalhes da Solicita��o</span>
+
+                <span class="g-modal-title" id="modal-titulo">Detalhes da Solicitação</span>
+
                 <button class="g-modal-close" onclick="fecharModal()">
+
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
                         <path d="M18 6 6 18M6 6l12 12" />
+
                     </svg>
+
                 </button>
+
             </div>
+
             <div class="g-modal-body">
+
                 <div class="g-form-group">
-                    <label class="g-label">Observa��o *</label>
+
+                    <label class="g-label">Observação *</label>
+
                     <textarea id="modal-obs" class="g-textarea" rows="4"></textarea>
+
                 </div>
+
                 <div class="g-form-group">
+
                     <label class="g-label">Data e Hora</label>
+
                     <input type="text" id="modal-data" class="g-input" readonly>
+
                 </div>
+
                 <div class="g-form-group">
-                    <label class="g-label">Motivo da Nega��o *</label>
+
+                    <label class="g-label">Motivo da Negação *</label>
+
                     <textarea id="modal-motivo" class="g-textarea" rows="2"
-                        placeholder="Digite o motivo caso v� negar..."></textarea>
+
+                        placeholder="Digite o motivo caso vá negar..."></textarea>
+
                 </div>
+
                 <div class="modal-actions" id="modal-actions" style="display:none">
-                    <label class="g-label" style="color:var(--green)">A��o Administrativa</label>
+
+                    <label class="g-label" style="color:var(--green)">Ação Administrativa</label>
+
                     <div style="display:flex;gap:8px;align-items:center">
+
                         <select id="select-acao-admin" class="g-select" style="margin-bottom:0">
-                            <option value="">Selecione uma a��o...</option>
+
+                            <option value="">Selecione uma ação...</option>
+
                             <option value="aceitar">Aceitar</option>
+
                             <option value="negar">Reprovar</option>
+
                             <option value="cancelar">Cancelar</option>
+
                             <option value="editar">Editar</option>
+
                             <option value="apagar">Apagar</option>
+
                         </select>
+
                         <button class="btn-primary" onclick="confirmarAcaoAdmin()">Confirmar</button>
+
                     </div>
+
                 </div>
+
                 <div class="log-section">
+
                     <h4 style="font-size:.76rem;font-weight:700;margin-bottom:8px;color:var(--t2)">Log</h4>
+
                     <div id="modal-logs" style="font-size:.78rem;color:var(--t3)">Nenhum LOG encontrado</div>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
 
+
+
     <script src="/scripts/notificacoes.js"></script>
+
     <script src="/scripts/requerimentos.js"></script>
+
 </body>
 
+
+
 </html>
+
