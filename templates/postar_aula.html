@@ -279,7 +279,9 @@
 
 
 
-                <!-- Centro (auto-detectado ou selecionável) -->
+
+
+                <!-- Centro de Tarefas -->
 
                 <div class="g-form-group">
 
@@ -293,17 +295,15 @@
 
                 </div>
 
-
-
-                <!-- Tipo de Aula -->
+                <!-- Treinamento -->
 
                 <div class="g-form-group">
 
-                    <label class="g-label">Tipo de Aula <span class="req-star">*</span></label>
+                    <label class="g-label">Treinamento <span class="req-star">*</span></label>
 
                     <select class="g-input" id="aula-select-tipo">
 
-                        <option value="">Primeiro selecione o centro</option>
+                        <option value="">Escolha um treinamento</option>
 
                     </select>
 
@@ -315,35 +315,13 @@
 
                 <div class="g-form-group">
 
-                    <label class="g-label">Instrutor Aplicador</label>
+                    <label class="g-label">Aplicador</label>
 
                     <input type="text" class="g-input" id="aula-aplicador" readonly>
 
                 </div>
 
 
-
-                <!-- Data e Hora -->
-
-                <div class="g-form-row">
-
-                    <div class="g-form-group">
-
-                        <label class="g-label">Data e Hora da Aula <span class="req-star">*</span></label>
-
-                        <input type="datetime-local" class="g-input" id="aula-datahora">
-
-                    </div>
-
-                    <div class="g-form-group">
-
-                        <label class="g-label">Permissor / Autorizou</label>
-
-                        <input type="text" class="g-input" id="aula-permissor" placeholder="Nick de quem autorizou">
-
-                    </div>
-
-                </div>
 
 
 
@@ -355,9 +333,13 @@
 
                         <label class="g-label">Aprovados</label>
 
-                        <textarea class="g-input" id="aula-aprovados" style="min-height:80px;resize:vertical"
+                        <div class="tag-input-container" id="aprovados-container" onclick="document.getElementById('aprovados-input').focus()">
 
-                            placeholder="Um nick por linha ou separados por vírgula..."></textarea>
+                            <input type="text" id="aprovados-input" class="tag-input-field"
+
+                                placeholder="Nick + Enter ou Tab...">
+
+                        </div>
 
                     </div>
 
@@ -365,9 +347,13 @@
 
                         <label class="g-label">Reprovados</label>
 
-                        <textarea class="g-input" id="aula-reprovados" style="min-height:80px;resize:vertical"
+                        <div class="tag-input-container" id="reprovados-container" onclick="document.getElementById('reprovados-input').focus()">
 
-                            placeholder="Um nick por linha ou separados por vírgula..."></textarea>
+                            <input type="text" id="reprovados-input" class="tag-input-field"
+
+                                placeholder="Nick + Enter ou Tab...">
+
+                        </div>
 
                     </div>
 

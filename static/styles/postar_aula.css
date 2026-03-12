@@ -1,337 +1,46 @@
-/* ══════════════════════════════════════════════════════
-   POSTAR AULA — CSS
-   ══════════════════════════════════════════════════════ */
 
-/* Breadcrumb (reusa pattern do centro_detalhe) */
-.breadcrumb-bar {
+/* ── Tag chips (aprovados / reprovados) ───────────────── */
+.tag-input-container {
     display: flex;
-    align-items: center;
+    flex-wrap: wrap;
     gap: 6px;
-    padding: 10px 24px;
-    background: var(--bg-2);
-    border-bottom: 1px solid var(--b1);
-    font-size: 0.8rem;
-}
-
-.breadcrumb-link {
-    color: var(--green);
-    text-decoration: none;
-    font-weight: 600;
-    transition: opacity .2s;
-}
-
-.breadcrumb-link:hover {
-    opacity: .75;
-}
-
-.breadcrumb-sep {
-    width: 14px;
-    height: 14px;
-    color: var(--t3);
-}
-
-.breadcrumb-current {
-    color: var(--t2);
-    font-weight: 500;
-}
-
-/* Layout */
-.aula-main {
-    max-width: 780px;
-    margin: 0 auto;
-    padding: 28px 20px 60px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-/* Card */
-.aula-card {
-    background: var(--bg-2);
+    padding: 8px 10px;
+    background: var(--bg-1);
     border: 1px solid var(--b1);
-    border-radius: 16px;
-    padding: 28px 28px 24px;
-}
-
-.aula-card-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 24px;
-}
-
-.aula-header-icon {
-    width: 52px;
-    height: 52px;
-    min-width: 52px;
-    background: var(--green-muted);
-    border: 1px solid rgba(34, 197, 94, .2);
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--green);
-}
-
-.aula-header-icon svg {
-    width: 22px;
-    height: 22px;
-}
-
-.aula-header-title {
-    font-size: 1.3rem;
-    font-weight: 800;
-    color: var(--t1);
-}
-
-.aula-header-sub {
-    font-size: 0.82rem;
-    color: var(--t3);
-    margin-top: 2px;
-}
-
-/* Alert */
-.aula-alert {
-    padding: 12px 16px;
     border-radius: 10px;
-    font-size: 0.84rem;
-    font-weight: 600;
-    margin-bottom: 16px;
-    display: flex;
+    min-height: 42px;
     align-items: center;
-    gap: 8px;
-}
-
-.aula-alert.success {
-    background: rgba(34, 197, 94, .12);
-    color: var(--green);
-    border: 1px solid rgba(34, 197, 94, .2);
-}
-
-.aula-alert.error {
-    background: rgba(239, 68, 68, .12);
-    color: var(--red);
-    border: 1px solid rgba(239, 68, 68, .2);
-}
-
-/* Form */
-.aula-form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.req-star {
-    color: var(--red);
-    margin-left: 2px;
-}
-
-/* Checkbox customizado */
-.aula-check-label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    color: var(--t2);
-    font-weight: 500;
-    user-select: none;
-}
-
-.aula-check-label input[type="checkbox"] {
-    display: none;
-}
-
-.aula-check-box {
-    width: 18px;
-    height: 18px;
-    min-width: 18px;
-    border: 1.5px solid var(--b3);
-    border-radius: 5px;
-    background: var(--bg-3);
-    transition: all .2s;
-    position: relative;
-}
-
-.aula-check-label input:checked+.aula-check-box {
-    background: var(--green);
-    border-color: var(--green);
-}
-
-.aula-check-label input:checked+.aula-check-box::after {
-    content: '';
-    position: absolute;
-    left: 5px;
-    top: 2px;
-    width: 5px;
-    height: 9px;
-    border: 2px solid #000;
-    border-top: none;
-    border-left: none;
-    transform: rotate(45deg);
-}
-
-/* Actions */
-.aula-form-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 8px;
-    padding-top: 16px;
-    border-top: 1px solid var(--b1);
-}
-
-/* Histórico */
-.aula-hist-card {
-    padding: 24px 28px;
-}
-
-.aula-hist-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.aula-hist-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 12px 14px;
-    background: var(--bg-3);
-    border: 1px solid var(--b2);
-    border-radius: 10px;
+    cursor: text;
     transition: border-color .2s;
 }
+.tag-input-container:focus-within { border-color: var(--green); }
 
-.aula-hist-item:hover {
-    border-color: var(--green);
-}
-
-.aula-hist-left {
-    flex: 1;
-    min-width: 0;
-}
-
-.aula-hist-tipo {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--t1);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.aula-hist-meta {
-    font-size: 0.72rem;
-    color: var(--t3);
-    margin-top: 3px;
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.aula-hist-badge {
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    white-space: nowrap;
-}
-
-.aula-hist-badge.ok {
-    background: rgba(34, 197, 94, .15);
-    color: var(--green);
-}
-
-.aula-hist-badge.periodo {
-    background: rgba(59, 130, 246, .15);
-    color: var(--blue);
-}
-
-/* Toast */
-.toast-container {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    z-index: 9999;
-}
-
-.toast {
-    display: flex;
+.tag-chip {
+    display: inline-flex;
     align-items: center;
-    gap: 10px;
-    padding: 12px 18px;
-    border-radius: 12px;
-    font-size: 0.84rem;
+    gap: 4px;
+    padding: 4px 8px 4px 10px;
+    border-radius: 6px;
+    font-size: .78rem;
     font-weight: 600;
-    box-shadow: var(--shadow-lg);
-    animation: toastIn .25s var(--ease), toastOut .3s var(--ease) 3s forwards;
-    max-width: 320px;
+    animation: tagIn .15s ease;
 }
+.tag-chip.aprov { background: var(--green-muted); color: var(--green); }
+.tag-chip.reprov { background: rgba(239,68,68,.12); color: #ef4444; }
 
-.toast.success {
-    background: var(--bg-2);
-    border: 1px solid var(--green);
-    color: var(--green);
+@keyframes tagIn {
+    from { transform: scale(.85); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
 }
-
-.toast.error {
-    background: var(--bg-2);
-    border: 1px solid var(--red);
-    color: var(--red);
+.tag-chip button {
+    background: none; border: none; color: inherit; cursor: pointer;
+    font-size: .9rem; line-height: 1; padding: 0 2px; opacity: .7;
+    transition: opacity .15s;
 }
+.tag-chip button:hover { opacity: 1; }
 
-.toast svg {
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
+.tag-input-field {
+    border: none; background: transparent; outline: none;
+    font-size: .82rem; color: var(--t1); flex: 1; min-width: 120px; padding: 2px 0;
 }
-
-@keyframes toastIn {
-    from {
-        opacity: 0;
-        transform: translateY(16px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes toastOut {
-    from {
-        opacity: 1;
-    }
-
-    to {
-        opacity: 0;
-        pointer-events: none;
-    }
-}
-
-/* Responsivo */
-@media (max-width: 600px) {
-    .aula-main {
-        padding: 12px 12px 40px;
-    }
-
-    .aula-card {
-        padding: 18px 16px;
-    }
-
-    .aula-form-actions {
-        flex-direction: column;
-    }
-
-    .aula-form-actions .btn-secondary,
-    .aula-form-actions .btn-primary {
-        width: 100%;
-        justify-content: center;
-    }
-}
+.tag-input-field::placeholder { color: var(--t3); }

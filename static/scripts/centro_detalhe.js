@@ -152,6 +152,7 @@
         const fw = qs('#periodoFiltroWrap');
         if (fw) fw.style.display = 'block';
         const _ft = qs('#fiscalizacaoTab'); if (_ft) _ft.style.display = '';
+        const _mt = qs('#metaSemanalTab'); if (_mt) _mt.style.display = '';
         // Preencher datepickers com período atual
         const p = getPeriodo(orgao.id);
         const toDateStr = iso => iso.substring(0, 10);
@@ -238,12 +239,16 @@
         const fim = new Date(p.fim).getTime();
         return getAulas().filter(a => a.centro === orgaoId && a.timestamp >= ini && a.timestamp <= fim);
     }
+    // Apenas aulas válidas (não anuladas) — usada no ranking
+    function getAulasAtivasDoPeriodo(orgaoId) {
+        return getAulasDoPeriodo(orgaoId).filter(a => !a.anulada);
+    }
 
     function renderAulas() {
         // Período texto
         if (qs('#aulasPeriodoText')) qs('#aulasPeriodoText').textContent = formatPeriodo(orgao.id);
         renderRanking();
-        if (isLider(orgao.id)) renderFiscalizacao();
+        if (isLider(orgao.id)) { renderFiscalizacao(); renderMetaSemanal(); }
     }
 
     // ── Ranking ──────────────────────────────────────────
@@ -252,62 +257,162 @@
     function renderRanking() {
         const list = qs('#rankingList');
         if (!list) return;
-        const aulas = getAulasDoPeriodo(orgao.id);
+        const aulas = getAulasAtivasDoPeriodo(orgao.id);
 
         if (aulas.length === 0) {
             list.innerHTML = `<div class="empty-state"><div class="empty-icon">🎓</div><div class="empty-text">Nenhuma aula registrada neste período.</div></div>`;
             return;
         }
 
-        // Agrupa por instrutor
+        // Agrupa por instrutor → array de aulas
         const agrupado = {};
         aulas.forEach(a => {
-            if (!agrupado[a.aplicador]) agrupado[a.aplicador] = 0;
-            agrupado[a.aplicador]++;
+            if (!agrupado[a.aplicador]) agrupado[a.aplicador] = [];
+            agrupado[a.aplicador].push(a);
         });
 
         const ranking = Object.entries(agrupado)
-            .sort((a, b) => b[1] - a[1])
-            .map(([nick, count], i) => ({ nick, count, pos: i + 1 }));
+            .sort((a, b) => b[1].length - a[1].length)
+            .map(([nick, aulasArr], i) => ({ nick, aulasArr, count: aulasArr.length, pos: i + 1 }));
 
         const posColors = ['#f59e0b', '#94a3b8', '#cd7c3d'];
         const posEmoji = ['🥇', '🥈', '🥉'];
 
-        list.innerHTML = `
-        <table class="subforum-table">
-            <thead><tr>
-                <th>#</th><th>Instrutor</th><th>Aulas Aplicadas</th>
-            </tr></thead>
-            <tbody>
-            ${ranking.map(r => `
-                <tr>
-                    <td style="font-weight:800;color:${posColors[r.pos - 1] || 'var(--t2)'}">
-                        ${r.pos <= 3 ? posEmoji[r.pos - 1] : r.pos + 'º'}
-                    </td>
-                    <td>
-                        <div style="display:flex;align-items:center;gap:10px">
-                            <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(r.nick)}&headonly=1&size=s&gesture=std"
-                                style="width:28px;height:28px;border-radius:50%;object-fit:cover" loading="lazy">
-                            <span style="font-weight:700;color:var(--t1)">${escH(r.nick)}</span>
-                            ${r.nick === username ? '<span style="background:var(--green-muted);color:var(--green);font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:8px;margin-left:4px">Você</span>' : ''}
+        list.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px;padding:4px 0">` +
+        ranking.map(r => {
+            const rowId = 'rank-expand-' + r.nick.replace(/\W/g,'_');
+
+            // Montar lista de aulas com aprovados/reprovados
+            const aulasHTML = r.aulasArr
+                .sort((a, b) => b.timestamp - a.timestamp)
+                .map(a => {
+                    const aprovs = (a.aprovados||'').split(/[,\n]/).map(n=>n.trim()).filter(Boolean);
+                    const reprovs = (a.reprovados||'').split(/[,\n]/).map(n=>n.trim()).filter(Boolean);
+                    const dataStr = new Date(a.dataAula||a.timestamp).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
+                    const numLabel = a.numero ? `<span class="fisc-num-badge" style="font-size:.65rem">#${escH(a.numero)}</span>` : '';
+                    const nickBadge = (nicks, cor, icone) => nicks.map(n =>
+                        `<span style="display:inline-flex;align-items:center;gap:4px;background:${cor}18;border:1px solid ${cor}33;border-radius:6px;padding:2px 7px;font-size:.7rem;font-weight:600;color:${cor}">
+                            ${icone} ${escH(n)}
+                        </span>`).join('');
+                    return `
+                    <div style="background:var(--bg-1);border:1px solid var(--b1);border-radius:8px;padding:9px 12px;margin-top:6px">
+                        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:5px">
+                            ${numLabel}
+                            <span style="font-size:.78rem;font-weight:700;color:var(--t1)">${escH(a.tipo)}</span>
+                            <span style="font-size:.68rem;color:var(--t3);margin-left:auto">📅 ${dataStr}</span>
                         </div>
-                    </td>
-                    <td>
-                        <span style="background:var(--green-muted);color:var(--green);font-weight:800;padding:4px 12px;border-radius:10px;font-size:.85rem">
-                            ${r.count} Aula${r.count !== 1 ? 's' : ''}
-                        </span>
-                    </td>
-                </tr>`).join('')}
-            </tbody>
-        </table>`;
+                        ${!a.semAlunos && (aprovs.length||reprovs.length) ? `
+                        <div style="display:flex;flex-direction:column;gap:5px">
+                            ${aprovs.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">
+                                <span style="font-size:.65rem;color:var(--t3);margin-right:2px;font-weight:700">✅ Aprov.:</span>
+                                ${nickBadge(aprovs,'#22c55e','✅')}
+                            </div>` : ''}
+                            ${reprovs.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">
+                                <span style="font-size:.65rem;color:var(--t3);margin-right:2px;font-weight:700">❌ Reprov.:</span>
+                                ${nickBadge(reprovs,'#ef4444','❌')}
+                            </div>` : ''}
+                        </div>` : a.semAlunos ? `<span style="font-size:.7rem;color:var(--t3)">Sem alunos</span>` : `<span style="font-size:.7rem;color:var(--t3)">Sem registros de alunos</span>`}
+                        ${a.observacao ? `<div style="font-size:.68rem;color:var(--t3);margin-top:4px;font-style:italic">"${escH(a.observacao.substring(0,80))}${a.observacao.length>80?'…':''}"</div>` : ''}
+                    </div>`;
+                }).join('');
+
+            return `
+            <div class="hierarquia-item" style="border-radius:10px;overflow:hidden">
+                <div class="ranking-row" data-target="${rowId}"
+                    style="display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;user-select:none">
+                    <div style="font-weight:800;color:${posColors[r.pos-1]||'var(--t2)'};font-size:.95rem;min-width:28px;text-align:center">
+                        ${r.pos <= 3 ? posEmoji[r.pos-1] : r.pos + 'º'}
+                    </div>
+                    <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(r.nick)}&headonly=1&size=s&gesture=std"
+                        style="width:28px;height:28px;border-radius:50%;object-fit:cover" loading="lazy">
+                    <span style="font-weight:700;color:var(--t1);flex:1">${escH(r.nick)}
+                        ${r.nick === username ? '<span style="background:var(--green-muted);color:var(--green);font-size:.62rem;font-weight:700;padding:2px 6px;border-radius:8px;margin-left:4px">Você</span>' : ''}
+                    </span>
+                    <span style="background:var(--green-muted);color:var(--green);font-weight:800;padding:4px 12px;border-radius:10px;font-size:.82rem">
+                        ${r.count} Aula${r.count !== 1 ? 's' : ''}
+                    </span>
+                    <svg class="rank-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;color:var(--t3);transition:transform .2s"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+                <div id="${rowId}" style="display:none;padding:0 14px 12px">
+                    ${aulasHTML}
+                </div>
+            </div>`;
+        }).join('') + '</div>';
+
+        // Toggle expand por linha
+        list.querySelectorAll('.ranking-row').forEach(row => {
+            row.addEventListener('click', () => {
+                const target = document.getElementById(row.dataset.target);
+                if (!target) return;
+                const open = target.style.display !== 'none';
+                target.style.display = open ? 'none' : 'block';
+                row.querySelector('.rank-chevron').style.transform = open ? '' : 'rotate(90deg)';
+            });
+        });
     }
 
     // ── Fiscalização ─────────────────────────────────────
     if (isLider(orgao.id)) {
         renderFiscalizacao();
+        renderMetaSemanal();
         qs('#fiscSearch')?.addEventListener('input', function () {
             renderFiscalizacao(this.value.toLowerCase());
         });
+    }
+
+    function getBlacklist() {
+        return get('dme_blacklist_' + orgao.id) || [];
+    }
+    function saveBlacklist(arr) {
+        set('dme_blacklist_' + orgao.id, arr);
+    }
+
+    // Detecta pares de aulas do mesmo instrutor com intervalo < 10min
+    function detectarAlertas(aulas) {
+        const LIMITE = 10 * 60 * 1000; // 10 min em ms
+        const alertas = {}; // id → array de motivos
+        const blacklist = getBlacklist();
+
+        // Ordenar por timestamp
+        const sorted = aulas.slice().sort((a, b) => a.timestamp - b.timestamp);
+
+        sorted.forEach((a, i) => {
+            const motivos = alertas[a.id] || [];
+
+            // Blacklist de alunos: checar aprovados e reprovados
+            const todosNicksAula = [
+                ...(a.aprovados || '').split(/[,\n]/).map(n => n.trim().toLowerCase()).filter(Boolean),
+                ...(a.reprovados || '').split(/[,\n]/).map(n => n.trim().toLowerCase()).filter(Boolean),
+            ];
+            const blNomes = blacklist.map(b => b.toLowerCase());
+            const nicksBlacklist = todosNicksAula.filter(n => blNomes.includes(n));
+            if (nicksBlacklist.length > 0) {
+                if (!motivos.includes('blacklist')) motivos.push('blacklist');
+                // Guardar quais nicks acionaram
+                a._nicksBlacklist = nicksBlacklist;
+            }
+            // Flag salva no registro (intervalo)
+            if (a.flags && a.flags.intervalo_curto) motivos.push('intervalo_curto');
+
+            // Verificar pares com aulas anteriores do mesmo instrutor
+            for (let j = i - 1; j >= 0; j--) {
+                const prev = sorted[j];
+                if (prev.aplicador.toLowerCase() !== a.aplicador.toLowerCase()) continue;
+                const diff = a.timestamp - prev.timestamp;
+                if (diff < 0) break;
+                if (diff < LIMITE) {
+                    if (!motivos.includes('intervalo_curto')) motivos.push('intervalo_curto');
+                    // Marcar também a aula anterior
+                    const motivosPrev = alertas[prev.id] || [];
+                    if (!motivosPrev.includes('intervalo_curto')) motivosPrev.push('intervalo_curto');
+                    alertas[prev.id] = motivosPrev;
+                }
+                break; // só checar a imediatamente anterior do mesmo instrutor
+            }
+
+            if (motivos.length) alertas[a.id] = motivos;
+        });
+        return alertas;
     }
 
     function renderFiscalizacao(filtro = '') {
@@ -315,7 +420,9 @@
         if (!list) return;
         let aulas = getAulasDoPeriodo(orgao.id);
         if (filtro) aulas = aulas.filter(a =>
-            a.aplicador.toLowerCase().includes(filtro) || a.tipo.toLowerCase().includes(filtro));
+            (a.aplicador||'').toLowerCase().includes(filtro) ||
+            (a.tipo||'').toLowerCase().includes(filtro) ||
+            (a.numero||'').includes(filtro));
         aulas.sort((a, b) => b.timestamp - a.timestamp);
 
         if (aulas.length === 0) {
@@ -323,35 +430,755 @@
             return;
         }
 
-        list.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px;padding:12px 16px">` +
-            aulas.map((a, i) => `
-        <div class="hierarquia-item" style="border-radius:10px">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px">
+        const alertas = detectarAlertas(aulas);
+        const blacklist = getBlacklist();
+
+        // Contadores de alertas para o header
+        const totalIntervalo = Object.values(alertas).filter(m => m.includes('intervalo_curto')).length;
+        const totalBlacklist = Object.values(alertas).filter(m => m.includes('blacklist')).length;
+
+        const headerAlertas = (totalIntervalo > 0 || totalBlacklist > 0) ? `
+        <div class="fisc-alertas-header">
+            ${totalIntervalo > 0 ? `<span class="fisc-alerta-badge intervalo">⏱ ${totalIntervalo} aula(s) com intervalo &lt; 10min</span>` : ''}
+            ${totalBlacklist > 0 ? `<span class="fisc-alerta-badge blacklist">🚫 ${totalBlacklist} aula(s) de instrutor na blacklist</span>` : ''}
+        </div>` : '';
+
+        // Botão para gerenciar blacklist
+        const btnBlacklist = `<button class="btn-secondary" id="btnGerenciarBlacklist" style="font-size:.72rem;padding:6px 12px;margin-left:auto">
+            🚫 Blacklist Alunos (${blacklist.length})
+        </button>`;
+
+        list.innerHTML = headerAlertas +
+            `<div style="display:flex;align-items:center;gap:8px;padding:10px 16px 0;flex-wrap:wrap">
+                ${btnBlacklist}
+            </div>` +
+            `<div style="display:flex;flex-direction:column;gap:6px;padding:12px 16px">` +
+            aulas.map((a) => {
+                const motivos = alertas[a.id] || [];
+                const temAlerta = motivos.length > 0;
+                const isBlacklist = motivos.includes('blacklist');
+                const isIntervalo = motivos.includes('intervalo_curto');
+                const numLabel = a.numero ? `<span class="fisc-num-badge">#${escH(a.numero)}</span>` : '';
+
+                const isAnulada = !!a.anulada;
+                const badgesAlerta = [
+                    isAnulada ? `<span class="fisc-flag" style="background:rgba(107,114,128,.18);color:#9ca3af;border:1px solid rgba(107,114,128,.3)">🚫 ANULADA</span>` : '',
+                    isBlacklist ? `<span class="fisc-flag blacklist-flag">🚫 BLACKLIST</span>` : '',
+                    isIntervalo ? `<span class="fisc-flag intervalo-flag">⏱ &lt;10MIN</span>` : '',
+                ].filter(Boolean).join('');
+
+                const dataFormatada = escH(new Date(a.dataAula || a.timestamp).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }));
+                const nAprov = a.aprovados ? a.aprovados.split(/[,\n]/).filter(Boolean).length : 0;
+                const nReprov = a.reprovados ? a.reprovados.split(/[,\n]/).filter(Boolean).length : 0;
+
+                return `
+        <div class="hierarquia-item fisc-row${isAnulada ? ' fisc-row-anulada' : (temAlerta ? ' fisc-row-alerta' + (isBlacklist ? ' fisc-row-blacklist' : '') : '')}" style="border-radius:10px${isAnulada ? ';opacity:.6' : ''}">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 14px">
                 <div style="flex:1;min-width:0">
-                    <div style="font-size:.85rem;font-weight:700;color:var(--t1);margin-bottom:3px">${escH(a.tipo)}</div>
+                    <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:4px">
+                        ${numLabel}
+                        <span style="font-size:.85rem;font-weight:700;color:var(--t1)${isAnulada ? ';text-decoration:line-through;color:var(--t3)' : ''}">${escH(a.tipo)}</span>
+                        ${badgesAlerta}
+                    </div>
                     <div style="font-size:.72rem;color:var(--t3);display:flex;gap:8px;flex-wrap:wrap">
                         <span>👤 ${escH(a.aplicador)}</span>
-                        <span>📅 ${escH(new Date(a.dataAula || a.timestamp).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }))}</span>
-                        ${a.semAlunos ? '<span>Sem alunos</span>' : (a.aprovados ? `<span>✅ ${a.aprovados.split(/[,\n]/).filter(Boolean).length} aprov.</span>` : '')}
-                        ${a.reprovados ? `<span>❌ ${a.reprovados.split(/[,\n]/).filter(Boolean).length} reprov.</span>` : ''}
+                        <span>📅 ${dataFormatada}</span>
+                        ${a.semAlunos ? '<span>Sem alunos</span>' : (nAprov > 0 ? '<span>\u2705 ' + nAprov + ' aprov.</span>' : '')}
+                        ${nReprov > 0 ? '<span>\u274c ' + nReprov + ' reprov.</span>' : ''}
                     </div>
+                    ${a.motivoAnulacao ? `<div style="font-size:.7rem;color:#ef4444;margin-top:3px;font-weight:600">Motivo: ${escH(a.motivoAnulacao)}</div>` : ''}
+                    ${!a.anulada && a.observacao ? `<div style="font-size:.7rem;color:var(--t3);margin-top:3px;font-style:italic">"${escH(a.observacao.substring(0,80))}${a.observacao.length>80?'…':''}"</div>` : ''}
                 </div>
-                <button class="btn-icon del" title="Remover aula" onclick="removerAulaFisc('${escH(a.id)}')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /></svg>
-                </button>
+                <div style="display:flex;gap:6px;flex-shrink:0;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+                    <button class="btn-tabela-edit" title="Ver detalhes" onclick="verAulaFisc('${escH(a.id)}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                        </svg> Ver
+                    </button>
+                    ${!isAnulada ? `
+                    <button class="btn-tabela-edit" title="Editar aula" style="background:rgba(59,130,246,.15);color:#3b82f6;border-color:rgba(59,130,246,.3)" onclick="editarAulaFisc('${escH(a.id)}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg> Editar
+                    </button>
+                    <button class="btn-tabela-edit" title="Anular aula" style="background:rgba(239,68,68,.12);color:#ef4444;border-color:rgba(239,68,68,.3)" onclick="anularAulaFisc('${escH(a.id)}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12">
+                            <circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+                        </svg> Anular
+                    </button>` : `
+                    <button class="btn-tabela-edit" title="Reativar aula" style="background:rgba(34,197,94,.12);color:var(--green);border-color:rgba(34,197,94,.3)" onclick="reativarAulaFisc('${escH(a.id)}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12">
+                            <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/>
+                        </svg> Reativar
+                    </button>`}
+                </div>
             </div>
-            </div>`).join('') + '</div>';
+        </div>`;
+            }).join('') + '</div>';
+
+        // Gerenciar blacklist
+        qs('#btnGerenciarBlacklist')?.addEventListener('click', () => abrirModalBlacklist());
     }
 
-    window.removerAulaFisc = (id) => {
+    // ── Modal de Blacklist ────────────────────────────────
+    window._blacklistModalOpen = false;
+    function abrirModalBlacklist() {
+        if (window._blacklistModalOpen) return;
+        window._blacklistModalOpen = true;
+
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-wrap open';
+        overlay.id = 'blacklistModal';
+        const bl = getBlacklist();
+
+        overlay.innerHTML = `
+        <div class="modal-content" style="max-width:420px">
+            <div class="modal-header">
+                <h3>🚫 Blacklist de Alunos</h3>
+                <button class="modal-close" id="blModalClose">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:.75rem;color:var(--t3);margin-bottom:12px">Alunos na blacklist terão suas aulas sinalizadas automaticamente.</p>
+                <div class="g-form-group" style="display:flex;gap:8px">
+                    <input type="text" class="g-input" id="blNickInput" placeholder="Nick do aluno" style="flex:1">
+                    <button class="btn-primary" id="blAdicionarBtn" style="white-space:nowrap">Adicionar</button>
+                </div>
+                <div id="blLista" style="margin-top:12px;display:flex;flex-direction:column;gap:6px">
+                    ${bl.length === 0 ? '<div style="color:var(--t3);font-size:.78rem">Nenhum instrutor na blacklist.</div>' :
+                      bl.map(nick => `
+                      <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:8px 12px">
+                          <span style="font-weight:700;color:var(--red);font-size:.82rem">🚫 ${escH(nick)}</span>
+                          <button class="btn-icon del bl-remover" data-nick="${escH(nick)}" style="width:26px;height:26px">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                          </button>
+                      </div>`).join('')}
+                </div>
+            </div>
+        </div>`;
+
+        document.body.appendChild(overlay);
+
+        overlay.querySelector('#blModalClose').addEventListener('click', fecharBlacklist);
+        overlay.addEventListener('click', e => { if (e.target === overlay) fecharBlacklist(); });
+
+        overlay.querySelector('#blAdicionarBtn').addEventListener('click', () => {
+            const nick = (overlay.querySelector('#blNickInput').value || '').trim();
+            if (!nick) return;
+            const bl2 = getBlacklist();
+            if (bl2.some(b => b.toLowerCase() === nick.toLowerCase())) { toast('Já está na blacklist.', 'error'); return; }
+            bl2.push(nick);
+            saveBlacklist(bl2);
+            toast(`${nick} adicionado à blacklist.`);
+            fecharBlacklist();
+            renderFiscalizacao((qs('#fiscSearch')||{}).value||'');
+        });
+
+        overlay.querySelectorAll('.bl-remover').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const nick = btn.dataset.nick;
+                const bl2 = getBlacklist().filter(b => b.toLowerCase() !== nick.toLowerCase());
+                saveBlacklist(bl2);
+                toast(`${nick} removido da blacklist.`);
+                fecharBlacklist();
+                renderFiscalizacao((qs('#fiscSearch')||{}).value||'');
+            });
+        });
+
+        function fecharBlacklist() {
+            overlay.remove();
+            window._blacklistModalOpen = false;
+        }
+    }
+
+    // ── Modal Ver Aula ───────────────────────────────────
+    window.verAulaFisc = (id) => {
+        const todas = getAulas();
+        const a = todas.find(x => x.id === id);
+        if (!a) return;
+
+        const dataFormatada = new Date(a.dataAula || a.timestamp).toLocaleString('pt-BR', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+
+        const aprovList = (a.aprovados || '').split(/[,\n]/).map(n => n.trim()).filter(Boolean);
+        const reprovList = (a.reprovados || '').split(/[,\n]/).map(n => n.trim()).filter(Boolean);
+
+        const renderNicks = (nicks, cor, icone) => nicks.length === 0
+            ? `<span style="color:var(--t3);font-size:.78rem">Nenhum</span>`
+            : nicks.map(n => `
+                <span style="display:inline-flex;align-items:center;gap:5px;background:${cor}22;border:1px solid ${cor}44;border-radius:8px;padding:4px 10px;font-size:.78rem;font-weight:600;color:${cor}">
+                    ${icone}
+                    <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(n)}&headonly=1&size=s&gesture=std"
+                        style="width:20px;height:20px;border-radius:50%;object-fit:cover" loading="lazy" onerror="this.style.display='none'">
+                    ${escH(n)}
+                </span>`).join('');
+
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-wrap open';
+        overlay.innerHTML = `
+        <div class="modal-content" style="max-width:500px">
+            <div class="modal-header">
+                <h3>📋 Detalhes da Aula ${a.numero ? '<span style="color:var(--green);font-size:.85rem">#' + escH(a.numero) + '</span>' : ''}</h3>
+                <button class="modal-close" id="verAulaClose">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body" style="display:flex;flex-direction:column;gap:14px">
+                <!-- Info principal -->
+                <div style="background:var(--bg-2);border-radius:10px;padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                    <div>
+                        <div style="font-size:.65rem;color:var(--t3);text-transform:uppercase;font-weight:700;margin-bottom:3px">Tipo</div>
+                        <div style="font-size:.85rem;font-weight:700;color:var(--t1)">${escH(a.tipo)}</div>
+                    </div>
+                    <div>
+                        <div style="font-size:.65rem;color:var(--t3);text-transform:uppercase;font-weight:700;margin-bottom:3px">Aplicador</div>
+                        <div style="display:flex;align-items:center;gap:6px">
+                            <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(a.aplicador||'')}&headonly=1&size=s&gesture=std"
+                                style="width:22px;height:22px;border-radius:50%;object-fit:cover" loading="lazy">
+                            <span style="font-size:.85rem;font-weight:700;color:var(--t1)">${escH(a.aplicador)}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size:.65rem;color:var(--t3);text-transform:uppercase;font-weight:700;margin-bottom:3px">📅 Data e Hora</div>
+                        <div style="font-size:.82rem;font-weight:600;color:var(--t2)">${dataFormatada}</div>
+                    </div>
+                    <div>
+                        <div style="font-size:.65rem;color:var(--t3);text-transform:uppercase;font-weight:700;margin-bottom:3px">Centro</div>
+                        <div style="font-size:.82rem;font-weight:600;color:var(--t2)">${escH(a.centro || orgao.title || orgao.id)}</div>
+                    </div>
+                </div>
+
+                <!-- Aprovados -->
+                <div>
+                    <div style="font-size:.7rem;color:var(--green);font-weight:700;text-transform:uppercase;margin-bottom:6px">
+                        ✅ Aprovados (${aprovList.length})
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;min-height:28px">
+                        ${a.semAlunos ? '<span style="color:var(--t3);font-size:.78rem">Aula sem alunos</span>' : renderNicks(aprovList, '#22c55e', '✅')}
+                    </div>
+                </div>
+
+                <!-- Reprovados -->
+                <div>
+                    <div style="font-size:.7rem;color:#ef4444;font-weight:700;text-transform:uppercase;margin-bottom:6px">
+                        ❌ Reprovados (${reprovList.length})
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;min-height:28px">
+                        ${a.semAlunos ? '<span style="color:var(--t3);font-size:.78rem">Aula sem alunos</span>' : renderNicks(reprovList, '#ef4444', '❌')}
+                    </div>
+                </div>
+
+                <!-- Observação -->
+                ${a.observacao ? `
+                <div>
+                    <div style="font-size:.7rem;color:var(--t3);font-weight:700;text-transform:uppercase;margin-bottom:6px">💬 Observação</div>
+                    <div style="background:var(--bg-2);border-radius:8px;padding:10px 12px;font-size:.8rem;color:var(--t2);font-style:italic">"${escH(a.observacao)}"</div>
+                </div>` : ''}
+            </div>
+        </div>`;
+
+        document.body.appendChild(overlay);
+        overlay.querySelector('#verAulaClose').addEventListener('click', () => overlay.remove());
+        overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+    };
+
+    // ── Modal Editar Aula ────────────────────────────────
+    window.editarAulaFisc = (id) => {
+        const todas = getAulas();
+        const a = todas.find(x => x.id === id);
+        if (!a) return;
+
+        // Monta chips helper reutilizável
+        function makeTagSystem(containerId, inputId, initialNicks, chipClass, icone) {
+            let tags = [...initialNicks];
+            const container = document.getElementById(containerId);
+            const input = document.getElementById(inputId);
+
+            function render() {
+                container.querySelectorAll('.tag-chip-modal').forEach(c => c.remove());
+                tags.forEach((nick, idx) => {
+                    const chip = document.createElement('span');
+                    chip.className = `tag-chip-modal ${chipClass}`;
+                    chip.innerHTML = `${icone} ${escH(nick)}<button type="button" data-idx="${idx}">&times;</button>`;
+                    container.insertBefore(chip, input);
+                });
+                container.querySelectorAll('.tag-chip-modal button').forEach(btn => {
+                    btn.addEventListener('click', () => { tags.splice(+btn.dataset.idx, 1); render(); });
+                });
+            }
+            render();
+
+            function add(nick) {
+                const n = nick.trim();
+                if (!n || tags.some(t => t.toLowerCase() === n.toLowerCase())) return;
+                tags.push(n);
+                render();
+            }
+
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === 'Tab') {
+                    e.preventDefault();
+                    add(e.target.value);
+                    e.target.value = '';
+                }
+            });
+            input.addEventListener('blur', e => {
+                if (e.target.value.trim()) { add(e.target.value); e.target.value = ''; }
+            });
+
+            return { get: () => tags };
+        }
+
+        const aprovInicial = (a.aprovados || '').split(/[,\n]/).map(n => n.trim()).filter(Boolean);
+        const reprovInicial = (a.reprovados || '').split(/[,\n]/).map(n => n.trim()).filter(Boolean);
+
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-wrap open';
+        overlay.innerHTML = `
+        <div class="modal-content" style="max-width:520px">
+            <div class="modal-header">
+                <h3>✏️ Editar Aula ${a.numero ? '<span style="color:var(--green);font-size:.85rem">#' + escH(a.numero) + '</span>' : ''}</h3>
+                <button class="modal-close" id="editAulaClose">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body" style="display:flex;flex-direction:column;gap:14px">
+                <div class="g-form-group">
+                    <label class="g-label">Tipo de Aula</label>
+                    <input type="text" class="g-input" id="editTipo" value="${escH(a.tipo)}">
+                </div>
+                <div class="g-form-group">
+                    <label class="g-label">✅ Aprovados</label>
+                    <div class="tag-input-container" id="editAprovContainer" onclick="document.getElementById('editAprovInput').focus()" style="cursor:text">
+                        <input type="text" id="editAprovInput" class="tag-input-field" placeholder="Nick + Enter ou Tab...">
+                    </div>
+                </div>
+                <div class="g-form-group">
+                    <label class="g-label">❌ Reprovados</label>
+                    <div class="tag-input-container" id="editReprovContainer" onclick="document.getElementById('editReprovInput').focus()" style="cursor:text">
+                        <input type="text" id="editReprovInput" class="tag-input-field" placeholder="Nick + Enter ou Tab...">
+                    </div>
+                </div>
+                <div class="g-form-group">
+                    <label class="aula-check-label">
+                        <input type="checkbox" id="editSemAlunos" ${a.semAlunos ? 'checked' : ''}>
+                        <span class="aula-check-box"></span>
+                        Aula sem alunos
+                    </label>
+                </div>
+                <div class="g-form-group">
+                    <label class="g-label">💬 Observação</label>
+                    <textarea class="g-input" id="editObs" style="min-height:80px;resize:vertical">${escH(a.observacao || '')}</textarea>
+                </div>
+                <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:4px">
+                    <button class="btn-secondary" id="editAulaCancelar">Cancelar</button>
+                    <button class="btn-primary" id="editAulaSalvar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14"><polyline points="20 6 9 17 4 12"/></svg>
+                        Salvar Alterações
+                    </button>
+                </div>
+            </div>
+        </div>`;
+
+        document.body.appendChild(overlay);
+
+        // Inicia tag systems após o DOM estar pronto
+        const aprovSys = makeTagSystem('editAprovContainer', 'editAprovInput', aprovInicial, 'aprov', '✅');
+        const reprovSys = makeTagSystem('editReprovContainer', 'editReprovInput', reprovInicial, 'reprov', '❌');
+
+        const fechar = () => overlay.remove();
+        overlay.querySelector('#editAulaClose').addEventListener('click', fechar);
+        overlay.querySelector('#editAulaCancelar').addEventListener('click', fechar);
+        overlay.addEventListener('click', e => { if (e.target === overlay) fechar(); });
+
+        overlay.querySelector('#editAulaSalvar').addEventListener('click', () => {
+            const novoTipo = overlay.querySelector('#editTipo').value.trim();
+            const novaObs = overlay.querySelector('#editObs').value.trim();
+            const novoSemAlunos = overlay.querySelector('#editSemAlunos').checked;
+            if (!novoTipo) { toast('Informe o tipo de aula.', 'error'); return; }
+
+            const idx = todas.findIndex(x => x.id === id);
+            if (idx === -1) return;
+            todas[idx] = {
+                ...todas[idx],
+                tipo: novoTipo,
+                aprovados: aprovSys.get().join(', '),
+                reprovados: reprovSys.get().join(', '),
+                semAlunos: novoSemAlunos,
+                observacao: novaObs,
+                editadoEm: new Date().toLocaleString('pt-BR'),
+                editadoPor: username,
+            };
+            set('dme_aulas', todas);
+            toast('Aula atualizada com sucesso.', 'success');
+            fechar();
+            renderFiscalizacao((qs('#fiscSearch') || {}).value || '');
+            renderRanking();
+        });
+    };
+
+    // ── Anular Aula ──────────────────────────────────────
+    window.anularAulaFisc = (id) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-wrap open';
+        overlay.innerHTML = `
+        <div class="modal-content" style="max-width:400px">
+            <div class="modal-header">
+                <h3>🚫 Anular Aula</h3>
+                <button class="modal-close" id="anularClose">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body" style="display:flex;flex-direction:column;gap:14px">
+                <p style="font-size:.82rem;color:var(--t2)">A aula ficará visível com status <strong style="color:#ef4444">ANULADA</strong> e não será contabilizada no ranking.</p>
+                <div class="g-form-group">
+                    <label class="g-label">Motivo da Anulação <span class="req-star">*</span></label>
+                    <textarea class="g-input" id="motivoAnulacao" style="min-height:70px;resize:vertical" placeholder="Descreva o motivo..."></textarea>
+                </div>
+                <div style="display:flex;gap:10px;justify-content:flex-end">
+                    <button class="btn-secondary" id="anularCancelar">Cancelar</button>
+                    <button class="btn-primary" id="anularConfirmar" style="background:#ef4444;border-color:#ef4444">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                        Confirmar Anulação
+                    </button>
+                </div>
+            </div>
+        </div>`;
+
+        document.body.appendChild(overlay);
+        const fechar = () => overlay.remove();
+        overlay.querySelector('#anularClose').addEventListener('click', fechar);
+        overlay.querySelector('#anularCancelar').addEventListener('click', fechar);
+        overlay.addEventListener('click', e => { if (e.target === overlay) fechar(); });
+
+        overlay.querySelector('#anularConfirmar').addEventListener('click', () => {
+            const motivo = overlay.querySelector('#motivoAnulacao').value.trim();
+            if (!motivo) { toast('Informe o motivo da anulação.', 'error'); return; }
+            const todas = getAulas();
+            const idx = todas.findIndex(x => x.id === id);
+            if (idx === -1) return;
+            todas[idx] = { ...todas[idx], anulada: true, motivoAnulacao: motivo, anuladaEm: new Date().toLocaleString('pt-BR'), anuladaPor: username };
+            set('dme_aulas', todas);
+            toast('Aula anulada.', 'success');
+            fechar();
+            renderFiscalizacao((qs('#fiscSearch') || {}).value || '');
+            renderRanking();
+        });
+    };
+
+    // ── Reativar Aula ────────────────────────────────────
+    window.reativarAulaFisc = (id) => {
+        confirmar('Reativar esta aula? Ela voltará a ser contabilizada normalmente.', () => {
+            const todas = getAulas();
+            const idx = todas.findIndex(x => x.id === id);
+            if (idx === -1) return;
+            delete todas[idx].anulada;
+            delete todas[idx].motivoAnulacao;
+            delete todas[idx].anuladaEm;
+            delete todas[idx].anuladaPor;
+            set('dme_aulas', todas);
+            toast('Aula reativada.', 'success');
+            renderFiscalizacao((qs('#fiscSearch') || {}).value || '');
+            renderRanking();
+        });
+    };
+
+        window.removerAulaFisc = (id) => {
         confirmar('Remover esta aula do registro? Esta ação é irreversível.', () => {
             const todas = getAulas().filter(a => a.id !== id);
             set('dme_aulas', todas);
             toast('Aula removida.');
             renderFiscalizacao();
+            renderMetaSemanal();
             renderRanking();
         });
     };
+
+    // ── Meta Semanal ─────────────────────────────────────
+    function getMetas() {
+        // Metas por cargo: retorna { min, tipo, label }
+        // tipo: 'total' = qualquer aula, 'caps' = capacitações, 'adm' = admissões, 'lideranca' = cumprimento interno
+        const c = (orgao.id || '').toLowerCase();
+        return {
+            instrutor:    { min: 3, tipo: 'total',    label: 'Aulas', cargo: 'Instrutor' },
+            treinador:    { min: 3, tipo: 'total',    label: 'Treinamentos', cargo: 'Treinador' },
+            supervisor:   { min: 3, tipo: 'total',    label: 'Supervisões', cargo: 'Supervisor' },
+            capacitador:  { min: 2, tipo: 'caps',     label: 'Capacitações', cargo: 'Capacitador' },
+            ministro:     { min: 2, tipo: 'adm',      label: 'Admissões', cargo: 'Ministro' },
+            'vice-lider': { min: 0, tipo: 'lideranca', label: 'Obrigações', cargo: 'Vice-Líder' },
+            'vice-líder': { min: 0, tipo: 'lideranca', label: 'Obrigações', cargo: 'Vice-Líder' },
+            lider:        { min: 0, tipo: 'lideranca', label: 'Obrigações', cargo: 'Líder' },
+            'líder':      { min: 0, tipo: 'lideranca', label: 'Obrigações', cargo: 'Líder' },
+        };
+    }
+
+    function getMetaDoCargo(cargo) {
+        const METAS = getMetas();
+        const cargoLower = (cargo || '').toLowerCase();
+        // Ministros (qualquer especialidade)
+        if (cargoLower.startsWith('ministro')) return METAS['ministro'];
+        return METAS[cargoLower] || null;
+    }
+
+    function contarAulasPorTipo(aulas, nick) {
+        const minhas = aulas.filter(a =>
+            (a.aplicador || '').toLowerCase() === nick.toLowerCase() && !a.anulada
+        );
+        let total = 0, caps = 0, adm = 0, aux = 0;
+        minhas.forEach(a => {
+            const tipo = (a.tipo || '').toLowerCase();
+            if (tipo.includes('capacitação') || tipo.includes('capacitacao') || tipo.includes('cap')) caps++;
+            else if (tipo.includes('admissão') || tipo.includes('admissao') || tipo.includes('adm')) adm++;
+            else if (tipo.includes('auxílio') || tipo.includes('auxilio') || tipo.includes('aux')) aux++;
+            else total++;
+        });
+        return { total: minhas.length, treinos: total, caps, adm, aux };
+    }
+
+    function renderMetaSemanal() {
+        const panel = qs('#metaSemanalPanel');
+        if (!panel) return;
+
+        const aulas = getAulasAtivasDoPeriodo(orgao.id);
+        const membros = getMembrosOrgao();
+        const periodo = formatPeriodo(orgao.id);
+
+        if (membros.length === 0) {
+            panel.innerHTML = `<div class="empty-state"><div class="empty-icon">🎯</div><div class="empty-text">Nenhum membro cadastrado.</div></div>`;
+            return;
+        }
+
+        // Processar cada membro
+        const processados = membros.map(m => {
+            const meta = getMetaDoCargo(m.cargo);
+            if (!meta) return null;
+            const stats = contarAulasPorTipo(aulas, m.username);
+            let progresso = 0, atual = 0;
+            if (meta.tipo === 'lideranca') { progresso = 100; atual = 1; }
+            else if (meta.tipo === 'total') { atual = stats.total; progresso = Math.min(100, Math.round((atual / meta.min) * 100)); }
+            else if (meta.tipo === 'caps')  { atual = stats.caps;  progresso = Math.min(100, Math.round((atual / meta.min) * 100)); }
+            else if (meta.tipo === 'adm')   { atual = stats.adm;   progresso = Math.min(100, Math.round((atual / meta.min) * 100)); }
+            const cumpriu = meta.tipo === 'lideranca' ? true : atual >= meta.min;
+            return { ...m, meta, stats, progresso, atual, cumpriu };
+        }).filter(Boolean);
+
+        // Separar grupos
+        const lideranca = processados.filter(m => m.meta.tipo === 'lideranca');
+        const cumprindo = processados.filter(m => m.meta.tipo !== 'lideranca' && m.cumpriu);
+        const pendentes = processados.filter(m => m.meta.tipo !== 'lideranca' && !m.cumpriu);
+
+        // Medalhista = aprovado com mais atividades totais
+        const medalhista = cumprindo.reduce((best, m) => (!best || m.stats.total > best.stats.total) ? m : best, null);
+
+        // Totais gerais
+        const totalAulas = aulas.length;
+        const totalCaps  = aulas.filter(a => (a.tipo||'').toLowerCase().includes('cap')).length;
+        const totalAdm   = aulas.filter(a => (a.tipo||'').toLowerCase().includes('adm')).length;
+        const totalAux   = aulas.filter(a => (a.tipo||'').toLowerCase().includes('aux')).length;
+
+        // ── Helpers ──────────────────────────────────────
+        const fmtStat = (m) => {
+            const s = m.stats; const p = [];
+            if (s.treinos > 0) p.push(`${String(s.treinos).padStart(2,'0')} Aulas`);
+            if (s.caps > 0)    p.push(`${String(s.caps).padStart(2,'0')} Capacitações`);
+            if (s.adm > 0)     p.push(`${String(s.adm).padStart(2,'0')} Admissões`);
+            if (s.aux > 0)     p.push(`${String(s.aux).padStart(2,'0')} Auxílios`);
+            return p.length ? `[${p.join(' / ')}]` : '[0 Atividades]';
+        };
+
+        const corBarra = (m) => m.cumpriu ? '#22c55e' : m.progresso >= 60 ? '#f59e0b' : '#ef4444';
+
+        // ── Card de membro (UI redesenhada) ──────────────
+        const memberCard = (m, isMedal = false) => `
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg-2);border-radius:10px;border:1px solid var(--b1);margin-bottom:6px${isMedal ? ';border-color:#f59e0b44;background:rgba(245,158,11,.06)' : m.cumpriu ? ';border-color:rgba(34,197,94,.2)' : ';border-color:rgba(239,68,68,.15)'}">
+            <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(m.username)}&headonly=1&size=s&gesture=std"
+                style="width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid ${isMedal ? '#f59e0b' : m.cumpriu ? '#22c55e' : '#ef4444'}" loading="lazy">
+            <div style="flex:1;min-width:0">
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:${m.meta.tipo !== 'lideranca' ? '5' : '0'}px">
+                    <span style="font-weight:700;font-size:.84rem;color:var(--t1)">${escH(m.username)}</span>
+                    ${isMedal ? '<span title="Medalhista">🏆</span>' : ''}
+                    ${m.username === username ? '<span style="background:var(--green-muted);color:var(--green);font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:5px">Você</span>' : ''}
+                    <span style="font-size:.68rem;color:var(--t3);background:var(--bg-3);padding:1px 7px;border-radius:5px">${escH(m.cargo)}</span>
+                </div>
+                ${m.meta.tipo !== 'lideranca' ? `
+                <div style="display:flex;align-items:center;gap:8px">
+                    <div style="flex:1;height:4px;background:var(--bg-3);border-radius:2px;overflow:hidden">
+                        <div style="height:100%;width:${m.progresso}%;background:${corBarra(m)};border-radius:2px;transition:width .5s ease"></div>
+                    </div>
+                    <span style="font-size:.65rem;color:var(--t3);white-space:nowrap;font-weight:600">${m.atual}/${m.meta.min} ${m.meta.label}</span>
+                </div>` : `<span style="font-size:.7rem;color:var(--green)">Cumpriu com suas funções na liderança</span>`}
+            </div>
+            <div style="flex-shrink:0;text-align:right">
+                <span style="display:inline-flex;align-items:center;gap:4px;font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:8px;${m.meta.tipo === 'lideranca' ? 'background:rgba(34,197,94,.12);color:#22c55e' : m.cumpriu ? 'background:rgba(34,197,94,.12);color:#22c55e' : 'background:rgba(239,68,68,.1);color:#ef4444'}">
+                    ${m.meta.tipo === 'lideranca' || m.cumpriu ? '✅ Meta' : '❌ Pendente'}
+                </span>
+                ${m.meta.tipo !== 'lideranca' ? `<div style="font-size:.62rem;color:var(--t3);margin-top:3px;text-align:center">${fmtStat(m)}</div>` : ''}
+            </div>
+        </div>`;
+
+        // ── Seção com título estilo CI ────────────────────
+        const section = (cor, titulo, cards, empty = '---') => `
+        <div style="margin-bottom:18px">
+            <div style="font-size:.68rem;font-weight:800;color:${cor};text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid ${cor}22;display:flex;align-items:center;gap:6px">
+                <div style="width:3px;height:12px;background:${cor};border-radius:2px"></div>
+                ${titulo}
+            </div>
+            ${cards || `<div style="font-size:.78rem;color:var(--t3);padding:4px 0">${empty}</div>`}
+        </div>`;
+
+        // ── Separar aprovados por cargo para seções distintas ─
+        const instrutoresOK  = cumprindo.filter(m => m !== medalhista && (m.meta.tipo === 'total'));
+        const capacitadoresOK= cumprindo.filter(m => m !== medalhista && (m.meta.tipo === 'caps'));
+        const ministrosOK    = cumprindo.filter(m => m !== medalhista && (m.meta.tipo === 'adm'));
+
+        const instrutoresFail  = pendentes.filter(m => m.meta.tipo === 'total');
+        const capacitadoresFail= pendentes.filter(m => m.meta.tipo === 'caps');
+        const ministrosFail    = pendentes.filter(m => m.meta.tipo === 'adm');
+
+        // ── Texto para copiar (layout exato do Habbo) ────
+        const buildTexto = () => {
+            const pad = (n) => String(n).padStart(2, '0');
+            const fmtCopy = (m) => {
+                const s = m.stats; const p = [];
+                if (s.treinos > 0) p.push(`${pad(s.treinos)} Aulas`);
+                if (s.caps > 0)    p.push(`${pad(s.caps)} Capacitações`);
+                if (s.adm > 0)     p.push(`${pad(s.adm)} Admissões`);
+                if (s.aux > 0)     p.push(`${pad(s.aux)} Auxílios`);
+                return `${m.username} [${p.join(' / ')}]`;
+            };
+            const lines = [];
+            lines.push(`Meta Semanal - ${periodo}`);
+            lines.push('');
+            lines.push('MEDALHISTA SEMANAL:');
+            lines.push(medalhista ? `${fmtCopy(medalhista)} 🏆` : '---');
+            lines.push('');
+            lines.push('INSTRUTORES COM METAS ALCANÇADAS:');
+            lines.push(...(instrutoresOK.length ? instrutoresOK.map(fmtCopy) : ['---']));
+            lines.push('');
+            lines.push('CAPACITADORES COM METAS ALCANÇADAS:');
+            lines.push(...(capacitadoresOK.length ? capacitadoresOK.map(fmtCopy) : ['---']));
+            lines.push('');
+            lines.push('MINISTROS COM METAS ALCANÇADAS:');
+            lines.push(...(ministrosOK.length ? ministrosOK.map(fmtCopy) : ['---']));
+            lines.push('');
+            lines.push('LIDERANÇA:');
+            lines.push(...(lideranca.length ? lideranca.map(m => `${m.username} (Cumpriu com sua função na liderança)`) : ['---']));
+            lines.push('');
+            lines.push('INSTRUTORES QUE NÃO ATINGIRAM A META:');
+            lines.push(...(instrutoresFail.length ? instrutoresFail.map(fmtCopy) : ['---']));
+            lines.push('');
+            lines.push('CAPACITADORES QUE NÃO ATINGIRAM A META:');
+            lines.push(...(capacitadoresFail.length ? capacitadoresFail.map(fmtCopy) : ['---']));
+            lines.push('');
+            lines.push('MINISTROS QUE NÃO ATINGIRAM A META:');
+            lines.push(...(ministrosFail.length ? ministrosFail.map(fmtCopy) : ['---']));
+            lines.push('');
+            lines.push('CASOS ESPECIAIS:');
+            const casosEl = document.getElementById('casosEspeciaisInput');
+            const casosTexto = casosEl ? casosEl.value.trim() : '';
+            lines.push(casosTexto || 'Nick [00 Aulas] - (Licença / Novo membro)');
+            lines.push('');
+            lines.push('➔ TOTAL ⬅');
+            lines.push(`${pad(totalAulas)} Aulas / ${pad(totalCaps)} Capacitações / ${pad(totalAdm)} Admissões / ${pad(totalAux)} Auxílios`);
+            return lines.join('\n');
+        };
+
+        // ── Render HTML ───────────────────────────────────
+        panel.innerHTML = `
+        <!-- Header -->
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+            <div>
+                <h3 style="font-size:1rem;font-weight:800;color:var(--t1);margin:0">🎯 Meta Semanal</h3>
+                <p style="font-size:.72rem;color:var(--t3);margin:3px 0 0">Período: <strong style="color:var(--t2)">${periodo}</strong></p>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <div style="display:flex;gap:10px;font-size:.72rem">
+                    <span style="background:rgba(34,197,94,.12);color:#22c55e;padding:4px 10px;border-radius:8px;font-weight:700">✅ ${cumprindo.length + lideranca.length} cumpriram</span>
+                    <span style="background:rgba(239,68,68,.1);color:#ef4444;padding:4px 10px;border-radius:8px;font-weight:700">❌ ${pendentes.length} pendentes</span>
+                </div>
+                <button id="btnCopiarMeta" style="display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;border:none;padding:7px 14px;border-radius:8px;font-weight:700;font-size:.78rem;cursor:pointer;transition:.2s">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    Copiar Meta
+                </button>
+            </div>
+        </div>
+
+        <!-- Medalhista -->
+        ${medalhista ? section('#f59e0b', '🏆 Medalhista Semanal', memberCard(medalhista, true)) : ''}
+
+        <!-- Liderança -->
+        ${lideranca.length ? section('#22c55e', '⭐ Liderança', lideranca.map(m => memberCard(m)).join('')) : ''}
+
+        <!-- Instrutores OK -->
+        ${section('#22c55e', '✅ Instrutores com Metas Alcançadas',
+            instrutoresOK.length ? instrutoresOK.map(m => memberCard(m)).join('') : null)}
+
+        <!-- Capacitadores OK -->
+        ${section('#22c55e', '✅ Capacitadores com Metas Alcançadas',
+            capacitadoresOK.length ? capacitadoresOK.map(m => memberCard(m)).join('') : null)}
+
+        <!-- Ministros OK -->
+        ${section('#22c55e', '✅ Ministros com Metas Alcançadas',
+            ministrosOK.length ? ministrosOK.map(m => memberCard(m)).join('') : null)}
+
+        <!-- Instrutores FAIL -->
+        ${section('#ef4444', '❌ Instrutores que Não Atingiram a Meta',
+            instrutoresFail.length ? instrutoresFail.map(m => memberCard(m)).join('') : null)}
+
+        <!-- Capacitadores FAIL -->
+        ${section('#ef4444', '❌ Capacitadores que Não Atingiram a Meta',
+            capacitadoresFail.length ? capacitadoresFail.map(m => memberCard(m)).join('') : null)}
+
+        <!-- Ministros FAIL -->
+        ${section('#ef4444', '❌ Ministros que Não Atingiram a Meta',
+            ministrosFail.length ? ministrosFail.map(m => memberCard(m)).join('') : null)}
+
+        <!-- Casos Especiais -->
+        <div style="margin-bottom:18px">
+            <div style="font-size:.68rem;font-weight:800;color:#1abc9c;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid rgba(26,188,156,.2);display:flex;align-items:center;gap:6px">
+                <div style="width:3px;height:12px;background:#1abc9c;border-radius:2px"></div>
+                🔵 Casos Especiais
+            </div>
+            <textarea id="casosEspeciaisInput" style="width:100%;min-height:64px;resize:vertical;padding:10px 12px;background:var(--bg-2);border:1px solid var(--b1);border-radius:8px;font-size:.78rem;color:var(--t2);font-family:inherit;box-sizing:border-box" placeholder="Nick [00 Aulas] - (Licença / Novo membro)&#10;Nick [00 Aulas] - (Licença)"></textarea>
+        </div>
+
+        <!-- Total -->
+        <div style="padding:14px;background:var(--bg-2);border-radius:10px;border:1px solid var(--b1);text-align:center">
+            <div style="font-size:.72rem;font-weight:800;color:var(--t1);letter-spacing:.05em;margin-bottom:6px">➔ TOTAL ⬅</div>
+            <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;font-size:.78rem;color:var(--t2);font-weight:600">
+                <span>${String(totalAulas).padStart(2,'0')} Aulas</span>
+                <span style="color:var(--t3)">•</span>
+                <span>${String(totalCaps).padStart(2,'0')} Capacitações</span>
+                <span style="color:var(--t3)">•</span>
+                <span>${String(totalAdm).padStart(2,'0')} Admissões</span>
+                <span style="color:var(--t3)">•</span>
+                <span>${String(totalAux).padStart(2,'0')} Auxílios</span>
+            </div>
+        </div>`;
+
+        // ── Botão Copiar ──────────────────────────────────
+        qs('#btnCopiarMeta')?.addEventListener('click', function() {
+            const texto = buildTexto();
+            navigator.clipboard.writeText(texto).then(() => {
+                this.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13"><polyline points="20 6 9 17 4 12"/></svg> Copiado!`;
+                this.style.background = '#16a34a';
+                setTimeout(() => {
+                    this.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar Meta`;
+                    this.style.background = 'var(--green)';
+                }, 2500);
+            }).catch(() => {
+                // Fallback para navegadores sem clipboard API
+                const ta = document.createElement('textarea');
+                ta.value = texto; ta.style.position = 'fixed'; ta.style.opacity = '0';
+                document.body.appendChild(ta); ta.select();
+                document.execCommand('copy'); document.body.removeChild(ta);
+                toast('Meta copiada!', 'success');
+            });
+        });
+    }
 
     // ── Membros ─────────────────────────────────────────
     // Funções de dados

@@ -127,7 +127,77 @@
     // Data/hora padrão = agora
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    document.getElementById('aula-datahora').value = now.toISOString().slice(0, 16);
+
+
+    // ── Sistema de Tags (Aprovados / Reprovados) ─────────
+    let tagsAprovados = [];
+    let tagsReprovados = [];
+
+    function renderTagsAprovados() {
+        const container = document.getElementById('aprovados-container');
+        const input = document.getElementById('aprovados-input');
+        container.querySelectorAll('.tag-chip').forEach(c => c.remove());
+        tagsAprovados.forEach((nick, idx) => {
+            const chip = document.createElement('div');
+            chip.className = 'tag-chip aprov';
+            chip.innerHTML = `✅ ${nick}<button type="button" onclick="removeAprovado(${idx})">&times;</button>`;
+            container.insertBefore(chip, input);
+        });
+    }
+
+    function renderTagsReprovados() {
+        const container = document.getElementById('reprovados-container');
+        const input = document.getElementById('reprovados-input');
+        container.querySelectorAll('.tag-chip').forEach(c => c.remove());
+        tagsReprovados.forEach((nick, idx) => {
+            const chip = document.createElement('div');
+            chip.className = 'tag-chip reprov';
+            chip.innerHTML = `❌ ${nick}<button type="button" onclick="removeReprovado(${idx})">&times;</button>`;
+            container.insertBefore(chip, input);
+        });
+    }
+
+    window.removeAprovado = (idx) => { tagsAprovados.splice(idx, 1); renderTagsAprovados(); };
+    window.removeReprovado = (idx) => { tagsReprovados.splice(idx, 1); renderTagsReprovados(); };
+
+    function addTag(arr, renderFn, nick) {
+        const n = nick.trim();
+        if (!n) return false;
+        if (arr.some(x => x.toLowerCase() === n.toLowerCase())) return false;
+        arr.push(n);
+        renderFn();
+        return true;
+    }
+
+    document.getElementById('aprovados-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === 'Tab') {
+            e.preventDefault();
+            addTag(tagsAprovados, renderTagsAprovados, e.target.value);
+            e.target.value = '';
+        }
+    });
+
+    document.getElementById('reprovados-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === 'Tab') {
+            e.preventDefault();
+            addTag(tagsReprovados, renderTagsReprovados, e.target.value);
+            e.target.value = '';
+        }
+    });
+
+    // Também adiciona ao sair do campo com valor preenchido (blur)
+    document.getElementById('aprovados-input').addEventListener('blur', (e) => {
+        if (e.target.value.trim()) {
+            addTag(tagsAprovados, renderTagsAprovados, e.target.value);
+            e.target.value = '';
+        }
+    });
+    document.getElementById('reprovados-input').addEventListener('blur', (e) => {
+        if (e.target.value.trim()) {
+            addTag(tagsReprovados, renderTagsReprovados, e.target.value);
+            e.target.value = '';
+        }
+    });
 
     // ── Salvar Aula ──────────────────────────────────────
     document.getElementById('aula-btn-salvar').addEventListener('click', salvar);
@@ -135,24 +205,54 @@
     function salvar() {
         const centroId = selectCentro.value;
         const tipo = selectTipo.value;
-        const dataHora = document.getElementById('aula-datahora').value;
-        const permissor = document.getElementById('aula-permissor').value.trim();
-        const aprovados = document.getElementById('aula-aprovados').value.trim();
-        const reprovados = document.getElementById('aula-reprovados').value.trim();
+        // Data e hora: capturar automaticamente no momento do clique
+        const dataHora = new Date().toISOString().slice(0, 16);
+        const permissor = '';
+        // Pegar possível nick ainda digitado no input mas não confirmado
+        const inputAprov = (document.getElementById('aprovados-input').value||'').trim();
+        if (inputAprov) addTag(tagsAprovados, renderTagsAprovados, inputAprov);
+        document.getElementById('aprovados-input').value = '';
+        const inputReprov = (document.getElementById('reprovados-input').value||'').trim();
+        if (inputReprov) addTag(tagsReprovados, renderTagsReprovados, inputReprov);
+        document.getElementById('reprovados-input').value = '';
+
+        const aprovados = tagsAprovados.join(', ');
+        const reprovados = tagsReprovados.join(', ');
         const semAlunos = document.getElementById('aula-sem-alunos').checked;
         const obs = document.getElementById('aula-observacao').value.trim();
 
         if (!centroId) { toast('Selecione o centro de tarefas.', 'error'); return; }
-        if (!tipo) { toast('Selecione o tipo de aula.', 'error'); return; }
-        if (!dataHora) { toast('Informe a data e hora da aula.', 'error'); return; }
+        if (!tipo) { toast('Escolha um treinamento.', 'error'); return; }
         if (!obs) { toast('Preencha a observação.', 'error'); return; }
         if (!semAlunos && !aprovados && !reprovados) {
             toast('Informe aprovados/reprovados ou marque "sem alunos".', 'error'); return;
         }
 
+        const aulas = getAulas();
+
+        // ── Número sequencial por centro ─────────────────
+        const aulasDocentro = aulas.filter(a => a.centro === centroId);
+        const proximoNum = aulasDocentro.length + 1;
+        const numFormatado = proximoNum.toString().padStart(3, '0');
+
+        // ── Detecção de intervalo curto (< 10 min) ───────
+        const INTERVALO_MINIMO_MS = 10 * 60 * 1000;
+        const agora = Date.now();
+        const aulasRecentesInstrutor = aulas.filter(a =>
+            a.centro === centroId &&
+            a.aplicador.toLowerCase() === username.toLowerCase() &&
+            (agora - a.timestamp) < INTERVALO_MINIMO_MS
+        );
+        const alertaIntervalo = aulasRecentesInstrutor.length > 0;
+
+        // ── Verificação de blacklist ──────────────────────
+        const blacklist = get('dme_blacklist_' + centroId) || [];
+        const naBlacklist = blacklist.some(b => b.toLowerCase() === username.toLowerCase());
+
         const registro = {
             id: Date.now().toString(36) + Math.random().toString(36).substr(2),
-            timestamp: Date.now(),
+            numero: numFormatado,
+            timestamp: agora,
             data: new Date().toLocaleString('pt-BR'),
             dataAula: dataHora,
             aplicador: username,
@@ -163,11 +263,18 @@
             semAlunos,
             permissor,
             observacao: obs,
+            flags: {
+                intervalo_curto: alertaIntervalo,
+                blacklist: naBlacklist,
+            }
         };
 
-        const aulas = getAulas();
         aulas.push(registro);
         saveAulas(aulas);
+
+        // Alertas visuais pós-postagem
+        if (naBlacklist) toast('⚠️ ATENÇÃO: Você está na blacklist deste centro!', 'error');
+        else if (alertaIntervalo) toast('⚠️ Aviso: aula postada em intervalo inferior a 10 minutos.', 'warn');
 
         // ── Criação automática de perfil para INS ────────
         if (centroId === 'instrucao-inicial' && aprovados) {
@@ -212,14 +319,10 @@
         }
 
         // Limpar formulário
-        document.getElementById('aula-aprovados').value = '';
-        document.getElementById('aula-reprovados').value = '';
+        tagsAprovados = []; renderTagsAprovados();
+        tagsReprovados = []; renderTagsReprovados();
         document.getElementById('aula-observacao').value = '';
-        document.getElementById('aula-permissor').value = '';
         document.getElementById('aula-sem-alunos').checked = false;
-        const nowN = new Date();
-        nowN.setMinutes(nowN.getMinutes() - nowN.getTimezoneOffset());
-        document.getElementById('aula-datahora').value = nowN.toISOString().slice(0, 16);
 
         renderHistorico();
     }
