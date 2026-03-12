@@ -1293,7 +1293,7 @@ async function verLicenca(id) {
             .from('requerimentos')
             .select('*')
             .eq('id', id)
-            .single();
+            .maybeSingle();
 
         if (error || !data) { alert('Licença não encontrada.'); return; }
 

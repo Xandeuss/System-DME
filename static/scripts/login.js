@@ -24,7 +24,7 @@ async function syncStaticCredentials() {
                 .from('militares')
                 .select('nick')
                 .eq('nick', cred.username)
-                .single();
+                .maybeSingle();
 
             if (!data && !error) {
                 // Insere se não existir
@@ -216,7 +216,7 @@ DOM.registerForm.addEventListener('submit', async (e) => {
             .from('militares')
             .select('nick')
             .eq('nick', appState.formData.username)
-            .single();
+            .maybeSingle();
 
         if (existingUser) {
             toast('Este nome de usuário já está em uso.', 'err');
@@ -272,7 +272,7 @@ DOM.loginForm.addEventListener('submit', async (e) => {
             .from('militares')
             .select('*')
             .eq('nick', username)
-            .single();
+            .maybeSingle();
 
         if (error || !user) {
             toast('Usuário não encontrado.', 'err');
