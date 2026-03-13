@@ -233,7 +233,23 @@
     }
 
     // ── Aulas: Funções Helper ────────────────────────────
+    // Verifica se o usuário atual pode ver aulas de um centro:
+    // Instrução Inicial → visível para todos
+    // Outros centros → só membros, líderes e admins
+    function podeVerAulasDoCentro(centroId) {
+        if (centroId === 'instrucao-inicial') return true;
+        if (isAdmin()) return true;
+        if ((getLideres()[centroId] || []).includes(username)) return true;
+        try {
+            const raw = localStorage.getItem('dme_orgao_' + centroId);
+            if (!raw) return false;
+            const data = JSON.parse(raw);
+            return (data.membros || []).some(m => m.username.toLowerCase() === username.toLowerCase());
+        } catch (_) { return false; }
+    }
+
     function getAulasDoPeriodo(orgaoId) {
+        if (!podeVerAulasDoCentro(orgaoId)) return [];
         const p = getPeriodo(orgaoId);
         const ini = new Date(p.inicio).getTime();
         const fim = new Date(p.fim).getTime();
@@ -897,6 +913,196 @@
         });
     };
 
+    // ── Licenças do Centro ───────────────────────────────
+    function getLicencas() {
+        return get('dme_licencas_' + orgao.id) || [];
+    }
+    function saveLicencas(arr) {
+        set('dme_licencas_' + orgao.id, arr);
+    }
+    function getLicencasAtivas() {
+        const hoje = new Date(); hoje.setHours(0,0,0,0);
+        return getLicencas().filter(l => {
+            if (!l.ativa) return false;
+            if (l.dataFim) {
+                const fim = new Date(l.dataFim); fim.setHours(23,59,59,999);
+                return fim >= hoje;
+            }
+            return true; // sem data fim = indefinida
+        });
+    }
+    function isEmLicenca(nick) {
+        return getLicencasAtivas().some(l => l.nick.toLowerCase() === nick.toLowerCase());
+    }
+
+    // Botão Licença → abre modal
+    qs('#btnLicenca')?.addEventListener('click', abrirModalLicenca);
+
+    function abrirModalLicenca() {
+        const membros = getMembrosOrgao();
+        const hoje = new Date().toISOString().slice(0,10);
+        const licAtivas = getLicencasAtivas();
+
+        // Cargo do usuário atual neste centro
+        const meuMembro = membros.find(m => m.username.toLowerCase() === username.toLowerCase());
+        const meuCargo = meuMembro ? meuMembro.cargo : 'Militar';
+
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-wrap open';
+        overlay.id = 'licencaModal';
+
+        overlay.innerHTML = `
+        <div class="modal-content" style="max-width:460px">
+            <div class="modal-header">
+                <h3>📅 Licenças do Centro</h3>
+                <button class="modal-close" id="licModalClose">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body" style="display:flex;flex-direction:column;gap:16px">
+
+                <!-- Solicitante (fixo = usuário logado) -->
+                <div style="background:var(--bg-3);border:1px solid var(--b1);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px">
+                    <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(username)}&headonly=1&size=m&gesture=std"
+                        style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid var(--green);flex-shrink:0" loading="lazy">
+                    <div>
+                        <div style="font-weight:800;font-size:.9rem;color:var(--t1)">${escH(username)}</div>
+                        <div style="font-size:.72rem;color:var(--t3)">${escH(meuCargo)} · Solicitante</div>
+                    </div>
+                    <span style="margin-left:auto;font-size:.68rem;font-weight:700;background:var(--green-muted);color:var(--green);padding:3px 10px;border-radius:8px">Você</span>
+                </div>
+
+                <!-- Formulário -->
+                <div style="display:flex;flex-direction:column;gap:12px">
+                    <div style="font-size:.7rem;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.05em">Nova Licença</div>
+
+                    <div class="g-form-row" style="gap:10px">
+                        <div class="g-form-group" style="margin:0;flex:1">
+                            <label class="g-label">📅 Início</label>
+                            <input type="date" class="g-input" id="licDataInicio" value="${hoje}">
+                        </div>
+                        <div class="g-form-group" style="margin:0;flex:1">
+                            <label class="g-label">📅 Fim <span style="color:var(--t3);font-weight:400">(opcional)</span></label>
+                            <input type="date" class="g-input" id="licDataFim">
+                        </div>
+                    </div>
+
+                    <div class="g-form-group" style="margin:0">
+                        <label class="g-label">💬 Motivo</label>
+                        <input type="text" class="g-input" id="licMotivo" placeholder="Ex: Viagem, Problema pessoal, Trabalho...">
+                    </div>
+
+                    <button class="btn-primary" id="licAdicionarBtn" style="width:100%;justify-content:center">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14"><path d="M12 5v14M5 12h14"/></svg>
+                        Registrar Minha Licença
+                    </button>
+                </div>
+
+                <!-- Divider -->
+                <div style="border-top:1px solid var(--b1)"></div>
+
+                <!-- Lista de licenças ativas -->
+                <div>
+                    <div style="font-size:.7rem;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">
+                        Licenças Ativas
+                        <span style="background:var(--bg-3);border:1px solid var(--b1);border-radius:6px;padding:1px 7px;font-size:.68rem;margin-left:6px;color:var(--t2)">${licAtivas.length}</span>
+                    </div>
+                    <div id="licListaAtivas" style="display:flex;flex-direction:column;gap:8px">
+                        ${licAtivas.length === 0
+                            ? `<div style="text-align:center;padding:16px 0;color:var(--t3);font-size:.8rem">
+                                <div style="font-size:1.5rem;margin-bottom:6px">🏖️</div>
+                                Nenhuma licença ativa no momento.
+                               </div>`
+                            : licAtivas.map(l => `
+                            <div style="display:flex;align-items:center;gap:10px;background:var(--bg-3);border:1px solid var(--b1);border-radius:10px;padding:10px 12px">
+                                <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(l.nick)}&headonly=1&size=s&gesture=std"
+                                    style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #f59e0b" loading="lazy">
+                                <div style="flex:1;min-width:0">
+                                    <div style="font-weight:700;font-size:.83rem;color:var(--t1)">${escH(l.nick)}</div>
+                                    <div style="font-size:.69rem;color:var(--t3);margin-top:1px">
+                                        ${l.dataInicio ? new Date(l.dataInicio).toLocaleDateString('pt-BR') : '—'}
+                                        ${l.dataFim ? ' → ' + new Date(l.dataFim + 'T23:59:59').toLocaleDateString('pt-BR') : ' (indefinido)'}
+                                        ${l.motivo ? ' · ' + escH(l.motivo) : ''}
+                                    </div>
+                                </div>
+                                <button class="lic-encerrar" data-id="${l.id}" title="Encerrar licença"
+                                    style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#ef4444;border-radius:8px;padding:5px 10px;font-size:.7rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .2s">
+                                    Encerrar
+                                </button>
+                            </div>`).join('')
+                        }
+                    </div>
+                </div>
+
+            </div>
+        </div>`;
+
+        document.body.appendChild(overlay);
+
+        overlay.querySelector('#licModalClose').addEventListener('click', () => overlay.remove());
+        overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+
+        overlay.querySelector('#licAdicionarBtn').addEventListener('click', () => {
+            const dataInicio = overlay.querySelector('#licDataInicio').value;
+            const dataFim = overlay.querySelector('#licDataFim').value;
+            const motivo = overlay.querySelector('#licMotivo').value.trim();
+
+            const todas = getLicencas();
+            todas.forEach(l => { if (l.nick.toLowerCase() === username.toLowerCase()) l.ativa = false; });
+
+            todas.push({
+                id: Date.now().toString(36) + Math.random().toString(36).slice(2),
+                nick: username, dataInicio, dataFim: dataFim || null, motivo,
+                ativa: true,
+                registradoPor: username,
+                registradoEm: new Date().toLocaleString('pt-BR'),
+            });
+            saveLicencas(todas);
+            toast('Licença registrada com sucesso!', 'success');
+            overlay.remove();
+            renderMetaSemanal();
+            renderListaLicencas();
+        });
+
+        overlay.querySelectorAll('.lic-encerrar').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const todas = getLicencas();
+                const l = todas.find(x => x.id === btn.dataset.id);
+                if (l) { l.ativa = false; l.encerradoEm = new Date().toLocaleString('pt-BR'); }
+                saveLicencas(todas);
+                toast('Licença encerrada.', 'success');
+                overlay.remove();
+                renderMetaSemanal();
+                renderListaLicencas();
+            });
+        });
+    }
+
+    // ── Listagem de licenças na aba Membros ──────────────
+    function renderListaLicencas() {
+        const container = qs('#licencasListContainer');
+        if (!container) return;
+        const ativas = getLicencasAtivas();
+        const title = qs('#licencasSection');
+        if (title) title.style.display = ativas.length > 0 ? 'block' : 'none';
+        if (!ativas.length) { container.innerHTML = ''; return; }
+
+        container.innerHTML = ativas.map(l => `
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--b1)">
+            <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(l.nick)}&headonly=1&size=s&gesture=std"
+                style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid #f59e0b" loading="lazy">
+            <div style="flex:1">
+                <div style="font-weight:700;font-size:.83rem;color:var(--t1)">${escH(l.nick)}</div>
+                <div style="font-size:.68rem;color:var(--t3)">
+                    📅 ${l.dataInicio ? new Date(l.dataInicio).toLocaleDateString('pt-BR') : '—'}
+                    ${l.dataFim ? ' até ' + new Date(l.dataFim + 'T23:59:59').toLocaleDateString('pt-BR') : ' (indefinido)'}
+                    ${l.motivo ? ' · ' + escH(l.motivo) : ''}
+                </div>
+            </div>
+            <span style="font-size:.68rem;font-weight:700;background:rgba(245,158,11,.15);color:#f59e0b;padding:3px 9px;border-radius:7px">📅 Licença</span>
+        </div>`).join('');
+    }
+
     // ── Meta Semanal ─────────────────────────────────────
     function getMetas() {
         // Metas por cargo: retorna { min, tipo, label }
@@ -938,11 +1144,12 @@
         return { total: minhas.length, treinos: total, caps, adm, aux };
     }
 
+    // ── Meta Semanal ─────────────────────────────────────
     function renderMetaSemanal() {
         const panel = qs('#metaSemanalPanel');
         if (!panel) return;
 
-        const aulas = getAulasAtivasDoPeriodo(orgao.id);
+        const aulas  = getAulasAtivasDoPeriodo(orgao.id);
         const membros = getMembrosOrgao();
         const periodo = formatPeriodo(orgao.id);
 
@@ -951,234 +1158,235 @@
             return;
         }
 
-        // Processar cada membro
+        // ── Processar membros ────────────────────────────
+        const pad = n => String(n).padStart(2, '0');
+
         const processados = membros.map(m => {
             const meta = getMetaDoCargo(m.cargo);
             if (!meta) return null;
             const stats = contarAulasPorTipo(aulas, m.username);
-            let progresso = 0, atual = 0;
-            if (meta.tipo === 'lideranca') { progresso = 100; atual = 1; }
-            else if (meta.tipo === 'total') { atual = stats.total; progresso = Math.min(100, Math.round((atual / meta.min) * 100)); }
-            else if (meta.tipo === 'caps')  { atual = stats.caps;  progresso = Math.min(100, Math.round((atual / meta.min) * 100)); }
-            else if (meta.tipo === 'adm')   { atual = stats.adm;   progresso = Math.min(100, Math.round((atual / meta.min) * 100)); }
+            let atual = 0;
+            if      (meta.tipo === 'lideranca') atual = 1;
+            else if (meta.tipo === 'total')     atual = stats.total;
+            else if (meta.tipo === 'caps')      atual = stats.caps;
+            else if (meta.tipo === 'adm')       atual = stats.adm;
             const cumpriu = meta.tipo === 'lideranca' ? true : atual >= meta.min;
-            return { ...m, meta, stats, progresso, atual, cumpriu };
+            return { ...m, meta, stats, atual, cumpriu };
         }).filter(Boolean);
 
-        // Separar grupos
-        const lideranca = processados.filter(m => m.meta.tipo === 'lideranca');
-        const cumprindo = processados.filter(m => m.meta.tipo !== 'lideranca' && m.cumpriu);
-        const pendentes = processados.filter(m => m.meta.tipo !== 'lideranca' && !m.cumpriu);
+        // Período atual para detectar membro novo
+        const periodoObj = getPeriodo(orgao.id);
+        const inicioSemana = new Date(periodoObj.inicio).getTime();
 
-        // Medalhista = aprovado com mais atividades totais
-        const medalhista = cumprindo.reduce((best, m) => (!best || m.stats.total > best.stats.total) ? m : best, null);
+        const lideranca      = processados.filter(m => m.meta.tipo === 'lideranca');
 
-        // Totais gerais
+        // Licenciados: qualquer cargo que esteja com licença ativa
+        const licenciados    = processados.filter(m => m.meta.tipo !== 'lideranca' && isEmLicenca(m.username));
+
+        // Membros novos: entraram durante ou após o início da semana atual E não atingiram a meta
+        const membrosNovos   = processados.filter(m => {
+            if (m.meta.tipo === 'lideranca') return false;
+            if (isEmLicenca(m.username)) return false;
+            if (m.cumpriu) return false;
+            if (!m.dataEntrada) return false;
+            const entrada = new Date(m.dataEntrada).getTime();
+            return entrada >= inicioSemana;
+        });
+
+        const idsBloqueados = new Set([
+            ...licenciados.map(m => m.username),
+            ...membrosNovos.map(m => m.username),
+        ]);
+
+        const cumprindo = processados.filter(m => m.meta.tipo !== 'lideranca' && m.cumpriu && !idsBloqueados.has(m.username));
+        const pendentes = processados.filter(m => m.meta.tipo !== 'lideranca' && !m.cumpriu && !idsBloqueados.has(m.username));
+
+        const medalhista = cumprindo.reduce((b, m) => (!b || m.stats.total > b.stats.total) ? m : b, null);
+
+        const instrutoresOK   = cumprindo.filter(m => m !== medalhista && m.meta.tipo === 'total');
+        const capacitadoresOK = cumprindo.filter(m => m !== medalhista && m.meta.tipo === 'caps');
+        const ministrosOK     = cumprindo.filter(m => m !== medalhista && m.meta.tipo === 'adm');
+        const instutoresFail  = pendentes.filter(m => m.meta.tipo === 'total');
+        const capssFail       = pendentes.filter(m => m.meta.tipo === 'caps');
+        const minFail         = pendentes.filter(m => m.meta.tipo === 'adm');
+
         const totalAulas = aulas.length;
         const totalCaps  = aulas.filter(a => (a.tipo||'').toLowerCase().includes('cap')).length;
         const totalAdm   = aulas.filter(a => (a.tipo||'').toLowerCase().includes('adm')).length;
         const totalAux   = aulas.filter(a => (a.tipo||'').toLowerCase().includes('aux')).length;
 
-        // ── Helpers ──────────────────────────────────────
-        const fmtStat = (m) => {
+        // ── Formatar linha de stats ───────────────────────
+        const fmtStats = (m) => {
             const s = m.stats; const p = [];
-            if (s.treinos > 0) p.push(`${String(s.treinos).padStart(2,'0')} Aulas`);
-            if (s.caps > 0)    p.push(`${String(s.caps).padStart(2,'0')} Capacitações`);
-            if (s.adm > 0)     p.push(`${String(s.adm).padStart(2,'0')} Admissões`);
-            if (s.aux > 0)     p.push(`${String(s.aux).padStart(2,'0')} Auxílios`);
-            return p.length ? `[${p.join(' / ')}]` : '[0 Atividades]';
+            if (s.treinos > 0) p.push(`${pad(s.treinos)} Aulas`);
+            if (s.caps > 0)    p.push(`${pad(s.caps)} Capacitações`);
+            if (s.adm > 0)     p.push(`${pad(s.adm)} Admissões`);
+            if (s.aux > 0)     p.push(`${pad(s.aux)} Auxílios`);
+            return `[${p.length ? p.join(' / ') : '00 Atividades'}]`;
         };
 
-        const corBarra = (m) => m.cumpriu ? '#22c55e' : m.progresso >= 60 ? '#f59e0b' : '#ef4444';
+        // ── Linha de membro idêntica ao print ────────────
+        // NICK [00 Aulas] com avatar pequeno ao lado
+        const memberLine = (m, medal = false) => `
+            <div style="display:flex;align-items:center;justify-content:center;gap:7px;margin:2px 0">
+                <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(m.username)}&headonly=1&size=s&gesture=std"
+                    style="width:22px;height:22px;border-radius:50%;object-fit:cover;flex-shrink:0" loading="lazy"
+                    onerror="this.style.display='none'">
+                <span style="font-size:13px;color:#333">${escH(m.username)} ${fmtStats(m)}${medal ? ' 🏆' : ''}</span>
+            </div>`;
 
-        // ── Card de membro (UI redesenhada) ──────────────
-        const memberCard = (m, isMedal = false) => `
-        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg-2);border-radius:10px;border:1px solid var(--b1);margin-bottom:6px${isMedal ? ';border-color:#f59e0b44;background:rgba(245,158,11,.06)' : m.cumpriu ? ';border-color:rgba(34,197,94,.2)' : ';border-color:rgba(239,68,68,.15)'}">
-            <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(m.username)}&headonly=1&size=s&gesture=std"
-                style="width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid ${isMedal ? '#f59e0b' : m.cumpriu ? '#22c55e' : '#ef4444'}" loading="lazy">
-            <div style="flex:1;min-width:0">
-                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:${m.meta.tipo !== 'lideranca' ? '5' : '0'}px">
-                    <span style="font-weight:700;font-size:.84rem;color:var(--t1)">${escH(m.username)}</span>
-                    ${isMedal ? '<span title="Medalhista">🏆</span>' : ''}
-                    ${m.username === username ? '<span style="background:var(--green-muted);color:var(--green);font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:5px">Você</span>' : ''}
-                    <span style="font-size:.68rem;color:var(--t3);background:var(--bg-3);padding:1px 7px;border-radius:5px">${escH(m.cargo)}</span>
-                </div>
-                ${m.meta.tipo !== 'lideranca' ? `
-                <div style="display:flex;align-items:center;gap:8px">
-                    <div style="flex:1;height:4px;background:var(--bg-3);border-radius:2px;overflow:hidden">
-                        <div style="height:100%;width:${m.progresso}%;background:${corBarra(m)};border-radius:2px;transition:width .5s ease"></div>
-                    </div>
-                    <span style="font-size:.65rem;color:var(--t3);white-space:nowrap;font-weight:600">${m.atual}/${m.meta.min} ${m.meta.label}</span>
-                </div>` : `<span style="font-size:.7rem;color:var(--green)">Cumpriu com suas funções na liderança</span>`}
-            </div>
-            <div style="flex-shrink:0;text-align:right">
-                <span style="display:inline-flex;align-items:center;gap:4px;font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:8px;${m.meta.tipo === 'lideranca' ? 'background:rgba(34,197,94,.12);color:#22c55e' : m.cumpriu ? 'background:rgba(34,197,94,.12);color:#22c55e' : 'background:rgba(239,68,68,.1);color:#ef4444'}">
-                    ${m.meta.tipo === 'lideranca' || m.cumpriu ? '✅ Meta' : '❌ Pendente'}
-                </span>
-                ${m.meta.tipo !== 'lideranca' ? `<div style="font-size:.62rem;color:var(--t3);margin-top:3px;text-align:center">${fmtStat(m)}</div>` : ''}
-            </div>
-        </div>`;
+        const liderancaLine = (m) => `
+            <div style="display:flex;align-items:center;justify-content:center;gap:7px;margin:2px 0">
+                <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(m.username)}&headonly=1&size=s&gesture=std"
+                    style="width:22px;height:22px;border-radius:50%;object-fit:cover;flex-shrink:0" loading="lazy"
+                    onerror="this.style.display='none'">
+                <span style="font-size:13px;color:#333">${escH(m.username)} (Cumpriu com sua função na liderança)</span>
+            </div>`;
 
-        // ── Seção com título estilo CI ────────────────────
-        const section = (cor, titulo, cards, empty = '---') => `
-        <div style="margin-bottom:18px">
-            <div style="font-size:.68rem;font-weight:800;color:${cor};text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid ${cor}22;display:flex;align-items:center;gap:6px">
-                <div style="width:3px;height:12px;background:${cor};border-radius:2px"></div>
-                ${titulo}
-            </div>
-            ${cards || `<div style="font-size:.78rem;color:var(--t3);padding:4px 0">${empty}</div>`}
-        </div>`;
+        // ── Título de seção colorido UPPERCASE ───────────
+        const secTitle = (cor, txt) =>
+            `<p style="color:${cor};font-weight:bold;text-transform:uppercase;font-size:13px;margin:18px 0 6px">${txt}</p>`;
 
-        // ── Separar aprovados por cargo para seções distintas ─
-        const instrutoresOK  = cumprindo.filter(m => m !== medalhista && (m.meta.tipo === 'total'));
-        const capacitadoresOK= cumprindo.filter(m => m !== medalhista && (m.meta.tipo === 'caps'));
-        const ministrosOK    = cumprindo.filter(m => m !== medalhista && (m.meta.tipo === 'adm'));
-
-        const instrutoresFail  = pendentes.filter(m => m.meta.tipo === 'total');
-        const capacitadoresFail= pendentes.filter(m => m.meta.tipo === 'caps');
-        const ministrosFail    = pendentes.filter(m => m.meta.tipo === 'adm');
-
-        // ── Texto para copiar (layout exato do Habbo) ────
+        // ── Texto para copiar ─────────────────────────────
         const buildTexto = () => {
-            const pad = (n) => String(n).padStart(2, '0');
-            const fmtCopy = (m) => {
-                const s = m.stats; const p = [];
-                if (s.treinos > 0) p.push(`${pad(s.treinos)} Aulas`);
-                if (s.caps > 0)    p.push(`${pad(s.caps)} Capacitações`);
-                if (s.adm > 0)     p.push(`${pad(s.adm)} Admissões`);
-                if (s.aux > 0)     p.push(`${pad(s.aux)} Auxílios`);
-                return `${m.username} [${p.join(' / ')}]`;
-            };
             const lines = [];
             lines.push(`Meta Semanal - ${periodo}`);
             lines.push('');
             lines.push('MEDALHISTA SEMANAL:');
-            lines.push(medalhista ? `${fmtCopy(medalhista)} 🏆` : '---');
+            lines.push(medalhista ? `${medalhista.username} ${fmtStats(medalhista)} 🏆` : '---');
             lines.push('');
             lines.push('INSTRUTORES COM METAS ALCANÇADAS:');
-            lines.push(...(instrutoresOK.length ? instrutoresOK.map(fmtCopy) : ['---']));
+            instrutoresOK.length ? instrutoresOK.forEach(m => lines.push(`${m.username} ${fmtStats(m)}`)) : lines.push('---');
             lines.push('');
             lines.push('CAPACITADORES COM METAS ALCANÇADAS:');
-            lines.push(...(capacitadoresOK.length ? capacitadoresOK.map(fmtCopy) : ['---']));
+            capacitadoresOK.length ? capacitadoresOK.forEach(m => lines.push(`${m.username} ${fmtStats(m)}`)) : lines.push('---');
             lines.push('');
             lines.push('MINISTROS COM METAS ALCANÇADAS:');
-            lines.push(...(ministrosOK.length ? ministrosOK.map(fmtCopy) : ['---']));
+            ministrosOK.length ? ministrosOK.forEach(m => lines.push(`${m.username} ${fmtStats(m)}`)) : lines.push('---');
             lines.push('');
             lines.push('LIDERANÇA:');
-            lines.push(...(lideranca.length ? lideranca.map(m => `${m.username} (Cumpriu com sua função na liderança)`) : ['---']));
+            lideranca.length ? lideranca.forEach(m => lines.push(`${m.username} (Cumpriu com sua função na liderança)`)) : lines.push('---');
             lines.push('');
             lines.push('INSTRUTORES QUE NÃO ATINGIRAM A META:');
-            lines.push(...(instrutoresFail.length ? instrutoresFail.map(fmtCopy) : ['---']));
+            instutoresFail.length ? instutoresFail.forEach(m => lines.push(`${m.username} ${fmtStats(m)}`)) : lines.push('---');
             lines.push('');
             lines.push('CAPACITADORES QUE NÃO ATINGIRAM A META:');
-            lines.push(...(capacitadoresFail.length ? capacitadoresFail.map(fmtCopy) : ['---']));
+            capssFail.length ? capssFail.forEach(m => lines.push(`${m.username} ${fmtStats(m)}`)) : lines.push('---');
             lines.push('');
             lines.push('MINISTROS QUE NÃO ATINGIRAM A META:');
-            lines.push(...(ministrosFail.length ? ministrosFail.map(fmtCopy) : ['---']));
+            minFail.length ? minFail.forEach(m => lines.push(`${m.username} ${fmtStats(m)}`)) : lines.push('---');
             lines.push('');
             lines.push('CASOS ESPECIAIS:');
-            const casosEl = document.getElementById('casosEspeciaisInput');
-            const casosTexto = casosEl ? casosEl.value.trim() : '';
-            lines.push(casosTexto || 'Nick [00 Aulas] - (Licença / Novo membro)');
+            // Automáticos
+            licenciados.forEach(m => lines.push(`${m.username} ${fmtStats(m)} - (Licença)`));
+            membrosNovos.forEach(m => lines.push(`${m.username} ${fmtStats(m)} - (Membro novo)`));
+            // Manuais
+            const ce = (qs('#casosEspeciaisInput') || {}).value || '';
+            if (ce.trim()) lines.push(ce.trim());
+            if (!licenciados.length && !membrosNovos.length && !ce.trim()) lines.push('---');
             lines.push('');
             lines.push('➔ TOTAL ⬅');
             lines.push(`${pad(totalAulas)} Aulas / ${pad(totalCaps)} Capacitações / ${pad(totalAdm)} Admissões / ${pad(totalAux)} Auxílios`);
             return lines.join('\n');
         };
 
-        // ── Render HTML ───────────────────────────────────
+        // ── Render ────────────────────────────────────────
         panel.innerHTML = `
-        <!-- Header -->
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
-            <div>
-                <h3 style="font-size:1rem;font-weight:800;color:var(--t1);margin:0">🎯 Meta Semanal</h3>
-                <p style="font-size:.72rem;color:var(--t3);margin:3px 0 0">Período: <strong style="color:var(--t2)">${periodo}</strong></p>
+        <!-- Barra de ações -->
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-bottom:14px;margin-bottom:6px;border-bottom:1px solid var(--b1)">
+            <div style="font-size:.72rem;color:var(--t3)">
+                <strong style="color:var(--t1);font-size:.82rem">🎯 Meta Semanal</strong>
+                &nbsp;·&nbsp; ${periodo}
+                &nbsp;·&nbsp; <span style="color:#22c55e">✅ ${cumprindo.length + lideranca.length}</span>
+                &nbsp;/&nbsp; <span style="color:#ef4444">❌ ${pendentes.length}</span>
             </div>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-                <div style="display:flex;gap:10px;font-size:.72rem">
-                    <span style="background:rgba(34,197,94,.12);color:#22c55e;padding:4px 10px;border-radius:8px;font-weight:700">✅ ${cumprindo.length + lideranca.length} cumpriram</span>
-                    <span style="background:rgba(239,68,68,.1);color:#ef4444;padding:4px 10px;border-radius:8px;font-weight:700">❌ ${pendentes.length} pendentes</span>
-                </div>
-                <button id="btnCopiarMeta" style="display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;border:none;padding:7px 14px;border-radius:8px;font-weight:700;font-size:.78rem;cursor:pointer;transition:.2s">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                    Copiar Meta
-                </button>
-            </div>
+            <button id="btnCopiarMeta" style="display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;border:none;padding:7px 16px;border-radius:8px;font-weight:700;font-size:.78rem;cursor:pointer;white-space:nowrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copiar Meta
+            </button>
         </div>
 
-        <!-- Medalhista -->
-        ${medalhista ? section('#f59e0b', '🏆 Medalhista Semanal', memberCard(medalhista, true)) : ''}
+        <!-- Corpo do relatório — centralizado igual ao Habbo -->
+        <div id="metaCorpo" style="font-family:'Verdana',sans-serif;text-align:center;line-height:1.8;padding:10px 0">
 
-        <!-- Liderança -->
-        ${lideranca.length ? section('#22c55e', '⭐ Liderança', lideranca.map(m => memberCard(m)).join('')) : ''}
+            <p style="font-size:11px;color:#666;font-weight:bold">Meta Semanal - ${periodo}</p>
 
-        <!-- Instrutores OK -->
-        ${section('#22c55e', '✅ Instrutores com Metas Alcançadas',
-            instrutoresOK.length ? instrutoresOK.map(m => memberCard(m)).join('') : null)}
+            ${secTitle('#F39C12', 'Medalhista Semanal:')}
+            ${medalhista ? memberLine(medalhista, true) : '<p style="font-size:13px;color:#333">---</p>'}
 
-        <!-- Capacitadores OK -->
-        ${section('#22c55e', '✅ Capacitadores com Metas Alcançadas',
-            capacitadoresOK.length ? capacitadoresOK.map(m => memberCard(m)).join('') : null)}
+            ${secTitle('#27AE60', 'Instrutores com Metas Alcançadas:')}
+            ${instrutoresOK.length ? instrutoresOK.map(m => memberLine(m)).join('') : '<p style="font-size:13px;color:#333">---</p>'}
 
-        <!-- Ministros OK -->
-        ${section('#22c55e', '✅ Ministros com Metas Alcançadas',
-            ministrosOK.length ? ministrosOK.map(m => memberCard(m)).join('') : null)}
+            ${secTitle('#27AE60', 'Capacitadores com Metas Alcançadas:')}
+            ${capacitadoresOK.length ? capacitadoresOK.map(m => memberLine(m)).join('') : '<p style="font-size:13px;color:#333">---</p>'}
 
-        <!-- Instrutores FAIL -->
-        ${section('#ef4444', '❌ Instrutores que Não Atingiram a Meta',
-            instrutoresFail.length ? instrutoresFail.map(m => memberCard(m)).join('') : null)}
+            ${secTitle('#27AE60', 'Ministros com Metas Alcançadas:')}
+            ${ministrosOK.length ? ministrosOK.map(m => memberLine(m)).join('') : '<p style="font-size:13px;color:#333">---</p>'}
 
-        <!-- Capacitadores FAIL -->
-        ${section('#ef4444', '❌ Capacitadores que Não Atingiram a Meta',
-            capacitadoresFail.length ? capacitadoresFail.map(m => memberCard(m)).join('') : null)}
+            ${secTitle('#27AE60', 'Liderança:')}
+            ${lideranca.length ? lideranca.map(m => liderancaLine(m)).join('') : '<p style="font-size:13px;color:#333">---</p>'}
 
-        <!-- Ministros FAIL -->
-        ${section('#ef4444', '❌ Ministros que Não Atingiram a Meta',
-            ministrosFail.length ? ministrosFail.map(m => memberCard(m)).join('') : null)}
+            ${secTitle('#E74C3C', 'Instrutores que Não Atingiram a Meta:')}
+            ${instutoresFail.length ? instutoresFail.map(m => memberLine(m)).join('') : '<p style="font-size:13px;color:#333">---</p>'}
 
-        <!-- Casos Especiais -->
-        <div style="margin-bottom:18px">
-            <div style="font-size:.68rem;font-weight:800;color:#1abc9c;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid rgba(26,188,156,.2);display:flex;align-items:center;gap:6px">
-                <div style="width:3px;height:12px;background:#1abc9c;border-radius:2px"></div>
-                🔵 Casos Especiais
+            ${secTitle('#E74C3C', 'Capacitadores que Não Atingiram a Meta:')}
+            ${capssFail.length ? capssFail.map(m => memberLine(m)).join('') : '<p style="font-size:13px;color:#333">---</p>'}
+
+            ${secTitle('#E74C3C', 'Ministros que Não Atingiram a Meta:')}
+            ${minFail.length ? minFail.map(m => memberLine(m)).join('') : '<p style="font-size:13px;color:#333">---</p>'}
+
+            ${secTitle('#1ABC9C', 'Casos Especiais:')}
+            ${licenciados.map(m => `
+            <div style="display:flex;align-items:center;justify-content:center;gap:7px;margin:2px 0">
+                <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(m.username)}&headonly=1&size=s&gesture=std"
+                    style="width:22px;height:22px;border-radius:50%;object-fit:cover;flex-shrink:0" loading="lazy" onerror="this.style.display='none'">
+                <span style="font-size:13px;color:#333">${escH(m.username)} ${fmtStats(m)} - (Licença)</span>
+            </div>`).join('')}
+            ${membrosNovos.map(m => `
+            <div style="display:flex;align-items:center;justify-content:center;gap:7px;margin:2px 0">
+                <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(m.username)}&headonly=1&size=s&gesture=std"
+                    style="width:22px;height:22px;border-radius:50%;object-fit:cover;flex-shrink:0" loading="lazy" onerror="this.style.display='none'">
+                <span style="font-size:13px;color:#333">${escH(m.username)} ${fmtStats(m)} - (Membro novo)</span>
+            </div>`).join('')}
+            ${licenciados.length === 0 && membrosNovos.length === 0 ? '' : ''}
+            <div style="margin:6px auto;max-width:420px">
+                <textarea id="casosEspeciaisInput"
+                    style="width:100%;min-height:46px;resize:vertical;padding:8px 12px;background:var(--bg-2);border:1px dashed var(--b1);border-radius:8px;font-size:12px;color:var(--t2);font-family:'Verdana',sans-serif;text-align:center;box-sizing:border-box"
+                    placeholder="Outros casos manuais..."></textarea>
             </div>
-            <textarea id="casosEspeciaisInput" style="width:100%;min-height:64px;resize:vertical;padding:10px 12px;background:var(--bg-2);border:1px solid var(--b1);border-radius:8px;font-size:.78rem;color:var(--t2);font-family:inherit;box-sizing:border-box" placeholder="Nick [00 Aulas] - (Licença / Novo membro)&#10;Nick [00 Aulas] - (Licença)"></textarea>
-        </div>
 
-        <!-- Total -->
-        <div style="padding:14px;background:var(--bg-2);border-radius:10px;border:1px solid var(--b1);text-align:center">
-            <div style="font-size:.72rem;font-weight:800;color:var(--t1);letter-spacing:.05em;margin-bottom:6px">➔ TOTAL ⬅</div>
-            <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;font-size:.78rem;color:var(--t2);font-weight:600">
-                <span>${String(totalAulas).padStart(2,'0')} Aulas</span>
-                <span style="color:var(--t3)">•</span>
-                <span>${String(totalCaps).padStart(2,'0')} Capacitações</span>
-                <span style="color:var(--t3)">•</span>
-                <span>${String(totalAdm).padStart(2,'0')} Admissões</span>
-                <span style="color:var(--t3)">•</span>
-                <span>${String(totalAux).padStart(2,'0')} Auxílios</span>
-            </div>
+            <p style="font-weight:bold;font-size:13px;margin:18px 0 4px">➔ TOTAL ⬅</p>
+            <p style="font-size:13px;color:#333">
+                ${pad(totalAulas)} Aulas / ${pad(totalCaps)} Capacitações / ${pad(totalAdm)} Admissões / ${pad(totalAux)} Auxílios
+            </p>
+
         </div>`;
 
-        // ── Botão Copiar ──────────────────────────────────
-        qs('#btnCopiarMeta')?.addEventListener('click', function() {
-            const texto = buildTexto();
-            navigator.clipboard.writeText(texto).then(() => {
-                this.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13"><polyline points="20 6 9 17 4 12"/></svg> Copiado!`;
-                this.style.background = '#16a34a';
+        // ── Copiar ────────────────────────────────────────
+        qs('#btnCopiarMeta').addEventListener('click', function() {
+            const txt = buildTexto();
+            const btn = this;
+            const ok = () => {
+                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13"><polyline points="20 6 9 17 4 12"/></svg> Copiado!`;
+                btn.style.background = '#16a34a';
                 setTimeout(() => {
-                    this.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar Meta`;
-                    this.style.background = 'var(--green)';
+                    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar Meta`;
+                    btn.style.background = 'var(--green)';
                 }, 2500);
-            }).catch(() => {
-                // Fallback para navegadores sem clipboard API
-                const ta = document.createElement('textarea');
-                ta.value = texto; ta.style.position = 'fixed'; ta.style.opacity = '0';
-                document.body.appendChild(ta); ta.select();
-                document.execCommand('copy'); document.body.removeChild(ta);
-                toast('Meta copiada!', 'success');
-            });
+            };
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(txt).then(ok).catch(() => { fallbackCopy(txt); ok(); });
+            } else { fallbackCopy(txt); ok(); }
         });
+
+        function fallbackCopy(txt) {
+            const ta = document.createElement('textarea');
+            ta.value = txt; ta.style.cssText = 'position:fixed;opacity:0';
+            document.body.appendChild(ta); ta.select();
+            document.execCommand('copy'); document.body.removeChild(ta);
+        }
     }
+
 
     // ── Membros ─────────────────────────────────────────
     // Funções de dados
@@ -1248,6 +1456,7 @@
 
     // Busca
     renderMembros();
+    renderListaLicencas();
     qs('#membrosSearch')?.addEventListener('input', function() {
         renderMembros(this.value.toLowerCase());
     });
