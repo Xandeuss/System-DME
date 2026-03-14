@@ -97,6 +97,9 @@ app.add_api_route("/centro_tarefas_orgaos", _render("centro_tarefas_orgaos.html"
 # Loja
 app.add_api_route("/loja", _render("loja.html"), methods=["GET"], response_class=HTMLResponse)
 
+# Mensagens Privadas
+app.add_api_route("/mensagens", _render("mensagens.html"), methods=["GET"], response_class=HTMLResponse)
+
 # Chat — /chat_global agora serve seu próprio template
 # CORREÇÃO: anteriormente ambas as rotas serviam chat.html, tornando chat_global sem efeito real.
 # Se você tiver um template separado para chat global, basta criar o arquivo; 

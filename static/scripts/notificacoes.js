@@ -4,14 +4,12 @@
     if (!currentUser) return;
 
     function injetarEstilos() {
+        // Redundantes, agora usamos .btn-circle do global.css + os específicos de dropdown
         if (document.getElementById('notif-styles')) return;
         const style = document.createElement('style');
         style.id = 'notif-styles';
         style.textContent = `
             .notif-bell-wrapper { position: relative; }
-            .notif-bell-btn { background: var(--hover-bg, #0f1a0f); border: 1px solid transparent; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-gray, #8c9c8c); transition: all 0.3s ease; position: relative; }
-            .notif-bell-btn:hover { color: var(--primary-green, #2ecc71); border-color: var(--primary-green, #2ecc71); }
-            .notif-badge { position: absolute; top: -4px; right: -4px; background: #e74c3c; color: #fff; font-size: 0.65rem; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; padding: 0 4px; line-height: 1; }
             .notif-dropdown { position: absolute; top: calc(100% + 10px); right: 0; width: 340px; max-height: 400px; background: var(--bg-card, #0a0f0a); border: 1px solid var(--border-color, #1a2a1a); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease; z-index: 2000; display: flex; flex-direction: column; }
             .notif-dropdown.active { opacity: 1; visibility: visible; transform: translateY(0); }
             .notif-dropdown-header { padding: 14px 16px; border-bottom: 1px solid var(--border-color, #1a2a1a); display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 0.9rem; color: var(--text-white, #fff); }
@@ -54,12 +52,12 @@
         bellWrapper.className = 'notif-bell-wrapper';
         bellWrapper.id = 'notifBellWrapper';
         bellWrapper.innerHTML = `
-            <button class="notif-bell-btn" id="notifBellBtn" title="Central de Alertas">
+            <button class="btn-circle" id="notifBellBtn" title="Central de Alertas">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
                     <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                 </svg>
-                <span class="notif-badge" id="notifBadge" style="display:none;">0</span>
+                <span class="badge-dot" id="notifBadge" style="display:none;">0</span>
             </button>
             <div class="notif-dropdown" id="notifDropdown">
                 <div class="notif-dropdown-header">

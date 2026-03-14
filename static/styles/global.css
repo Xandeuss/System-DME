@@ -196,8 +196,55 @@ button {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--b2);
     border-radius: 4px;
+}
+
+/* ── SHARED COMPONENTS ────────────────────────────── */
+.btn-circle {
+    background: var(--bg-3);
+    border: 1px solid var(--b2);
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--t2);
+    transition: all var(--dur) var(--ease);
+    position: relative;
+    text-decoration: none;
+}
+
+.btn-circle:hover {
+    color: var(--green);
+    border-color: var(--green);
+    background: var(--green-muted);
+    transform: translateY(-2px);
+}
+
+.btn-circle svg {
+    width: 20px;
+    height: 20px;
+}
+
+.badge-dot {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: var(--green);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    line-height: 1;
+    border: 2px solid var(--bg-1);
 }
 
 /* ══ NAVBAR ══════════════════════════════════════════ */
@@ -318,10 +365,10 @@ button {
 }
 
 /* Nav right area */
-.nav-right {
+.nav-actions {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
 }
 
 /* ── USER PROFILE CHIP ────────────────────────────── */
@@ -357,7 +404,7 @@ button {
     height: 140%;
     width: auto;
     object-fit: contain;
-    transform: scale(1.1) translateY(2px);
+    transform: scale(1.1) translateY(0);
 }
 
 .user-name {
@@ -430,6 +477,40 @@ button {
 
 .dropdown-menu {
     padding: 5px;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    color: var(--t1);
+    text-decoration: none;
+    font-size: .78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--dur) var(--ease);
+}
+
+.dropdown-item:hover {
+    background: var(--bg-4);
+    color: var(--green);
+}
+
+.dropdown-item.danger {
+    color: #f87171;
+}
+
+.dropdown-item.danger:hover {
+    background: rgba(239, 68, 68, .08);
+    color: var(--red);
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: var(--b1);
+    margin: 4px 5px;
 }
 
 .dropdown-item {
