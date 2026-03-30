@@ -1,10 +1,18 @@
-const usuarioLogado = localStorage.getItem('dme_username');
+// ── Autenticação via backend (JWT httpOnly) ──────────────────────────────────
+// usuarioLogado é injetado pelo template Jinja via contexto do servidor.
+// Fallback para cookie/localStorage somente se o template não injetar.
+const usuarioLogado = (typeof _USER_NICK !== 'undefined' && _USER_NICK)
+    ? _USER_NICK
+    : localStorage.getItem('dme_username');
+
 if (!usuarioLogado) {
     window.location.href = '/login';
 }
 
-function logout() {
-    localStorage.removeItem('dme_username');
+async function logout() {
+    try {
+        await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' });
+    } catch (_) {}
     window.location.href = '/login';
 }
 
@@ -12,6 +20,20 @@ const inputAplicador = document.getElementById('input-aplicador');
 if (inputAplicador) inputAplicador.value = usuarioLogado;
 const navUserName = document.getElementById('navUserName');
 if (navUserName) navUserName.textContent = usuarioLogado;
+
+// ── Helper: chamadas à API do backend ────────────────────────────────────────
+async function apiReq(method, path, body) {
+    const opts = {
+        method,
+        credentials: 'same-origin',
+        headers: body ? { 'Content-Type': 'application/json' } : undefined,
+        body: body ? JSON.stringify(body) : undefined,
+    };
+    const res = await fetch(path, opts);
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(json.detail || `Erro HTTP ${res.status}`);
+    return json;
+}
 
 const CORPO_MILITAR = [
     "Comandante-Geral", "Comandante", "Subcomandante", "Marechal", "General",
@@ -472,11 +494,7 @@ async function finalizar() {
     }
 
     try {
-        const { error } = await supabase
-            .from('requerimentos')
-            .insert([registro]);
-
-        if (error) throw error;
+        await apiReq('POST', '/api/requerimentos', registro);
 
         alert('Solicitação enviada para APROVAÇÃO do CRH!');
         mudarAba('minhas');
@@ -501,7 +519,7 @@ async function finalizar() {
         }
     } catch (err) {
         console.error('Erro ao salvar requerimento:', err);
-        alert('Erro ao enviar solicitação para o Supabase.');
+        alert('Erro ao enviar solicitação: ' + (err.message || 'tente novamente.'));
     }
 }
 
@@ -523,27 +541,17 @@ async function carregarHistorico(aba) {
     const container = document.getElementById('lista-historico');
     const tituloDiv = document.getElementById('historico-title');
 
-    container.innerHTML = '<div class="loading-historico">Carregando dados do Supabase...</div>';
+    container.innerHTML = '<div class="loading-historico">Carregando...</div>';
 
     try {
-        let query = supabase
-            .from('requerimentos')
-            .select('*')
-            .eq('tipo', tipoAtual)
-            .order('data_hora', { ascending: false });
-
         if (aba === 'minhas') {
-            query = query.eq('aplicador', usuarioLogado);
             tituloDiv.textContent = 'Minhas Ações - ' + configForm[tipoAtual].titulo;
         } else {
             tituloDiv.textContent = 'Todas as Ações - ' + configForm[tipoAtual].titulo;
         }
 
-        const { data, error } = await query;
-
-        if (error) throw error;
-
-        cacheHistorico = data || [];
+        const result = await apiReq('GET', `/api/requerimentos?tipo=${encodeURIComponent(tipoAtual)}&aba=${aba}`);
+        cacheHistorico = result.data || [];
 
         if (cacheHistorico.length === 0) {
             container.innerHTML = `
@@ -569,7 +577,7 @@ async function carregarHistorico(aba) {
         }
     } catch (err) {
         console.error('Erro ao carregar histórico:', err);
-        container.innerHTML = '<div class="error-historico">Erro ao carregar dados do Supabase.</div>';
+        container.innerHTML = '<div class="error-historico">Erro ao carregar dados: ' + (err.message || 'tente novamente') + '</div>';
     }
 }
 
@@ -661,72 +669,48 @@ function confirmarAcaoAdmin() {
 async function acaoModal(acao) {
     if (indexAtualModal === -1) return;
     const req = cacheHistorico[indexAtualModal];
-    const username = localStorage.getItem('dme_username');
 
     try {
         if (acao === 'aceitar') {
             if (!confirm('Confirmar aprovação?')) return;
-            
-            const { error: updateError } = await supabase
-                .from('requerimentos')
-                .update({ 
-                    status: 'aprovado',
-                    aprovador: username
-                })
-                .eq('id', req.id);
 
-            if (updateError) throw updateError;
+            await apiReq('PATCH', `/api/requerimentos/${req.id}`, {
+                status: 'aprovado',
+                aprovador: usuarioLogado,
+            });
 
-            // Se for promoção/rebaixamento/demissão, atualiza a patente do militar no Supabase
+            // Se for promoção/rebaixamento/demissão, atualiza o militar via backend
             if ((req.tipo === 'promocao' || req.tipo === 'rebaixamento' || req.tipo === 'demissao') && req.tags_envolvidos && req.tags_envolvidos[0]) {
                 const militarNick = req.tags_envolvidos[0];
-                const novaPatente = req.acao;
 
                 if (req.tipo === 'demissao') {
-                    await supabase.from('militares').update({ status: 'desativado' }).eq('nick', militarNick);
+                    await apiReq('PATCH', `/api/militares/${encodeURIComponent(militarNick)}`, { status: 'desativado' });
                 } else {
-                    await supabase.from('militares').update({ patente: novaPatente }).eq('nick', militarNick);
+                    await apiReq('PATCH', `/api/militares/${encodeURIComponent(militarNick)}`, { patente: req.acao });
                 }
             }
         } else if (acao === 'negar') {
             const motivo = document.getElementById('modal-motivo').value;
             if (!motivo) return alert('Preencha o motivo da negação!');
 
-            const { error: updateError } = await supabase
-                .from('requerimentos')
-                .update({ 
-                    status: 'reprovado',
-                    reprovador: username,
-                    motivo_reprovacao: motivo
-                })
-                .eq('id', req.id);
-
-            if (updateError) throw updateError;
+            await apiReq('PATCH', `/api/requerimentos/${req.id}`, {
+                status: 'reprovado',
+                reprovador: usuarioLogado,
+                motivo_reprovacao: motivo,
+            });
         } else if (acao === 'cancelar') {
             if (!confirm('Confirmar cancelamento da solicitação?')) return;
-            const { error: updateError } = await supabase
-                .from('requerimentos')
-                .update({ status: 'cancelado' })
-                .eq('id', req.id);
-            if (updateError) throw updateError;
+            await apiReq('PATCH', `/api/requerimentos/${req.id}`, { status: 'cancelado' });
         } else if (acao === 'apagar') {
             if (!confirm('Confirmar exclusão? Esta ação é irreversível.')) return;
-            const { error: delError } = await supabase
-                .from('requerimentos')
-                .delete()
-                .eq('id', req.id);
-            if (delError) throw delError;
-            
+            await apiReq('DELETE', `/api/requerimentos/${req.id}`);
+
             fecharModal();
             carregarHistorico(abaAtual);
             return;
         } else if (acao === 'editar') {
             const obs = document.getElementById('modal-obs').value;
-            const { error: updateError } = await supabase
-                .from('requerimentos')
-                .update({ observacao: obs })
-                .eq('id', req.id);
-            if (updateError) throw updateError;
+            await apiReq('PATCH', `/api/requerimentos/${req.id}`, { observacao: obs });
             alert('Observação atualizada!');
         }
 
@@ -735,7 +719,7 @@ async function acaoModal(acao) {
         carregarHistorico(abaAtual);
     } catch (err) {
         console.error('Erro na ação admin:', err);
-        alert('Erro ao processar ação no Supabase.');
+        alert('Erro ao processar ação: ' + (err.message || 'tente novamente.'));
     }
 }
 
@@ -1116,15 +1100,8 @@ async function renderizarLicencas() {
     if (todas) todas.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t3);padding:16px">Carregando...</td></tr>';
 
     try {
-        const { data, error } = await supabase
-            .from('requerimentos')
-            .select('*')
-            .eq('tipo', 'licenca')
-            .order('data_hora', { ascending: false });
-
-        if (error) throw error;
-
-        const licencas = data || [];
+        const result = await apiReq('GET', '/api/requerimentos?tipo=licenca&aba=todos');
+        const licencas = result.data || [];
         const hoje = new Date();
 
         const listaPendentes = licencas.filter(l => l.status === 'pendente');
@@ -1199,7 +1176,7 @@ async function renderizarLicencas() {
         }
     } catch (err) {
         console.error('Erro ao carregar licenças:', err);
-        if (pendentes) pendentes.innerHTML = '<tr><td colspan="4" style="color:#e74c3c;text-align:center;padding:16px">Erro ao carregar dados</td></tr>';
+        if (pendentes) pendentes.innerHTML = `<tr><td colspan="4" style="color:#e74c3c;text-align:center;padding:16px">Erro ao carregar dados: ${err.message || ''}</td></tr>`;
     }
 }
 
@@ -1271,15 +1248,14 @@ function abrirPostLicenca() {
             btn.disabled = true;
             btn.textContent = 'Salvando...';
 
-            const { error } = await supabase.from('requerimentos').insert([registro]);
-            if (error) throw error;
+            await apiReq('POST', '/api/requerimentos', registro);
 
             wrap.remove();
             renderizarLicencas();
             alert('Licença registrada com sucesso!');
         } catch (err) {
             console.error('Erro ao salvar licença:', err);
-            alert('Erro ao salvar licença.');
+            alert('Erro ao salvar licença: ' + (err.message || 'tente novamente.'));
             const btn = wrap.querySelector('#_licSalvar');
             if (btn) { btn.disabled = false; btn.textContent = 'Registrar Licença'; }
         }
@@ -1289,13 +1265,10 @@ function abrirPostLicenca() {
 // Ver detalhes de uma licença pelo ID
 async function verLicenca(id) {
     try {
-        const { data, error } = await supabase
-            .from('requerimentos')
-            .select('*')
-            .eq('id', id)
-            .maybeSingle();
+        const result = await apiReq('GET', `/api/requerimentos/${encodeURIComponent(id)}`);
+        const data = result.data;
 
-        if (error || !data) { alert('Licença não encontrada.'); return; }
+        if (!data) { alert('Licença não encontrada.'); return; }
 
         const nick = (data.tags_envolvidos && data.tags_envolvidos[0]) || data.aplicador;
         const inicio = data.data_hora ? new Date(data.data_hora).toLocaleDateString('pt-BR') : '—';

@@ -1,23 +1,22 @@
-window._DME_CREDENTIALS = [
-    {
-        username: "Xandelicado",
-        password: "123456",
-        status: "ativo",
-        corpo: "militar",
-        patente: "Comandante Geral"
-    },
-    {
-        username: "-079",
-        password: "123456",
-        status: "ativo",
-        corpo: "militar",
-        patente: "General de Exercito"
-    }
-];
+/**
+ * LOGIN.JS — DME System v2
+ * 
+ * MUDANÇAS em relação à versão anterior:
+ *   - REMOVIDO: _DME_CREDENTIALS (senhas em texto puro)
+ *   - REMOVIDO: ADMINS_FIXOS no frontend (agora vive no backend)
+ *   - REMOVIDO: acesso direto ao Supabase (supabase-client.js não é mais necessário)
+ *   - REMOVIDO: localStorage para dme_username e dme_admins (sessão via cookie httpOnly)
+ *   - ADICIONADO: fetch('/api/auth/login') e fetch('/api/auth/register')
+ *
+ * O que CONTINUA no frontend:
+ *   - Validação visual dos campos (UX)
+ *   - Toast de feedback
+ *   - Toggle de formulário login/registro
+ *   - Tema claro/escuro (localStorage apenas para tema)
+ *   - Animações de avatar
+ */
 
-const DEFAULT_LOGIN_USERNAME = "Xandelicado";
-const ADMINS_FIXOS = ["Xandelicado", "rafacv", "Ronaldo"];
-
+// ── Estado ───────────────────────────────────────────
 const appState = {
     formData: { username: "", email: "", password: "", termsAccepted: false },
     isSubmitting: false
@@ -36,6 +35,7 @@ const DOM = {
     loginSection: document.getElementById("loginSection")
 };
 
+// ── Toast ────────────────────────────────────────────
 function toast(msg, type) {
     const el = document.getElementById("toast");
     if (!el) return;
@@ -47,6 +47,7 @@ function toast(msg, type) {
     el._t = setTimeout(() => el.classList.remove("show"), 3500);
 }
 
+// ── Toggle Login / Registro ─────────────────────────
 function toggleForm(form) {
     if (!DOM.registerSection || !DOM.loginSection) return;
 
@@ -62,6 +63,7 @@ function toggleForm(form) {
 
 window.toggleForm = toggleForm;
 
+// ── Tema ─────────────────────────────────────────────
 (function applySavedTheme() {
     const theme = localStorage.getItem("dme_theme") || "dark";
     if (theme === "light") {
@@ -69,136 +71,7 @@ window.toggleForm = toggleForm;
     }
 })();
 
-function findStaticCredential(username) {
-    const normalized = (username || "").trim().toLowerCase();
-    return window._DME_CREDENTIALS.find((cred) => cred.username.toLowerCase() === normalized) || null;
-}
-
-function buildStaticUser(cred) {
-    return {
-        nick: cred.username,
-        patente: cred.patente || "Recruta",
-        corpo: cred.corpo || "militar",
-        status: (cred.status || "ativo").toLowerCase()
-    };
-}
-
-async function ensureStaticCredentialUser(cred) {
-    const fallbackUser = buildStaticUser(cred);
-
-    try {
-        const { data, error } = await supabase
-            .from("militares")
-            .select("*")
-            .eq("nick", cred.username)
-            .maybeSingle();
-
-        if (error) {
-            console.warn(`Supabase: falha ao consultar ${cred.username}. Usando usuario estatico.`, error);
-            return fallbackUser;
-        }
-
-        if (data) {
-            const mergedUser = {
-                ...data,
-                nick: data.nick || fallbackUser.nick,
-                patente: data.patente || fallbackUser.patente,
-                corpo: data.corpo || fallbackUser.corpo,
-                status: fallbackUser.status
-            };
-
-            const needsRepair =
-                (data.status || "").toLowerCase() !== fallbackUser.status ||
-                !data.patente ||
-                !data.corpo;
-
-            if (needsRepair) {
-                const { error: updateError } = await supabase
-                    .from("militares")
-                    .update({
-                        patente: fallbackUser.patente,
-                        corpo: fallbackUser.corpo,
-                        status: fallbackUser.status
-                    })
-                    .eq("nick", cred.username);
-
-                if (updateError) {
-                    console.warn(`Supabase: nao foi possivel normalizar ${cred.username}.`, updateError);
-                }
-            }
-
-            return mergedUser;
-        }
-
-        const { error: insertError } = await supabase.from("militares").insert([fallbackUser]);
-        if (insertError) {
-            console.warn(`Supabase: nao foi possivel recriar ${cred.username}. Usando usuario estatico.`, insertError);
-            return fallbackUser;
-        }
-
-        console.log(`Supabase: usuario padrao ${cred.username} restaurado.`);
-        return fallbackUser;
-    } catch (err) {
-        console.warn(`Supabase: erro ao garantir usuario padrao ${cred.username}.`, err);
-        return fallbackUser;
-    }
-}
-
-async function syncStaticCredentials() {
-    try {
-        for (const cred of window._DME_CREDENTIALS) {
-            await ensureStaticCredentialUser(cred);
-        }
-    } catch (err) {
-        console.warn("Erro ao sincronizar credenciais estaticas:", err);
-    }
-}
-
-syncStaticCredentials();
-
-async function salvarIpLoginERedirecionar(username) {
-    let ip = "desconhecido";
-    let isVpn = false;
-    let isp = "desconhecido";
-
-    try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3500);
-        const res = await fetch("https://ipwho.is/", { signal: controller.signal });
-        clearTimeout(timeoutId);
-
-        const data = await res.json();
-        if (data && data.success) {
-            ip = data.ip || "desconhecido";
-            isp = data.connection ? data.connection.isp : "desconhecido";
-            if (data.security) {
-                isVpn = Boolean(data.security.vpn || data.security.proxy || data.security.tor || data.security.relay);
-            }
-        }
-    } catch (err) {
-        console.warn("Falha ao obter dados de IP:", err);
-    }
-
-    const date = new Date().toLocaleString("pt-BR");
-    const log = JSON.parse(localStorage.getItem("dme_login_log") || "[]");
-    log.push({ username, ip, date, isVpn, isp });
-    localStorage.setItem("dme_login_log", JSON.stringify(log));
-
-    try {
-        await supabase
-            .from("militares")
-            .update({
-                last_login_ip: ip,
-                is_vpn: isVpn
-            })
-            .eq("nick", username);
-    } catch (err) {
-        console.warn("Erro ao atualizar IP no Supabase:", err);
-    }
-
-    window.location.href = "/home";
-}
-
+// ── Validação visual (apenas UX, o backend valida de verdade) ────────────
 const validationRules = {
     username: (value) => {
         if (!value || value.trim().length < 3) return "Minimo 3 caracteres";
@@ -266,6 +139,26 @@ if (DOM.termsCheckbox) {
     });
 }
 
+// ── Helper: chama a API e trata erros ────────────────
+async function apiCall(url, body) {
+    const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",  // envia/recebe cookies httpOnly
+        body: JSON.stringify(body),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+        // A API retorna { "detail": "mensagem de erro" }
+        throw new Error(data.detail || "Erro desconhecido");
+    }
+
+    return data;
+}
+
+// ── Registro ─────────────────────────────────────────
 if (DOM.registerForm) {
     DOM.registerForm.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -289,50 +182,20 @@ if (DOM.registerForm) {
         }
 
         try {
-            const staticCredential = findStaticCredential(appState.formData.username);
-            if (staticCredential) {
-                toast("Este nome de usuario ja esta reservado.", "err");
-                appState.isSubmitting = false;
-                if (DOM.submitBtn) {
-                    DOM.submitBtn.classList.remove("loading");
-                    DOM.submitBtn.disabled = false;
-                }
-                return;
-            }
+            await apiCall("/api/auth/register", {
+                nick: appState.formData.username.trim(),
+                email: appState.formData.email.trim(),
+                password: appState.formData.password,
+            });
 
-            const { data: existingUser } = await supabase
-                .from("militares")
-                .select("nick")
-                .eq("nick", appState.formData.username)
-                .maybeSingle();
-
-            if (existingUser) {
-                toast("Este nome de usuario ja esta em uso.", "err");
-                appState.isSubmitting = false;
-                if (DOM.submitBtn) {
-                    DOM.submitBtn.classList.remove("loading");
-                    DOM.submitBtn.disabled = false;
-                }
-                return;
-            }
-
-            const { error: insertError } = await supabase.from("militares").insert([{
-                nick: appState.formData.username,
-                patente: "Recruta",
-                corpo: "militar",
-                status: "pendente"
-            }]);
-
-            if (insertError) throw insertError;
-
-            localStorage.setItem("dme_username", appState.formData.username);
-            toast("Cadastro realizado! Aguarde redirecionamento.", "ok");
+            toast("Cadastro realizado! Aguarde aprovacao de um administrador.", "ok");
             setTimeout(() => {
                 window.location.href = "/verificacao";
             }, 1500);
         } catch (err) {
             console.error("Erro no registro:", err);
-            toast("Erro ao realizar cadastro. Tente novamente.", "err");
+            toast(err.message || "Erro ao realizar cadastro. Tente novamente.", "err");
+        } finally {
             appState.isSubmitting = false;
             if (DOM.submitBtn) {
                 DOM.submitBtn.classList.remove("loading");
@@ -342,6 +205,7 @@ if (DOM.registerForm) {
     });
 }
 
+// ── Login ────────────────────────────────────────────
 if (DOM.loginForm) {
     DOM.loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -360,80 +224,20 @@ if (DOM.loginForm) {
         }
 
         try {
-            const staticUser = findStaticCredential(username);
-            let data = null;
-            let error = null;
+            // O backend valida tudo: busca no banco, verifica bcrypt, checa status.
+            // Se tudo ok, seta o cookie httpOnly automaticamente na resposta.
+            await apiCall("/api/auth/login", {
+                nick: username,
+                password: password,
+            });
 
-            try {
-                const response = await supabase
-                    .from("militares")
-                    .select("*")
-                    .eq("nick", username)
-                    .maybeSingle();
-                data = response.data;
-                error = response.error;
-            } catch (queryError) {
-                if (!staticUser) throw queryError;
-                console.warn("Supabase: consulta falhou no login. Tentando usuario estatico.", queryError);
-            }
-
-            if (error && !staticUser) {
-                console.warn("Supabase: erro ao buscar usuario no login.", error);
-            }
-
-            let user = data;
-            if (!user && staticUser) {
-                user = await ensureStaticCredentialUser(staticUser);
-            }
-
-            if (!user) {
-                toast("Usuario nao encontrado.", "err");
-                if (DOM.loginBtn) {
-                    DOM.loginBtn.classList.remove("loading");
-                    DOM.loginBtn.disabled = false;
-                }
-                return;
-            }
-
-            const expectedPassword = staticUser ? staticUser.password : "123456";
-            if (password.trim() !== expectedPassword.trim()) {
-                toast("Senha incorreta.", "err");
-                if (DOM.loginBtn) {
-                    DOM.loginBtn.classList.remove("loading");
-                    DOM.loginBtn.disabled = false;
-                }
-                return;
-            }
-
-            const status = staticUser
-                ? (staticUser.status || "ativo").toLowerCase()
-                : (user.status || "ativo").toLowerCase();
-
-            if (status !== "ativo") {
-                const msg = {
-                    pendente: "Sua conta esta aguardando aprovacao de um administrador.",
-                    desativado: "Sua conta foi desativada. Entre em contato com a administracao.",
-                    banido: "Sua conta foi banida. Entre em contato se achar que houve engano."
-                };
-                toast(msg[status] || "Acesso negado. Conta nao esta ativa.", "err");
-                if (DOM.loginBtn) {
-                    DOM.loginBtn.classList.remove("loading");
-                    DOM.loginBtn.disabled = false;
-                }
-                return;
-            }
-
-            const nickname = user.nick || username;
-            localStorage.setItem("dme_username", nickname);
-
-            const adminsAtuais = JSON.parse(localStorage.getItem("dme_admins") || "[]");
-            const adminsUnificados = [...new Set([...ADMINS_FIXOS, ...adminsAtuais])];
-            localStorage.setItem("dme_admins", JSON.stringify(adminsUnificados));
-
-            salvarIpLoginERedirecionar(nickname);
+            // Login OK — o cookie já foi setado pelo backend.
+            // Redireciona para /home (o servidor vai validar o cookie lá também).
+            window.location.href = "/home";
         } catch (err) {
             console.error("Erro no login:", err);
-            toast("Erro ao conectar ao servidor.", "err");
+            toast(err.message || "Erro ao conectar ao servidor.", "err");
+        } finally {
             if (DOM.loginBtn) {
                 DOM.loginBtn.classList.remove("loading");
                 DOM.loginBtn.disabled = false;
@@ -442,15 +246,8 @@ if (DOM.loginForm) {
     });
 }
 
+// ── DOMContentLoaded ─────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
-    const adminsAtuais = JSON.parse(localStorage.getItem("dme_admins") || "[]");
-    localStorage.setItem("dme_admins", JSON.stringify([...new Set([...ADMINS_FIXOS, ...adminsAtuais])]));
-
-    const loginUsernameInput = document.getElementById("loginUsername");
-    if (loginUsernameInput && !loginUsernameInput.value) {
-        loginUsernameInput.value = DEFAULT_LOGIN_USERNAME;
-    }
-
     const savedTheme = localStorage.getItem("dme_theme") || "dark";
     if (savedTheme === "light") {
         document.documentElement.classList.add("light-mode");

@@ -1,32 +1,67 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exception_handlers import http_exception_handler
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import Response
 
 from pathlib import Path
 import logging
 
-# ── Logging ───────────────────────────────────────────────────────────────────
+from backend.config import get_settings
+from backend.routers.auth import router as auth_router
+from backend.routers.requerimentos import router as requerimentos_router
+from backend.dependencies import get_current_user, get_current_admin, ADMINS_FIXOS
+from backend.models.auth import UserInfo
+
+# ── Login
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
 )
 logger = logging.getLogger("dme")
 
-# ── App ───────────────────────────────────────────────────────────────────────
+# ── Validar configuração
+settings = get_settings()
+# Descomente a linha abaixo quando tiver a service key configurada no .env:
+settings.validate()
+
+# ── App 
 app = FastAPI(
     title="DME System",
     description="Sistema de RPG policial do DME no Habbo Hotel.",
-    version="1.0.0",
-    docs_url=None,   # desabilita /docs em produção (remova se quiser usar Swagger)
+    version="2.0.0",
+    docs_url=None,
     redoc_url=None,
 )
 
-# ── Middlewares ───────────────────────────────────────────────────────────────
+
+# ── Middleware: Headers de Segurança
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    """Adiciona headers de segurança em todas as respostas."""
+    async def dispatch(self, request: Request, call_next) -> Response:
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        return response
+
+
+# ── Middlewares
+app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Em produção, substitua pelo domínio real
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,6 +73,10 @@ app.mount("/scripts", StaticFiles(directory=str(BASE_DIR / "static/scripts")), n
 # ── Templates ─────────────────────────────────────────────────────────────────
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
+# ── Registrar routers ────────────────────────────────────────────────────────
+app.include_router(auth_router)
+app.include_router(requerimentos_router)
+
 # ── Tratamento global de erros ────────────────────────────────────────────────
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
@@ -47,62 +86,119 @@ async def custom_http_exception_handler(request: Request, exc: StarletteHTTPExce
         return RedirectResponse(url="/login")
     return await http_exception_handler(request, exc)
 
+
 # ── Helpers internos ──────────────────────────────────────────────────────────
 def _render(template: str):
-    """Atalho para criar rotas que apenas servem um template."""
+    """Atalho para criar rotas que apenas servem um template (páginas públicas)."""
     async def handler(request: Request) -> HTMLResponse:
         return templates.TemplateResponse(template, {"request": request})
-    handler.__name__ = template.replace(".html", "")   # evita conflito de nome no FastAPI
+    handler.__name__ = template.replace(".html", "")
     return handler
+
+
+def _render_protected(template: str):
+    """
+    Atalho para rotas protegidas: valida o cookie JWT antes de servir o template.
+    Se não autenticado, redireciona para /login.
+    Injeta os dados do usuário no contexto do template.
+    """
+    from backend.services.auth_service import decode_jwt
+
+    async def handler(request: Request) -> HTMLResponse:
+        token = request.cookies.get(settings.COOKIE_NAME)
+        if not token:
+            return RedirectResponse(url="/login")
+
+        payload = decode_jwt(token)
+        if payload is None:
+            return RedirectResponse(url="/login")
+
+        return templates.TemplateResponse(template, {
+            "request": request,
+            "user_nick": payload.get("sub", ""),
+            "user_role": payload.get("role", "user"),
+        })
+
+    handler.__name__ = template.replace(".html", "") + "_protected"
+    return handler
+
+
+def _render_admin(template: str):
+    """
+    Atalho para rotas de admin: exige role 'admin' no JWT.
+    Se não autenticado ou não admin, redireciona para /login ou /home.
+    """
+    from backend.services.auth_service import decode_jwt
+
+    async def handler(request: Request) -> HTMLResponse:
+        token = request.cookies.get(settings.COOKIE_NAME)
+        if not token:
+            return RedirectResponse(url="/login")
+
+        payload = decode_jwt(token)
+        if payload is None:
+            return RedirectResponse(url="/login")
+
+        nick = payload.get("sub", "")
+        role = payload.get("role", "user")
+        is_admin = role == "admin" or nick.lower() in ADMINS_FIXOS
+
+        if not is_admin:
+            return RedirectResponse(url="/home")
+
+        return templates.TemplateResponse(template, {
+            "request": request,
+            "user_nick": nick,
+            "user_role": "admin",
+        })
+
+    handler.__name__ = template.replace(".html", "") + "_admin"
+    return handler
+
 
 # ── Rotas ─────────────────────────────────────────────────────────────────────
 
-# Raiz → redireciona para /login (não expõe /home sem autenticação no cliente)
+# Raiz → redireciona para /login
 @app.get("/", response_class=RedirectResponse, include_in_schema=False)
 async def root():
     return RedirectResponse(url="/login")
 
-# Autenticação
+# ── Páginas públicas (não exigem login) ──────────────────────────────────────
 app.add_api_route("/login",       _render("login.html"),       methods=["GET"], response_class=HTMLResponse)
 app.add_api_route("/verificacao", _render("verificacao.html"), methods=["GET"], response_class=HTMLResponse)
 app.add_api_route("/setup_admin", _render("setup_admin.html"), methods=["GET"], response_class=HTMLResponse)
 
-# Área principal
-app.add_api_route("/home",         _render("home.html"),         methods=["GET"], response_class=HTMLResponse)
-app.add_api_route("/perfil",       _render("perfil.html"),       methods=["GET"], response_class=HTMLResponse)
-app.add_api_route("/configuracao", _render("configuracao.html"), methods=["GET"], response_class=HTMLResponse)
-
-# Administrativo
-app.add_api_route("/painel",    _render("painel.html"),    methods=["GET"], response_class=HTMLResponse)
-app.add_api_route("/listagens", _render("listagens.html"), methods=["GET"], response_class=HTMLResponse)
+# ── Páginas protegidas (exigem login) ────────────────────────────────────────
+app.add_api_route("/home",         _render_protected("home.html"),         methods=["GET"], response_class=HTMLResponse)
+app.add_api_route("/perfil",       _render_protected("perfil.html"),       methods=["GET"], response_class=HTMLResponse)
+app.add_api_route("/configuracao", _render_protected("configuracao.html"), methods=["GET"], response_class=HTMLResponse)
 
 # Serviços e operações
-app.add_api_route("/requerimentos",      _render("requerimentos.html"),      methods=["GET"], response_class=HTMLResponse)
-app.add_api_route("/ponto_servico",      _render("ponto_servico.html"),      methods=["GET"], response_class=HTMLResponse)
-app.add_api_route("/postar_aula",        _render("postar_aula.html"),        methods=["GET"], response_class=HTMLResponse)
-app.add_api_route("/recrutamentos",      _render("recrutamentos.html"),      methods=["GET"], response_class=HTMLResponse)
-app.add_api_route("/consulta_promocao",  _render("consulta_promocao.html"),  methods=["GET"], response_class=HTMLResponse)
-app.add_api_route("/documentos",         _render("documentos.html"),         methods=["GET"], response_class=HTMLResponse)
-app.add_api_route("/sabatina",           _render("sabatina.html"),           methods=["GET"], response_class=HTMLResponse)
-app.add_api_route("/todos_turnos",       _render("todos_turnos.html"),       methods=["GET"], response_class=HTMLResponse)
-app.add_api_route("/ouvidoria",          _render("ouvidoria.html"),          methods=["GET"], response_class=HTMLResponse)
-app.add_api_route("/setor_legislativo",  _render("setor_legislativo.html"),  methods=["GET"], response_class=HTMLResponse)
+app.add_api_route("/requerimentos",      _render_protected("requerimentos.html"),      methods=["GET"], response_class=HTMLResponse)
+app.add_api_route("/ponto_servico",      _render_protected("ponto_servico.html"),      methods=["GET"], response_class=HTMLResponse)
+app.add_api_route("/postar_aula",        _render_protected("postar_aula.html"),        methods=["GET"], response_class=HTMLResponse)
+app.add_api_route("/recrutamentos",      _render_protected("recrutamentos.html"),      methods=["GET"], response_class=HTMLResponse)
+app.add_api_route("/consulta_promocao",  _render_protected("consulta_promocao.html"),  methods=["GET"], response_class=HTMLResponse)
+app.add_api_route("/documentos",         _render_protected("documentos.html"),         methods=["GET"], response_class=HTMLResponse)
+app.add_api_route("/sabatina",           _render_protected("sabatina.html"),           methods=["GET"], response_class=HTMLResponse)
+app.add_api_route("/todos_turnos",       _render_protected("todos_turnos.html"),       methods=["GET"], response_class=HTMLResponse)
+app.add_api_route("/ouvidoria",          _render_protected("ouvidoria.html"),          methods=["GET"], response_class=HTMLResponse)
+app.add_api_route("/setor_legislativo",  _render_protected("setor_legislativo.html"),  methods=["GET"], response_class=HTMLResponse)
 
 # Órgãos / Centros
-app.add_api_route("/dashboard_orgao",       _render("dashboard_orgao.html"),       methods=["GET"], response_class=HTMLResponse)
-app.add_api_route("/orgao_interno",         _render("orgao_interno.html"),         methods=["GET"], response_class=HTMLResponse)
-app.add_api_route("/centro_detalhe",        _render("centro_detalhe.html"),        methods=["GET"], response_class=HTMLResponse)
-app.add_api_route("/centro_tarefas_orgaos", _render("centro_tarefas_orgaos.html"), methods=["GET"], response_class=HTMLResponse)
+app.add_api_route("/dashboard_orgao",       _render_protected("dashboard_orgao.html"),       methods=["GET"], response_class=HTMLResponse)
+app.add_api_route("/orgao_interno",         _render_protected("orgao_interno.html"),         methods=["GET"], response_class=HTMLResponse)
+app.add_api_route("/centro_detalhe",        _render_protected("centro_detalhe.html"),        methods=["GET"], response_class=HTMLResponse)
+app.add_api_route("/centro_tarefas_orgaos", _render_protected("centro_tarefas_orgaos.html"), methods=["GET"], response_class=HTMLResponse)
 
 # Loja
-app.add_api_route("/loja", _render("loja.html"), methods=["GET"], response_class=HTMLResponse)
+app.add_api_route("/loja", _render_protected("loja.html"), methods=["GET"], response_class=HTMLResponse)
 
-# Mensagens Privadas
-app.add_api_route("/mensagens", _render("mensagens.html"), methods=["GET"], response_class=HTMLResponse)
+# Mensagens e Chat
+app.add_api_route("/mensagens",   _render_protected("mensagens.html"), methods=["GET"], response_class=HTMLResponse)
+app.add_api_route("/chat",        _render_protected("chat.html"),      methods=["GET"], response_class=HTMLResponse)
+app.add_api_route("/chat_global", _render_protected("chat.html"),      methods=["GET"], response_class=HTMLResponse)
 
-# Chat — /chat_global agora serve seu próprio template
-# CORREÇÃO: anteriormente ambas as rotas serviam chat.html, tornando chat_global sem efeito real.
-# Se você tiver um template separado para chat global, basta criar o arquivo; 
-# enquanto não existir, ele aponta para chat.html como fallback explícito.
-app.add_api_route("/chat",        _render("chat.html"), methods=["GET"], response_class=HTMLResponse)
-app.add_api_route("/chat_global", _render("chat.html"), methods=["GET"], response_class=HTMLResponse)
+# ── Páginas administrativas (exigem role admin) ─────────────────────────────
+app.add_api_route("/painel",    _render_admin("painel.html"),    methods=["GET"], response_class=HTMLResponse)
+app.add_api_route("/listagens", _render_admin("listagens.html"), methods=["GET"], response_class=HTMLResponse)
