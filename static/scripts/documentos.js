@@ -1,91 +1,178 @@
-// Configurações e Estado
 const CONFIG = {
-    key: 'dme_documentos',
+    key: "dme_documentos",
     categorias: [
-        { id: 'triplice', titulo: 'Tríplice Documental', icon: '⚖️' },
-        { id: 'apendices', titulo: 'Apêndices', icon: '📎' },
-        { id: 'portarias', titulo: 'Portarias', icon: '📜' },
-        { id: 'tutoriais', titulo: 'Tutoriais', icon: '📚' }
+        { id: "triplice", titulo: "Triplice Documental", icon: "⚖️" },
+        { id: "apendices", titulo: "Apendices", icon: "📎" },
+        { id: "portarias", titulo: "Portarias", icon: "📜" },
+        { id: "tutoriais", titulo: "Tutoriais", icon: "📚" }
     ]
 };
 
 let docsData = { categorias: [] };
 let currentDocId = null;
-let currentUser = localStorage.getItem('dme_username');
+let currentUser = localStorage.getItem("dme_username") || "";
+let isEditing = false;
+let editingId = null;
 
-// Inicialização
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
+    if (!currentUser) {
+        window.location.href = "/login";
+        return;
+    }
+
     loadData();
+    loadUserProfile();
     renderSidebar();
     checkAdminPermissions();
     setupMobileSidebar();
-    loadUserProfile(); // Carrega avatar e nome
+    setupEditorBindings();
+    setupModalBehavior();
+    updateEditorPreview();
 });
 
 function loadUserProfile() {
-    const user = localStorage.getItem('dme_username');
-    if (user) {
-        // Navbar
-        document.getElementById('navUserName').textContent = user;
-        const avatarUrl = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${user}&direction=3&head_direction=3&gesture=sml&action=std`;
-        document.getElementById('navUserImage').src = avatarUrl;
+    const avatarUrl = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(currentUser)}&direction=3&head_direction=3&gesture=sml&action=std`;
+    const navUserName = document.getElementById("navUserName");
+    const navUserImage = document.getElementById("navUserImage");
+    const dropdownName = document.getElementById("dropdownName");
+    const dropdownUserImage = document.getElementById("dropdownUserImage");
+    const dropdownCargo = document.getElementById("dropdownCargo");
 
-        // Dropdown
-        document.getElementById('dropdownName').textContent = user;
-        document.getElementById('dropdownUserImage').src = avatarUrl;
+    if (navUserName) navUserName.textContent = currentUser;
+    if (navUserImage) navUserImage.src = avatarUrl;
+    if (dropdownName) dropdownName.textContent = currentUser;
+    if (dropdownUserImage) dropdownUserImage.src = avatarUrl;
+    if (dropdownCargo) dropdownCargo.textContent = "Militar DME";
 
-        // Painel link (se admin)
-        const admins = JSON.parse(localStorage.getItem('dme_admins') || '[]');
-        if (admins.includes(user) || ['Xandelicado', 'rafacv', 'Ronaldo'].includes(user)) {
-            document.getElementById('dropdownPainel').style.display = 'block';
-        }
-    } else {
-        window.location.href = '/login'; // Redireciona se não logado
+    const admins = JSON.parse(localStorage.getItem("dme_admins") || "[]");
+    const isAdmin = admins.includes(currentUser) || ["Xandelicado", "rafacv", "Ronaldo"].includes(currentUser);
+    if (isAdmin) {
+        const painel = document.getElementById("dropdownPainel");
+        const divider = document.getElementById("dropdownDivider");
+        if (painel) painel.style.display = "block";
+        if (divider) divider.style.display = "block";
     }
 
-    // Toggle do dropdown
-    const btn = document.getElementById('userProfileBtn');
-    const dropdown = document.getElementById('userDropdown');
+    const btn = document.getElementById("userProfileBtn");
+    const dropdown = document.getElementById("userDropdown");
+    if (btn && dropdown) {
+        btn.addEventListener("click", (event) => {
+            event.stopPropagation();
+            dropdown.classList.toggle("active");
+        });
 
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        dropdown.style.visibility = dropdown.style.visibility === 'visible' ? 'hidden' : 'visible';
-        dropdown.style.opacity = dropdown.style.opacity === '1' ? '0' : '1';
-    });
-
-    document.addEventListener('click', () => {
-        dropdown.style.visibility = 'hidden';
-        dropdown.style.opacity = '0';
-    });
+        document.addEventListener("click", () => dropdown.classList.remove("active"));
+        dropdown.addEventListener("click", (event) => event.stopPropagation());
+    }
 }
 
-
-// --- Gerenciamento de Dados ---
-
 function loadData() {
-    const saved = localStorage.getItem(CONFIG.key);
-    if (saved) {
-        docsData = JSON.parse(saved);
-        // Migração simples caso novas categorias sejam adicionadas no código
-        CONFIG.categorias.forEach(catDefault => {
-            if (!docsData.categorias.find(c => c.id === catDefault.id)) {
-                docsData.categorias.push({ ...catDefault, documentos: [] });
-            }
-        });
-    } else {
-        // Dados Iniciais
-        docsData.categorias = CONFIG.categorias.map(c => ({ ...c, documentos: [] }));
-
-        // Exemplo inicial
-        docsData.categorias[0].documentos.push({
-            id: generateId(),
-            titulo: 'Código de Conduta Militar',
-            autor: 'Sistema',
-            data: new Date().toLocaleDateString('pt-BR'),
-            conteudo: '[b]Bem-vindo ao Código de Conduta![/b]\n\nEste é um exemplo de documento. [i]Edite-o para começar.[/i]'
-        });
+    try {
+        const saved = localStorage.getItem(CONFIG.key);
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            docsData.categorias = buildCategoriesFromStorage(parsed.categorias || []);
+        } else {
+            docsData.categorias = CONFIG.categorias.map((cat) => ({
+                ...cat,
+                documentos: []
+            }));
+            createSeedDocument();
+            saveData();
+        }
+    } catch (error) {
+        console.warn("Documentos: erro ao carregar dados, recriando estrutura local.", error);
+        docsData.categorias = CONFIG.categorias.map((cat) => ({
+            ...cat,
+            documentos: []
+        }));
+        createSeedDocument();
         saveData();
     }
+}
+
+function buildCategoriesFromStorage(savedCategories) {
+    const map = new Map(savedCategories.map((cat) => [cat.id, cat]));
+    const categories = CONFIG.categorias.map((defaultCategory) => {
+        const stored = map.get(defaultCategory.id) || {};
+        const documentos = Array.isArray(stored.documentos) ? stored.documentos.map((doc) => normalizeDocument(doc, defaultCategory.id)) : [];
+        return {
+            ...defaultCategory,
+            documentos
+        };
+    });
+
+    savedCategories.forEach((cat) => {
+        if (!categories.find((existing) => existing.id === cat.id)) {
+            categories.push({
+                id: cat.id,
+                titulo: cat.titulo || "Categoria",
+                icon: cat.icon || "DOC",
+                documentos: Array.isArray(cat.documentos) ? cat.documentos.map((doc) => normalizeDocument(doc, cat.id)) : []
+            });
+        }
+    });
+
+    return categories;
+}
+
+function normalizeDocument(doc, categoryId) {
+    const author = doc.autor || doc.author || doc.createdBy || "Sistema";
+    const createdAt = doc.createdAt || doc.dataCriacao || doc.data || formatDateTime();
+    const updatedAt = doc.updatedAt || doc.dataEdicao || doc.data || createdAt;
+    const lastEditor = doc.lastEditor || doc.ultimoEditor || author;
+    const source = doc.source || doc.fonte || "";
+
+    return {
+        id: doc.id || generateId(),
+        titulo: doc.titulo || "Documento sem titulo",
+        conteudo: doc.conteudo || "",
+        autor: author,
+        createdAt,
+        updatedAt,
+        data: updatedAt,
+        lastEditor,
+        source,
+        categoryId: categoryId || doc.categoryId || "triplice"
+    };
+}
+
+function createSeedDocument() {
+    const categoriaInicial = docsData.categorias.find((cat) => cat.id === "triplice");
+    if (!categoriaInicial) return;
+
+    categoriaInicial.documentos.unshift(normalizeDocument({
+        id: generateId(),
+        titulo: "Codigo de Conduta Militar",
+        conteudo: [
+            "[h1]Codigo de Conduta Militar[/h1]",
+            "",
+            "[quote=Estado-Maior]Este documento demonstra a nova estrutura de BBCode da area de Documentos.[/quote]",
+            "",
+            "[panel][b]Objetivo:[/b] padronizar textos longos, com secoes, blocos e tabelas mais legiveis.[/panel]",
+            "",
+            "[h2]Diretrizes gerais[/h2]",
+            "[list]",
+            "[*][b]Disciplina[/b] em todos os atos oficiais.",
+            "[*][i]Clareza[/i] nos comunicados internos.",
+            "[*][u]Registro[/u] estruturado de conteudos institucionais.",
+            "[/list]",
+            "",
+            "[h2]Tabela de exemplo[/h2]",
+            "[table]",
+            "[tr][th]Item[/th][th]Descricao[/th][/tr]",
+            "[tr][td]Portarias[/td][td]Normas internas e atos oficiais.[/td][/tr]",
+            "[tr][td]Apendices[/td][td]Complementos tecnicos e anexos.[/td][/tr]",
+            "[/table]",
+            "",
+            "[source]Use este campo para importar observacoes, referencia institucional ou observacoes de origem externa.[/source]"
+        ].join("\n"),
+        autor: "Sistema",
+        lastEditor: "Sistema",
+        createdAt: formatDateTime(),
+        updatedAt: formatDateTime(),
+        source: ""
+    }, "triplice"));
 }
 
 function saveData() {
@@ -93,194 +180,381 @@ function saveData() {
 }
 
 function generateId() {
-    return '_' + Math.random().toString(36).substr(2, 9);
+    return "_" + Math.random().toString(36).slice(2, 11);
 }
 
-// --- Renderização ---
+function formatDateTime(date = new Date()) {
+    const baseDate = date instanceof Date ? date : new Date(date);
+    return `${baseDate.toLocaleDateString("pt-BR")} ${baseDate.toLocaleTimeString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit"
+    })}`;
+}
+
+function getCategoryById(categoryId) {
+    return docsData.categorias.find((cat) => cat.id === categoryId) || null;
+}
+
+function findDocumentById(id) {
+    for (const category of docsData.categorias) {
+        const index = category.documentos.findIndex((doc) => doc.id === id);
+        if (index !== -1) {
+            return {
+                category,
+                document: category.documentos[index],
+                index
+            };
+        }
+    }
+    return null;
+}
 
 function renderSidebar() {
-    const container = document.getElementById('docsCategories');
-    container.innerHTML = '';
+    const container = document.getElementById("docsCategories");
+    if (!container) return;
 
-    docsData.categorias.forEach(cat => {
-        const hasDocs = cat.documentos && cat.documentos.length > 0;
-        const hasActive = cat.documentos.some(d => d.id === currentDocId);
-        const expanded = hasActive || hasDocs;
+    container.innerHTML = docsData.categorias.map((category) => {
+        const hasDocs = category.documentos.length > 0;
+        const hasActive = category.documentos.some((doc) => doc.id === currentDocId);
+        const expanded = hasDocs || hasActive;
 
-        const section = document.createElement('div');
-        section.className = 'doc-cat-section' + (expanded ? ' expanded' : '') + (hasDocs ? ' has-docs' : '');
-        section.id = 'cat-' + cat.id;
-
-        section.innerHTML = `
-            <div class="doc-cat-hdr" onclick="toggleCat('${cat.id}')">
-                <span class="doc-cat-ico">${cat.icon}</span>
-                <span class="doc-cat-name">${cat.titulo}</span>
-                <span class="doc-cat-count">${cat.documentos.length}</span>
-                <span class="doc-cat-chevron">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12">
-                        <polyline points="6 9 12 15 18 9"/>
-                    </svg>
-                </span>
-            </div>
-            <div class="doc-cat-list">
-                ${hasDocs ? cat.documentos.map(doc => `
-                    <div class="doc-item ${currentDocId === doc.id ? 'active' : ''}" onclick="viewDocument('${doc.id}')">${doc.titulo}</div>
-                `).join('') : '<div class="doc-empty-hint">Nenhum documento</div>'}
+        return `
+            <div class="doc-cat-section ${expanded ? "expanded" : ""} ${hasDocs ? "has-docs" : ""}" id="cat-${category.id}">
+                <div class="doc-cat-hdr" onclick="toggleCat('${category.id}')">
+                    <span class="doc-cat-ico">${category.icon}</span>
+                    <span class="doc-cat-name">${escapeHtml(category.titulo)}</span>
+                    <span class="doc-cat-count">${category.documentos.length}</span>
+                    <span class="doc-cat-chevron">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </span>
+                </div>
+                <div class="doc-cat-list">
+                    ${hasDocs ? category.documentos.map((doc) => `
+                        <button type="button" class="doc-item ${currentDocId === doc.id ? "active" : ""}" onclick="viewDocument('${doc.id}')">
+                            ${escapeHtml(doc.titulo)}
+                        </button>
+                    `).join("") : '<div class="doc-empty-hint">Nenhum documento</div>'}
+                </div>
             </div>
         `;
+    }).join("");
 
-        container.appendChild(section);
-    });
-
-    // Atualiza o select do modal
-    const select = document.getElementById('editCategory');
-    select.innerHTML = '';
-    docsData.categorias.forEach(cat => {
-        const opt = document.createElement('option');
-        opt.value = cat.id;
-        opt.textContent = cat.titulo;
-        select.appendChild(opt);
-    });
-
+    renderCategorySelect();
     renderPlaceholder();
 }
 
-function toggleCat(id) {
-    const section = document.getElementById('cat-' + id);
-    if (section) section.classList.toggle('expanded');
+function renderCategorySelect() {
+    const select = document.getElementById("editCategory");
+    if (!select) return;
+
+    select.innerHTML = docsData.categorias.map((category) => `
+        <option value="${category.id}">${escapeHtml(category.titulo)}</option>
+    `).join("");
+}
+
+function toggleCat(categoryId) {
+    const section = document.getElementById(`cat-${categoryId}`);
+    if (section) {
+        section.classList.toggle("expanded");
+    }
 }
 
 function renderPlaceholder() {
-    const grid = document.getElementById('cpGrid');
+    const grid = document.getElementById("cpGrid");
     if (!grid) return;
 
-    grid.innerHTML = docsData.categorias.map(cat => {
-        const hasDocs = cat.documentos && cat.documentos.length > 0;
+    grid.innerHTML = docsData.categorias.map((category) => {
+        const items = category.documentos.slice(0, 5);
         return `
-            <div class="cp-cat-card ${hasDocs ? 'has-docs' : ''}">
+            <div class="cp-cat-card ${items.length ? "has-docs" : ""}">
                 <div class="cp-cat-card-head">
-                    <span class="cp-cat-card-ico">${cat.icon}</span>
-                    <span class="cp-cat-card-title">${cat.titulo}</span>
-                    <span class="cp-cat-card-count">${cat.documentos.length}</span>
+                    <span class="cp-cat-card-ico">${category.icon}</span>
+                    <span class="cp-cat-card-title">${escapeHtml(category.titulo)}</span>
+                    <span class="cp-cat-card-count">${category.documentos.length}</span>
                 </div>
-                ${hasDocs
-                ? cat.documentos.slice(0, 5).map(doc => `
-                        <button class="cp-doc-link" onclick="viewDocument('${doc.id}')">${doc.titulo}</button>
-                    `).join('')
-                : '<div class="cp-empty-cat">Nenhum documento ainda</div>'
-            }
+                ${items.length ? items.map((doc) => `
+                    <button type="button" class="cp-doc-link" onclick="viewDocument('${doc.id}')">${escapeHtml(doc.titulo)}</button>
+                `).join("") : '<div class="cp-empty-cat">Nenhum documento nesta categoria.</div>'}
             </div>
         `;
-    }).join('');
+    }).join("");
 }
 
 function viewDocument(id) {
-    currentDocId = id;
-    let foundDoc = null;
-    let foundCat = null;
+    const found = findDocumentById(id);
+    if (!found) return;
 
-    for (const cat of docsData.categorias) {
-        const doc = cat.documentos.find(d => d.id === id);
-        if (doc) { foundDoc = doc; foundCat = cat; break; }
+    currentDocId = id;
+    const doc = found.document;
+    const category = found.category;
+    const result = renderContent(doc.conteudo);
+
+    const placeholder = document.getElementById("contentPlaceholder");
+    const viewer = document.getElementById("documentViewer");
+    const body = document.getElementById("viewContent");
+    const title = document.getElementById("viewTitle");
+    const author = document.getElementById("viewAuthor");
+    const date = document.getElementById("viewDate");
+    const breadcrumbCat = document.getElementById("docBreadcrumbCat");
+    const breadcrumbDoc = document.getElementById("docBreadcrumbDoc");
+
+    if (placeholder) placeholder.style.display = "none";
+    if (viewer) viewer.style.display = "block";
+    if (title) title.textContent = doc.titulo;
+    if (author) author.textContent = doc.autor;
+    if (date) date.textContent = doc.updatedAt || doc.data;
+    if (breadcrumbCat) breadcrumbCat.textContent = category.titulo;
+    if (breadcrumbDoc) breadcrumbDoc.textContent = doc.titulo;
+    if (body) {
+        body.innerHTML = result.html;
+        body.classList.toggle("html-content", result.isHTML);
     }
 
-    if (!foundDoc) return;
-
-    document.getElementById('contentPlaceholder').style.display = 'none';
-    document.getElementById('documentViewer').style.display = 'block';
-
-    // Breadcrumb
-    const bcCat = document.getElementById('docBreadcrumbCat');
-    const bcDoc = document.getElementById('docBreadcrumbDoc');
-    if (bcCat) bcCat.textContent = foundCat ? foundCat.titulo : '';
-    if (bcDoc) bcDoc.textContent = foundDoc.titulo;
-
-    document.getElementById('viewTitle').textContent = foundDoc.titulo;
-    document.getElementById('viewAuthor').textContent = foundDoc.autor;
-    document.getElementById('viewDate').textContent = foundDoc.data;
-    const result = renderContent(foundDoc.conteudo);
-    const body = document.getElementById('viewContent');
-    body.innerHTML = result.html;
-    body.classList.toggle('html-content', result.isHTML);
-
+    renderSourceMeta(doc);
+    renderEditorMeta(doc);
     renderSidebar();
 }
 
-// --- Content Renderer: HTML or BBCode ---
+function renderSourceMeta(doc) {
+    const chip = document.getElementById("viewSourceChip");
+    const link = document.getElementById("viewSourceLink");
+    const text = document.getElementById("viewSourceText");
+    if (!chip || !link || !text) return;
+
+    const sourceValue = (doc.source || "").trim();
+    if (!sourceValue) {
+        chip.style.display = "none";
+        link.style.display = "none";
+        text.style.display = "none";
+        return;
+    }
+
+    const safeUrl = sanitizeUrl(sourceValue);
+    chip.style.display = "inline-flex";
+    if (safeUrl) {
+        link.style.display = "inline";
+        text.style.display = "none";
+        link.href = safeUrl;
+        link.textContent = compactLabel(sourceValue, 36);
+    } else {
+        link.style.display = "none";
+        text.style.display = "inline";
+        text.textContent = compactLabel(sourceValue, 36);
+    }
+}
+
+function renderEditorMeta(doc) {
+    const container = document.getElementById("viewEditorMeta");
+    const initials = document.getElementById("viewEditorInitials");
+    const editorName = document.getElementById("viewLastEditorName");
+    const editorDate = document.getElementById("viewLastEditorDate");
+    const createdBy = document.getElementById("viewCreatedBy");
+    if (!container || !initials || !editorName || !editorDate || !createdBy) return;
+
+    const editor = doc.lastEditor || doc.autor || "Sistema";
+    container.style.display = "inline-flex";
+    container.style.setProperty("--editor-hue", String(computeHue(editor)));
+    initials.textContent = getInitials(editor);
+    editorName.textContent = editor;
+    editorDate.textContent = doc.updatedAt || doc.data || "-";
+    createdBy.textContent = doc.autor || "Sistema";
+}
+
 function renderContent(text) {
-    if (!text) return { html: '', isHTML: false };
-    const isHTML = /<\/?(?:div|table|td|tr|th|tbody|thead|span|p|a|img|br|ul|ol|li|h[1-6]|strong|em|b|i|u|s|section|article|header|footer|hr|blockquote|pre|code|style)[\s>\/]/i.test(text);
-    return { html: isHTML ? text : parseBBCode(text), isHTML };
+    if (!text) {
+        return {
+            html: "",
+            isHTML: false,
+            format: "empty"
+        };
+    }
+
+    if (window.DMEBBCode && typeof window.DMEBBCode.render === "function") {
+        return window.DMEBBCode.render(text);
+    }
+
+    return {
+        html: escapeHtml(normalizeNewlines(text)).replace(/\n/g, "<br>"),
+        isHTML: false,
+        format: "plain"
+    };
 }
 
-// --- BBCode Parser ---
 function parseBBCode(text) {
-    if (!text) return '';
-
-    let html = text
-        .replace(/</g, '&lt;') // Sanitiza HTML
-        .replace(/>/g, '&gt;');
-
-    // Tags simples
-    html = html.replace(/\[b\](.*?)\[\/b\]/gis, '<b>$1</b>');
-    html = html.replace(/\[i\](.*?)\[\/i\]/gis, '<i>$1</i>');
-    html = html.replace(/\[u\](.*?)\[\/u\]/gis, '<u>$1</u>');
-    html = html.replace(/\[s\](.*?)\[\/s\]/gis, '<s>$1</s>');
-
-    // Alinhamento
-    html = html.replace(/\[center\](.*?)\[\/center\]/gis, '<div style="text-align:center">$1</div>');
-    html = html.replace(/\[left\](.*?)\[\/left\]/gis, '<div style="text-align:left">$1</div>');
-    html = html.replace(/\[right\](.*?)\[\/right\]/gis, '<div style="text-align:right">$1</div>');
-
-    // Cor e Tamanho
-    html = html.replace(/\[color=(.*?)\](.*?)\[\/color\]/gis, '<span style="color:$1">$2</span>');
-    html = html.replace(/\[size=(.*?)\](.*?)\[\/size\]/gis, '<span style="font-size:$1px">$2</span>');
-
-    // Mídia e Links
-    html = html.replace(/\[img\](.*?)\[\/img\]/gis, '<img src="$1" alt="Imagem">');
-    html = html.replace(/\[url=(.*?)\](.*?)\[\/url\]/gis, '<a href="$1" target="_blank">$2</a>');
-
-    // Blocos
-    html = html.replace(/\[quote\](.*?)\[\/quote\]/gis, '<blockquote>$1</blockquote>');
-    html = html.replace(/\[code\](.*?)\[\/code\]/gis, '<code>$1</code>');
-
-    // Quebras de linha
-    html = html.replace(/\n/g, '<br>');
-
-    return html;
+    const result = renderContent(text);
+    return result.html;
 }
 
-// --- Editor Functions ---
-
-function insertTag(start, end) {
-    const textarea = document.getElementById('editContent');
-    const scrollPos = textarea.scrollTop;
-    let strPos = textarea.selectionStart;
-    let endPos = textarea.selectionEnd;
-
-    const front = textarea.value.substring(0, strPos);
-    const back = textarea.value.substring(endPos, textarea.value.length);
-    const selected = textarea.value.substring(strPos, endPos);
-
-    textarea.value = front + start + selected + end + back;
-    textarea.selectionStart = strPos + start.length;
-    textarea.selectionEnd = strPos + start.length + selected.length;
-    textarea.focus();
-    textarea.scrollTop = scrollPos;
+function normalizeNewlines(text) {
+    return String(text || "").replace(/\r\n?/g, "\n").trim();
 }
 
-let isEditing = false;
-let editingId = null;
+function escapeHtml(text) {
+    return String(text || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+function escapeAttribute(text) {
+    return escapeHtml(text).replace(/`/g, "&#96;");
+}
+
+function decodeBasicEntities(text) {
+    return String(text || "")
+        .replace(/&amp;/g, "&")
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">");
+}
+
+function sanitizeUrl(value, options = {}) {
+    const clean = decodeBasicEntities(value).trim();
+    if (!clean) return "";
+
+    const allowDataImage = Boolean(options.allowDataImage);
+    if (/^(https?:\/\/|mailto:|\/)/i.test(clean)) return clean;
+    if (allowDataImage && /^data:image\//i.test(clean)) return clean;
+    return "";
+}
+
+function compactLabel(text, maxLength) {
+    const value = String(text || "").trim();
+    if (value.length <= maxLength) return value;
+    return `${value.slice(0, maxLength - 1)}…`;
+}
+
+function computeHue(text) {
+    let hash = 0;
+    const value = String(text || "");
+    for (let index = 0; index < value.length; index += 1) {
+        hash = value.charCodeAt(index) + ((hash << 5) - hash);
+    }
+    return Math.abs(hash) % 360;
+}
+
+function getInitials(name) {
+    const parts = String(name || "SI").trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return "SI";
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+}
+
+function setupEditorBindings() {
+    ["editTitle", "editCategory", "editSource", "editContent"].forEach((fieldId) => {
+        const element = document.getElementById(fieldId);
+        if (!element) return;
+
+        const eventName = element.tagName === "SELECT" ? "change" : "input";
+        element.addEventListener(eventName, updateEditorPreview);
+    });
+}
+
+function setupModalBehavior() {
+    const modal = document.getElementById("modalEditor");
+    if (!modal) return;
+
+    modal.addEventListener("click", (event) => {
+        if (event.target === modal) {
+            fecharModal("modalEditor");
+        }
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && modal.style.display === "flex") {
+            fecharModal("modalEditor");
+        }
+    });
+}
+
+function updateEditorPreview() {
+    const titleInput = document.getElementById("editTitle");
+    const categoryInput = document.getElementById("editCategory");
+    const sourceInput = document.getElementById("editSource");
+    const contentInput = document.getElementById("editContent");
+    const previewTitle = document.getElementById("editPreviewTitle");
+    const previewCategory = document.getElementById("editPreviewCategory");
+    const previewAuthor = document.getElementById("editPreviewAuthor");
+    const previewDate = document.getElementById("editPreviewDate");
+    const previewContent = document.getElementById("editPreviewContent");
+    const previewMode = document.getElementById("previewModeLabel");
+    const previewSourceLink = document.getElementById("editPreviewSourceLink");
+    const previewSourceText = document.getElementById("editPreviewSourceText");
+    const editorStats = document.getElementById("editorStats");
+
+    const title = titleInput ? titleInput.value.trim() : "";
+    const content = contentInput ? contentInput.value : "";
+    const category = getCategoryById(categoryInput ? categoryInput.value : "triplice");
+    const source = sourceInput ? sourceInput.value.trim() : "";
+
+    if (previewTitle) previewTitle.textContent = title || "Titulo do documento";
+    if (previewCategory) previewCategory.textContent = category ? category.titulo : "Categoria";
+    if (previewAuthor) previewAuthor.textContent = `Editor: ${currentUser || "Sistema"}`;
+    if (previewDate) previewDate.textContent = isEditing ? "Preview da edicao" : "Preview do rascunho";
+
+    const safeSource = sanitizeUrl(source);
+    if (previewSourceLink && previewSourceText) {
+        if (source && safeSource) {
+            previewSourceLink.style.display = "inline-flex";
+            previewSourceLink.href = safeSource;
+            previewSourceLink.textContent = compactLabel(source, 32);
+            previewSourceText.style.display = "none";
+        } else if (source) {
+            previewSourceLink.style.display = "none";
+            previewSourceText.style.display = "inline-flex";
+            previewSourceText.textContent = compactLabel(source, 32);
+        } else {
+            previewSourceLink.style.display = "none";
+            previewSourceText.style.display = "none";
+        }
+    }
+
+    if (editorStats) {
+        const lines = content ? content.split(/\r\n|\r|\n/).length : 0;
+        editorStats.textContent = `${content.length} caracteres · ${lines} linhas`;
+    }
+
+    if (!previewContent) return;
+
+    if (!content.trim()) {
+        previewContent.classList.remove("html-content");
+        previewContent.innerHTML = '<div class="bb-preview-empty">O preview do documento aparece aqui conforme voce edita.</div>';
+        if (previewMode) previewMode.textContent = "Aguardando conteudo";
+        return;
+    }
+
+    const result = renderContent(content);
+    previewContent.classList.toggle("html-content", result.isHTML);
+    previewContent.innerHTML = result.html;
+    if (previewMode) {
+        previewMode.textContent = result.isHTML ? "HTML detectado" : "BBCode renderizado";
+    }
+}
 
 function abrirModalCriar() {
     isEditing = false;
     editingId = null;
-    document.getElementById('modalTitle').textContent = 'Novo Documento';
-    document.getElementById('editTitle').value = '';
-    document.getElementById('editContent').value = '';
-    document.getElementById('editCategory').value = 'triplice';
 
-    document.getElementById('modalEditor').style.display = 'flex';
+    const modalTitle = document.getElementById("modalTitle");
+    const editTitle = document.getElementById("editTitle");
+    const editCategory = document.getElementById("editCategory");
+    const editContent = document.getElementById("editContent");
+    const editSource = document.getElementById("editSource");
+    const modal = document.getElementById("modalEditor");
+
+    if (modalTitle) modalTitle.textContent = "Novo Documento";
+    if (editTitle) editTitle.value = "";
+    if (editCategory) editCategory.value = "triplice";
+    if (editContent) editContent.value = "";
+    if (editSource) editSource.value = "";
+    if (modal) modal.style.display = "flex";
+
+    updateEditorPreview();
 }
 
 function abrirModalEditor() {
@@ -288,142 +562,342 @@ function abrirModalEditor() {
 }
 
 function fecharModal(id) {
-    document.getElementById(id).style.display = 'none';
+    const modal = document.getElementById(id);
+    if (modal) modal.style.display = "none";
 }
 
 function editarDocumentoAtual() {
-    if (!currentDocId) return;
-
-    let foundDoc = null;
-    let foundCatId = null;
-
-    for (const cat of docsData.categorias) {
-        const doc = cat.documentos.find(d => d.id === currentDocId);
-        if (doc) {
-            foundDoc = doc;
-            foundCatId = cat.id;
-            break;
-        }
-    }
-
-    if (!foundDoc) return;
+    const found = currentDocId ? findDocumentById(currentDocId) : null;
+    if (!found) return;
 
     isEditing = true;
-    editingId = currentDocId;
+    editingId = found.document.id;
 
-    document.getElementById('modalTitle').textContent = 'Editar Documento';
-    document.getElementById('editTitle').value = foundDoc.titulo;
-    document.getElementById('editContent').value = foundDoc.conteudo;
-    document.getElementById('editCategory').value = foundCatId;
+    const modalTitle = document.getElementById("modalTitle");
+    const editTitle = document.getElementById("editTitle");
+    const editCategory = document.getElementById("editCategory");
+    const editContent = document.getElementById("editContent");
+    const editSource = document.getElementById("editSource");
+    const modal = document.getElementById("modalEditor");
 
-    document.getElementById('modalEditor').style.display = 'flex';
+    if (modalTitle) modalTitle.textContent = "Editar Documento";
+    if (editTitle) editTitle.value = found.document.titulo;
+    if (editCategory) editCategory.value = found.category.id;
+    if (editContent) editContent.value = found.document.conteudo;
+    if (editSource) editSource.value = found.document.source || "";
+    if (modal) modal.style.display = "flex";
+
+    updateEditorPreview();
 }
 
 function salvarAlteracoes() {
-    const titulo = document.getElementById('editTitle').value.trim();
-    const conteudo = document.getElementById('editContent').value;
-    const catId = document.getElementById('editCategory').value;
+    const titleField = document.getElementById("editTitle");
+    const contentField = document.getElementById("editContent");
+    const categoryField = document.getElementById("editCategory");
+    const sourceField = document.getElementById("editSource");
 
-    if (!titulo) { alert('Título é obrigatório!'); return; }
+    const titulo = titleField ? titleField.value.trim() : "";
+    const conteudo = contentField ? contentField.value : "";
+    const categoryId = categoryField ? categoryField.value : "triplice";
+    const source = sourceField ? sourceField.value.trim() : "";
 
-    const timestamp = new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR');
+    if (!titulo) {
+        alert("O titulo do documento e obrigatorio.");
+        if (titleField) titleField.focus();
+        return;
+    }
+
+    const targetCategory = getCategoryById(categoryId);
+    if (!targetCategory) {
+        alert("Selecione uma categoria valida.");
+        return;
+    }
+
+    const timestamp = formatDateTime();
 
     if (isEditing && editingId) {
-        // Modo Edição: Primeiro remove do local antigo (caso tenha mudado de categoria)
-        for (const cat of docsData.categorias) {
-            const idx = cat.documentos.findIndex(d => d.id === editingId);
-            if (idx !== -1) {
-                cat.documentos.splice(idx, 1);
-                break; // Removeu, agora adiciona na nova (ou mesma) categoria
-            }
-        }
-        // Adiciona atualizado
-        const catDestino = docsData.categorias.find(c => c.id === catId);
-        if (catDestino) {
-            catDestino.documentos.push({
-                id: editingId,
-                titulo: titulo,
-                conteudo: conteudo,
-                autor: currentUser + ' (Edição)',
-                data: timestamp
-            });
-        }
+        const existing = findDocumentById(editingId);
+        if (!existing) return;
 
+        existing.category.documentos.splice(existing.index, 1);
+        targetCategory.documentos.unshift(normalizeDocument({
+            ...existing.document,
+            id: editingId,
+            titulo,
+            conteudo,
+            autor: existing.document.autor || currentUser,
+            createdAt: existing.document.createdAt || existing.document.data,
+            updatedAt: timestamp,
+            data: timestamp,
+            lastEditor: currentUser,
+            source,
+            categoryId
+        }, categoryId));
+
+        currentDocId = editingId;
     } else {
-        // Modo Criação
-        const catDestino = docsData.categorias.find(c => c.id === catId);
-        if (catDestino) {
-            const newId = generateId();
-            catDestino.documentos.push({
-                id: newId,
-                titulo: titulo,
-                conteudo: conteudo,
-                autor: currentUser,
-                data: new Date().toLocaleDateString('pt-BR')
-            });
-            currentDocId = newId; // Já seleciona o novo
-        }
+        const newId = generateId();
+        targetCategory.documentos.unshift(normalizeDocument({
+            id: newId,
+            titulo,
+            conteudo,
+            autor: currentUser,
+            createdAt: timestamp,
+            updatedAt: timestamp,
+            data: timestamp,
+            lastEditor: currentUser,
+            source,
+            categoryId
+        }, categoryId));
+
+        currentDocId = newId;
     }
 
     saveData();
-    fecharModal('modalEditor');
+    fecharModal("modalEditor");
     renderSidebar();
-    if (currentDocId) viewDocument(currentDocId); // Atualiza visualização
+    viewDocument(currentDocId);
 }
 
 function deletarDocumentoAtual() {
-    if (!currentDocId || !confirm('Tem certeza que deseja excluir este documento?')) return;
+    if (!currentDocId) return;
+    if (!window.confirm("Tem certeza que deseja excluir este documento?")) return;
 
-    for (const cat of docsData.categorias) {
-        const idx = cat.documentos.findIndex(d => d.id === currentDocId);
-        if (idx !== -1) {
-            cat.documentos.splice(idx, 1);
-            saveData();
-            break;
-        }
-    }
+    const found = findDocumentById(currentDocId);
+    if (!found) return;
+
+    found.category.documentos.splice(found.index, 1);
+    saveData();
 
     currentDocId = null;
-    document.getElementById('contentPlaceholder').style.display = 'flex';
-    document.getElementById('documentViewer').style.display = 'none';
+
+    const placeholder = document.getElementById("contentPlaceholder");
+    const viewer = document.getElementById("documentViewer");
+    if (placeholder) placeholder.style.display = "flex";
+    if (viewer) viewer.style.display = "none";
+
     renderSidebar();
 }
 
-// --- Permissões e UI ---
-
 function checkAdminPermissions() {
-    const admins = JSON.parse(localStorage.getItem('dme_admins') || '[]');
-    const isSuperAdmin = ['Xandelicado', 'rafacv', 'Ronaldo'].includes(currentUser);
+    const admins = JSON.parse(localStorage.getItem("dme_admins") || "[]");
+    const isSuperAdmin = ["Xandelicado", "rafacv", "Ronaldo"].includes(currentUser);
     const isAdmin = admins.includes(currentUser) || isSuperAdmin;
 
-    if (isAdmin) {
-        // Novo botão no header da sidebar
-        const btnNew = document.getElementById('btnNewDoc');
-        if (btnNew) btnNew.style.display = 'flex';
-        // Ações no viewer
-        document.getElementById('docActions').style.display = 'flex';
-    }
+    const newButton = document.getElementById("btnNewDoc");
+    const actions = document.getElementById("docActions");
+
+    if (newButton) newButton.style.display = isAdmin ? "inline-flex" : "none";
+    if (actions) actions.style.display = isAdmin ? "flex" : "none";
 }
 
 function logout() {
-    localStorage.removeItem('dme_username');
-    window.location.href = '/login';
+    localStorage.removeItem("dme_username");
+    window.location.href = "/login";
 }
 
-
-
 function setupMobileSidebar() {
-    const hamburger = document.getElementById('hamburger');
-    const mobileSidebar = document.getElementById('mobileSidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    const sidebarClose = document.getElementById('sidebarClose');
+    const hamburger = document.getElementById("hamburger");
+    const mobileSidebar = document.getElementById("mobileSidebar");
+    const sidebarOverlay = document.getElementById("sidebarOverlay");
+    const sidebarClose = document.getElementById("sidebarClose");
 
-    function toggleSidebar() {
-        mobileSidebar.classList.toggle('active');
-        sidebarOverlay.classList.toggle('active');
+    if (!hamburger || !mobileSidebar || !sidebarOverlay || !sidebarClose) return;
+
+    const toggleSidebar = () => {
+        mobileSidebar.classList.toggle("active");
+        sidebarOverlay.classList.toggle("active");
+    };
+
+    hamburger.addEventListener("click", toggleSidebar);
+    sidebarClose.addEventListener("click", toggleSidebar);
+    sidebarOverlay.addEventListener("click", toggleSidebar);
+}
+
+function getEditorTextarea() {
+    return document.getElementById("editContent");
+}
+
+function wrapSelection(openTag, closeTag) {
+    const textarea = getEditorTextarea();
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selected = textarea.value.slice(start, end);
+    const before = textarea.value.slice(0, start);
+    const after = textarea.value.slice(end);
+
+    textarea.value = `${before}${openTag}${selected}${closeTag}${after}`;
+    textarea.selectionStart = start + openTag.length;
+    textarea.selectionEnd = start + openTag.length + selected.length;
+    textarea.focus();
+    updateEditorPreview();
+}
+
+function insertSnippetText(text) {
+    const textarea = getEditorTextarea();
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const before = textarea.value.slice(0, start);
+    const after = textarea.value.slice(end);
+    const needsBreakBefore = before && !before.endsWith("\n") ? "\n" : "";
+    const needsBreakAfter = after && !after.startsWith("\n") ? "\n" : "";
+
+    textarea.value = `${before}${needsBreakBefore}${text}${needsBreakAfter}${after}`;
+    const caret = before.length + needsBreakBefore.length + text.length;
+    textarea.selectionStart = caret;
+    textarea.selectionEnd = caret;
+    textarea.focus();
+    updateEditorPreview();
+}
+
+function applyEditorAction(action) {
+    switch (action) {
+        case "bold":
+            wrapSelection("[b]", "[/b]");
+            break;
+        case "italic":
+            wrapSelection("[i]", "[/i]");
+            break;
+        case "underline":
+            wrapSelection("[u]", "[/u]");
+            break;
+        case "strike":
+            wrapSelection("[s]", "[/s]");
+            break;
+        case "sup":
+            wrapSelection("[sup]", "[/sup]");
+            break;
+        case "sub":
+            wrapSelection("[sub]", "[/sub]");
+            break;
+        case "h1":
+            wrapSelection("[h1]", "[/h1]");
+            break;
+        case "h2":
+            wrapSelection("[h2]", "[/h2]");
+            break;
+        case "h3":
+            wrapSelection("[h3]", "[/h3]");
+            break;
+        case "left":
+            wrapSelection("[left]", "[/left]");
+            break;
+        case "center":
+            wrapSelection("[center]", "[/center]");
+            break;
+        case "right":
+            wrapSelection("[right]", "[/right]");
+            break;
+        case "justify":
+            wrapSelection("[justify]", "[/justify]");
+            break;
+        case "indent":
+            wrapSelection("[indent]", "[/indent]");
+            break;
+        case "divider":
+            insertSnippetText("[hr]");
+            break;
+        case "linebreak":
+            insertSnippetText("[br]");
+            break;
+        case "color": {
+            const color = window.prompt("Cor em nome ou hexadecimal", "#22c55e");
+            if (color) wrapSelection(`[color=${color}]`, "[/color]");
+            break;
+        }
+        case "size": {
+            const size = window.prompt("Tamanho em px ou nome (small, normal, large)", "18");
+            if (size) wrapSelection(`[size=${size}]`, "[/size]");
+            break;
+        }
+        case "font": {
+            const font = window.prompt("Fonte. Ex: Georgia, Times New Roman", "Georgia");
+            if (font) wrapSelection(`[font=${font}]`, "[/font]");
+            break;
+        }
+        case "quote": {
+            const author = window.prompt("Autor da citacao (opcional)", "");
+            if (author) {
+                wrapSelection(`[quote=${author}]`, "[/quote]");
+            } else {
+                wrapSelection("[quote]", "[/quote]");
+            }
+            break;
+        }
+        case "code": {
+            const language = window.prompt("Linguagem do bloco de codigo (opcional)", "text");
+            if (language) {
+                wrapSelection(`[code=${language}]`, "[/code]");
+            } else {
+                wrapSelection("[code]", "[/code]");
+            }
+            break;
+        }
+        case "spoiler": {
+            const title = window.prompt("Titulo do spoiler (opcional)", "Detalhes");
+            if (title) {
+                wrapSelection(`[spoiler=${title}]`, "[/spoiler]");
+            } else {
+                wrapSelection("[spoiler]", "[/spoiler]");
+            }
+            break;
+        }
+        case "hidden":
+            wrapSelection("[hidden]", "[/hidden]");
+            break;
+        case "list":
+            insertSnippet("list");
+            break;
+        case "table":
+            insertSnippet("table");
+            break;
+        case "url": {
+            const url = window.prompt("URL do link", "https://");
+            if (!url) break;
+            const textarea = getEditorTextarea();
+            const selected = textarea ? textarea.value.slice(textarea.selectionStart, textarea.selectionEnd) : "";
+            const label = selected || window.prompt("Texto do link", "Abrir documento") || "Abrir documento";
+            wrapSelection(`[url=${url}]`, "[/url]");
+            if (!selected && textarea) {
+                const start = textarea.selectionStart;
+                textarea.setRangeText(label, start, start, "end");
+                updateEditorPreview();
+            }
+            break;
+        }
+        case "image": {
+            const url = window.prompt("URL da imagem", "https://");
+            if (url) insertSnippetText(`[img]${url}[/img]`);
+            break;
+        }
+        case "email": {
+            const email = window.prompt("Endereco de email", "contato@exemplo.com");
+            if (email) wrapSelection(`[email=${email}]`, "[/email]");
+            break;
+        }
+        default:
+            break;
     }
+}
 
-    if (hamburger) hamburger.addEventListener('click', toggleSidebar);
-    if (sidebarClose) sidebarClose.addEventListener('click', toggleSidebar);
-    if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
+function insertSnippet(type) {
+    const snippets = {
+        section: "[h2]Titulo da secao[/h2]\n[panel]Descreva aqui o conteudo principal da secao.[/panel]",
+        panel: "[panel]\n[b]Resumo:[/b] bloco util para destacar trechos institucionais, avisos e observacoes.\n[/panel]",
+        quote: "[quote=Autor]\nCole aqui a citacao ou o trecho institucional.\n[/quote]",
+        code: "[code=text]\nCole aqui um bloco tecnico, modelo ou instrucoes.\n[/code]",
+        list: "[list]\n[*]Primeiro item\n[*]Segundo item\n[*]Terceiro item\n[/list]",
+        table: "[table width=100% border=1 cellpadding=10 cellspacing=0]\n[tr][th width=35% align=center]Coluna 1[/th][th]Coluna 2[/th][/tr]\n[tr][td bgcolor=#101a12 colspan=1]Conteudo[/td][td]Conteudo[/td][/tr]\n[/table]",
+        image: "[img]https://exemplo.com/imagem.png[/img]",
+        source: "[source]\nOrigem, observacoes de importacao ou referencia externa.\n[/source]",
+        spoiler: "[spoiler=Detalhes]\nConteudo recolhido para consulta pontual.\n[/spoiler]"
+    };
+
+    if (snippets[type]) {
+        insertSnippetText(snippets[type]);
+    }
 }
