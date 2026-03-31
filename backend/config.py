@@ -29,12 +29,22 @@ class Settings:
     # ── Cookie ────────────────────────────────────────
     COOKIE_NAME: str = "dme_token"
     COOKIE_HTTPONLY: bool = True
-    COOKIE_SECURE: bool = True   # Mude pra True quando tiver HTTPS
+    COOKIE_SECURE: bool = os.getenv("COOKIE_SECURE", "false").lower() == "true"  # False em dev, True em produção (HTTPS)
     COOKIE_SAMESITE: str = "lax"
     COOKIE_MAX_AGE: int = JWT_EXPIRE_MINUTES * 60  # em segundos
 
+    # ── Ambiente ──────────────────────────────────────
+    DEV_MODE: bool = os.getenv("DEV_MODE", "true").lower() == "true"
+
     def validate(self) -> None:
-        """Verifica se as variáveis essenciais estão configuradas."""
+        """
+        Verifica se as variáveis essenciais estão configuradas.
+        Em DEV_MODE=true, emite avisos no console em vez de travar o servidor.
+        Em produção (DEV_MODE=false), lança RuntimeError se algo estiver faltando.
+        """
+        import logging
+        logger = logging.getLogger("dme.config")
+
         erros = []
         if not self.SUPABASE_URL:
             erros.append("SUPABASE_URL não configurada")
@@ -42,11 +52,17 @@ class Settings:
             erros.append("SUPABASE_SERVICE_KEY não configurada")
         if self.JWT_SECRET == "INSEGURO-troque-isso":
             erros.append("JWT_SECRET não configurada (gere com: openssl rand -hex 32)")
+
         if erros:
-            raise RuntimeError(
-                "Configuração incompleta. Verifique o arquivo .env:\n  - "
-                + "\n  - ".join(erros)
-            )
+            if self.DEV_MODE:
+                for e in erros:
+                    logger.warning(f"[DEV] Configuração ausente: {e}")
+                logger.warning("[DEV] Servidor iniciado com configuração incompleta. Defina DEV_MODE=false em produção.")
+            else:
+                raise RuntimeError(
+                    "Configuração incompleta. Verifique o arquivo .env:\n  - "
+                    + "\n  - ".join(erros)
+                )
 
 
 @lru_cache()

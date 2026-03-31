@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil — DME System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/global.css">
+    <link rel="stylesheet" href="/styles/meu_perfil.css">
+    <script src="/scripts/theme.js"></script>
+    <script>const _USER_NICK = "{{ user_nick }}";</script>
+</head>
+<body>
+
+    <!-- ══ SIDEBAR MOBILE ═══════════════════════════════ -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="mobile-sidebar" id="mobileSidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-title">DME System</span>
+            <div class="sidebar-close" id="sidebarClose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </div>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Principal</div>
+            <a href="/home" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                Página Inicial
+            </a>
+            <a href="/listagens" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                Listagens
+            </a>
+            <a href="/requerimentos" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Requerimentos
+            </a>
+            <a href="/ponto_servico" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Ponto de Serviço
+            </a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Ferramentas</div>
+            <a href="/loja" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                Loja
+            </a>
+            <a href="/documentos" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                Documentos
+            </a>
+            <a href="/centro_tarefas_orgaos" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 10v11M16 10v11M12 10v11"/></svg>
+                Centros e Órgãos
+            </a>
+            <a href="/ouvidoria" class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Ouvidoria
+            </a>
+        </div>
+    </div>
+
+    <!-- ══ NAVBAR ════════════════════════════════════════ -->
+    <nav class="navbar">
+        <div class="logo-section">
+            <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+            <div class="logo-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+            </div>
+            <div class="logo-text">DME<em>System</em></div>
+        </div>
+        <div class="nav-links">
+            <a href="/home" class="nav-link">Home</a>
+            <a href="/listagens" class="nav-link">Listagens</a>
+            <a href="/ponto_servico" class="nav-link">Ponto</a>
+            <a href="/requerimentos" class="nav-link">Requerimentos</a>
+        </div>
+        <div class="nav-actions">
+            <div class="user-profile" id="userProfileBtn">
+                <div class="user-avatar"><img id="navUserImage" src="" alt=""></div>
+                <span class="user-name" id="navUserName">Usuário</span>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-info">
+                            <div class="dropdown-avatar"><img id="dropdownUserImage" src="" alt=""></div>
+                            <div class="dropdown-user-details">
+                                <h4 id="dropdownName">Usuário</h4>
+                                <p>Militar DME</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="/painel" class="dropdown-item" id="dropdownPainel" style="display:none">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                            Painel Admin
+                        </a>
+                        <a href="/meu_perfil" class="dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            Meu Perfil
+                        </a>
+                        <a href="/mensagens" class="dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            Mensagens Privadas
+                        </a>
+                        <a href="/configuracao" class="dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                            Configurações
+                        </a>
+                        <a onclick="toggleTheme()" class="dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                            <span id="themeText">Modo Claro</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a onclick="logout()" class="dropdown-item danger">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            Sair
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ══ CONTEÚDO ══════════════════════════════════════ -->
+    <div class="page-container">
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="/home">Home</a>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            <span id="breadNick">Meu Perfil</span>
+        </div>
+
+        <div class="meu-perfil-grid">
+
+            <!-- ── COLUNA ESQUERDA ─────────────────────── -->
+            <div class="meu-perfil-sidebar">
+
+                <!-- Card principal -->
+                <div class="profile-card">
+                    <div class="avatar-banner" id="avatarBanner"></div>
+                    <div class="avatar-wrap">
+                        <div class="avatar-frame">
+                            <img id="profileAvatar" src="" alt="Avatar">
+                        </div>
+                    </div>
+                    <div class="profile-body">
+                        <div class="profile-nick">
+                            <span id="profileNick"></span>
+                            <span class="profile-nick-tag" id="profileTag">DME</span>
+                        </div>
+                        <div class="profile-rank-line">
+                            <span id="profilePatente"></span>
+                            &middot;
+                            <span class="corp-badge" id="profileCorpBadge"></span>
+                        </div>
+
+                        <div class="profile-info-list">
+                            <div class="pil-row">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                <span class="pil-label">Patente</span>
+                                <span class="pil-val" id="infoPatente"></span>
+                            </div>
+                            <div class="pil-row">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                <span class="pil-label">Tag</span>
+                                <span class="pil-val" id="infoTag"></span>
+                            </div>
+                            <div class="pil-row" id="rowGratificacoes">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                <span class="pil-label">Gratificação</span>
+                                <span class="pil-val" id="infoGratificacoes">0</span>
+                            </div>
+                            <div class="pil-row">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                <span class="pil-label">Status</span>
+                                <span class="pil-val" id="infoStatus"></span>
+                            </div>
+                            <div class="pil-row">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                <span class="pil-label">Membro desde</span>
+                                <span class="pil-val" id="infoDesde"></span>
+                            </div>
+                            <div class="pil-row">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 10v11M16 10v11M12 10v11"/></svg>
+                                <span class="pil-label">Corpo</span>
+                                <span class="pil-val" id="infoCorp"></span>
+                            </div>
+                            <div class="pil-row" id="rowListagem" style="display:none">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                                <span class="pil-label">Na Listagem</span>
+                                <span class="pil-val pil-listagem" id="infoListagem"></span>
+                                <button id="btnCopiarListagem" class="btn-copiar-listagem" onclick="copiarInfoListagem()" title="Copiar">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <a id="btnHabbo" href="#" target="_blank" class="btn-habbo">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                            Ver no Habbo
+                        </a>
+                    </div>
+
+                    <!-- Mini stats -->
+                    <div class="stats-mini">
+                        <div class="stat-m">
+                            <div class="stat-m-val" id="statHoras"></div>
+                            <div class="stat-m-lbl">Horas/mês</div>
+                        </div>
+                        <div class="stat-m">
+                            <div class="stat-m-val" id="statPromocoes"></div>
+                            <div class="stat-m-lbl">Promoções</div>
+                        </div>
+                        <div class="stat-m">
+                            <div class="stat-m-val" id="statAulas"></div>
+                            <div class="stat-m-lbl">Aulas</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emblemas -->
+                <div class="sec-card">
+                    <div class="sec-head">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+                        Emblemas
+                    </div>
+                    <div class="sec-body">
+                        <div class="emblemas-grid" id="emblemasList">
+                            <div style="font-size:.7rem;color:var(--t3)">Sem emblemas registrados</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Honrarias -->
+                <div class="sec-card">
+                    <div class="sec-head">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        Honrarias
+                    </div>
+                    <div class="sec-body">
+                        <div class="honrarias-grid" id="honrariasList">
+                            <div style="font-size:.7rem;color:var(--t3)">Sem honrarias registradas</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ── COLUNA DIREITA (tabs) ───────────────── -->
+            <div class="meu-perfil-main">
+
+                <!-- Tab bar -->
+                <div class="tabs-bar">
+                    <button class="tab-btn active" onclick="switchTab('historico')" id="tab-historico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        Histórico
+                        <span class="tab-badge" id="badgeHistorico">0</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('aulas')" id="tab-aulas">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                        Aulas e Diplomas
+                        <span class="tab-badge" id="badgeAulas">0</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('gratificacoes')" id="tab-gratificacoes">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        Gratificações
+                        <span class="tab-badge" id="badgeGratificacoes">0</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('funcoes')" id="tab-funcoes">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        Funções
+                        <span class="tab-badge" id="badgeFuncoes">0</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('aquisicoes')" id="tab-aquisicoes">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                        Aquisições
+                        <span class="tab-badge" id="badgeAquisicoes">0</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('turnos')" id="tab-turnos">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Turnos
+                        <span class="tab-badge" id="badgeTurnos">0</span>
+                    </button>
+                </div>
+
+                <!-- Tab: Histórico -->
+                <div class="tab-panel active" id="panel-historico">
+                    <div id="historicoList"></div>
+                </div>
+
+                <!-- Tab: Aulas e Diplomas -->
+                <div class="tab-panel" id="panel-aulas">
+                    <div id="aulasList"></div>
+                </div>
+
+                <!-- Tab: Gratificações -->
+                <div class="tab-panel" id="panel-gratificacoes">
+                    <div id="gratificacoesList"></div>
+                </div>
+
+                <!-- Tab: Funções -->
+                <div class="tab-panel" id="panel-funcoes">
+                    <div id="funcoesList"></div>
+                </div>
+
+                <!-- Tab: Aquisições -->
+                <div class="tab-panel" id="panel-aquisicoes">
+                    <div id="aquisicoesList"></div>
+                </div>
+
+                <!-- Tab: Turnos -->
+                <div class="tab-panel" id="panel-turnos">
+                    <div id="turnosList"></div>
+                </div>
+
+            </div><!-- /.meu-perfil-main -->
+        </div><!-- /.meu-perfil-grid -->
+    </div><!-- /.page-container -->
+
+    <script src="/scripts/meu_perfil.js"></script>
+</body>
+</html>

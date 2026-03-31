@@ -30,6 +30,30 @@ async def login(body: LoginRequest):
       4. Gera JWT e seta como cookie httpOnly
     """
     settings = get_settings()
+
+    # ── DEV BYPASS ───────────────────────────────────────────────────────────
+    # Ativo somente quando DEV_MODE=true E Supabase não está configurado.
+    # Aceita nick="dev" senha="dev123" (admin) ou nick="user" senha="dev123" (user).
+    # NUNCA chegará em produção porque DEV_MODE=false lá.
+    # ─────────────────────────────────────────────────────────────────────────
+    if settings.DEV_MODE:
+        DEV_USERS = {
+            "dev":  {"senha": "dev123", "role": "admin", "patente": "Comandante-Geral", "corpo": "militar"},
+            "user": {"senha": "dev123", "role": "user",  "patente": "Soldado",          "corpo": "militar"},
+        }
+        dev_user = DEV_USERS.get(body.nick.lower())
+        if dev_user and body.password == dev_user["senha"]:
+            token = create_jwt(body.nick, dev_user["role"])
+            response = JSONResponse(content={"ok": True, "message": "[DEV] Login de teste realizado"})
+            response.set_cookie(
+                key=settings.COOKIE_NAME, value=token,
+                httponly=settings.COOKIE_HTTPONLY, secure=settings.COOKIE_SECURE,
+                samesite=settings.COOKIE_SAMESITE, max_age=settings.COOKIE_MAX_AGE, path="/",
+            )
+            logger.warning(f"[DEV] Login de teste: {body.nick} (role={dev_user['role']})")
+            return response
+        raise HTTPException(status_code=401, detail="[DEV] Use nick='dev' ou 'user' com senha='dev123'")
+
     sb = get_supabase()
 
     # 1. Busca o usuário

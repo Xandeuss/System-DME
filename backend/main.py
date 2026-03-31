@@ -100,11 +100,20 @@ def _render_protected(template: str):
     """
     Atalho para rotas protegidas: valida o cookie JWT antes de servir o template.
     Se não autenticado, redireciona para /login.
-    Injeta os dados do usuário no contexto do template.
+    Em DEV_MODE sem Supabase configurado, pula a autenticação e injeta usuário de teste.
     """
     from backend.services.auth_service import decode_jwt
 
     async def handler(request: Request) -> HTMLResponse:
+        # ── DEV BYPASS ───────────────────────────────────────────────────────
+        if settings.DEV_MODE:
+            return templates.TemplateResponse(template, {
+                "request": request,
+                "user_nick": "dev",
+                "user_role": "admin",
+            })
+        # ─────────────────────────────────────────────────────────────────────
+
         token = request.cookies.get(settings.COOKIE_NAME)
         if not token:
             return RedirectResponse(url="/login")
@@ -126,11 +135,20 @@ def _render_protected(template: str):
 def _render_admin(template: str):
     """
     Atalho para rotas de admin: exige role 'admin' no JWT.
-    Se não autenticado ou não admin, redireciona para /login ou /home.
+    Em DEV_MODE sem Supabase configurado, pula a autenticação e injeta admin de teste.
     """
     from backend.services.auth_service import decode_jwt
 
     async def handler(request: Request) -> HTMLResponse:
+        # ── DEV BYPASS ───────────────────────────────────────────────────────
+        if settings.DEV_MODE:
+            return templates.TemplateResponse(template, {
+                "request": request,
+                "user_nick": "dev",
+                "user_role": "admin",
+            })
+        # ─────────────────────────────────────────────────────────────────────
+
         token = request.cookies.get(settings.COOKIE_NAME)
         if not token:
             return RedirectResponse(url="/login")
@@ -161,16 +179,23 @@ def _render_admin(template: str):
 # Raiz → redireciona para /login
 @app.get("/", response_class=RedirectResponse, include_in_schema=False)
 async def root():
+    if settings.DEV_MODE:
+        return RedirectResponse(url="/home")
     return RedirectResponse(url="/login")
 
 # ── Páginas públicas (não exigem login) ──────────────────────────────────────
-app.add_api_route("/login",       _render("login.html"),       methods=["GET"], response_class=HTMLResponse)
+@app.get("/login", response_class=HTMLResponse, include_in_schema=False)
+async def login_page(request: Request):
+    if settings.DEV_MODE:
+        return RedirectResponse(url="/home")
+    return templates.TemplateResponse("login.html", {"request": request})
 app.add_api_route("/verificacao", _render("verificacao.html"), methods=["GET"], response_class=HTMLResponse)
 app.add_api_route("/setup_admin", _render("setup_admin.html"), methods=["GET"], response_class=HTMLResponse)
 
 # ── Páginas protegidas (exigem login) ────────────────────────────────────────
 app.add_api_route("/home",         _render_protected("home.html"),         methods=["GET"], response_class=HTMLResponse)
 app.add_api_route("/perfil",       _render_protected("perfil.html"),       methods=["GET"], response_class=HTMLResponse)
+app.add_api_route("/meu_perfil",   _render_protected("meu_perfil.html"),   methods=["GET"], response_class=HTMLResponse)
 app.add_api_route("/configuracao", _render_protected("configuracao.html"), methods=["GET"], response_class=HTMLResponse)
 
 # Serviços e operações
