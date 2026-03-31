@@ -23,3 +23,6 @@ Thumbs.db
 
 # Node (caso use scripts auxiliares)
 node_modules/
+
+# Claude
+.claude
