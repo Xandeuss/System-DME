@@ -15,6 +15,7 @@ import logging
 from backend.config import get_settings
 from backend.routers.auth import router as auth_router
 from backend.routers.requerimentos import router as requerimentos_router
+from backend.routers.dashboard import router as dashboard_router
 from backend.dependencies import get_current_user, get_current_admin, ADMINS_FIXOS
 from backend.models.auth import UserInfo
 
@@ -95,6 +96,7 @@ templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 # ── Registrar routers ────────────────────────────────────────────────────────
 app.include_router(auth_router)
 app.include_router(requerimentos_router)
+app.include_router(dashboard_router)
 
 # ── Tratamento global de erros ────────────────────────────────────────────────
 @app.exception_handler(StarletteHTTPException)

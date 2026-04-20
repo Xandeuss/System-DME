@@ -1,10 +1,23 @@
 (function () {
     const NOTIF_KEY_PREFIX = 'dme_notificacoes_';
-    const currentUser = localStorage.getItem('dme_username');
-    if (!currentUser) return;
+
+    // Aguarda o home.js (ou qualquer página) definir window.dmeCurrentUser
+    // via chamada a /api/auth/me. Tenta até 5s, depois desiste.
+    let currentUser = null;
+    let retries = 0;
+
+    function tryInit() {
+        currentUser = window.dmeCurrentUser || null;
+        if (!currentUser) {
+            retries++;
+            if (retries < 25) { setTimeout(tryInit, 200); return; }
+            return; // desiste após 5s
+        }
+        injetarEstilos();
+        injetarSinoNaNavbar();
+    }
 
     function injetarEstilos() {
-        // Redundantes, agora usamos .btn-circle do global.css + os específicos de dropdown
         if (document.getElementById('notif-styles')) return;
         const style = document.createElement('style');
         style.id = 'notif-styles';
@@ -154,7 +167,7 @@
     }
 
     window.addEventListener('storage', function (e) {
-        if (e.key === getNotifKey()) {
+        if (currentUser && e.key === getNotifKey()) {
             renderNotificacoes();
         }
     });
@@ -170,15 +183,15 @@
         });
         localStorage.setItem(key, JSON.stringify(notifs));
 
-        if (targetUser === currentUser) {
+        if (currentUser && targetUser === currentUser) {
             renderNotificacoes();
         }
     };
 
+    // Inicia quando o DOM estiver pronto
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function () { injetarEstilos(); injetarSinoNaNavbar(); });
+        document.addEventListener('DOMContentLoaded', tryInit);
     } else {
-        injetarEstilos();
-        injetarSinoNaNavbar();
+        tryInit();
     }
 })();

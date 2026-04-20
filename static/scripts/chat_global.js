@@ -1,12 +1,21 @@
 (function () {
-    const currentUser = localStorage.getItem('dme_username');
-    if (!currentUser) return;
+    // Aguarda o home.js (ou qualquer página) definir window.dmeCurrentUser
+    let retries = 0;
+
+    function tryInit() {
+        const currentUser = window.dmeCurrentUser || null;
+        if (!currentUser) {
+            retries++;
+            if (retries < 25) { setTimeout(tryInit, 200); return; }
+            return;
+        }
+        injetarBotaoChat();
+    }
 
     function injetarBotaoChat() {
         const navActions = document.querySelector('.nav-actions');
         if (!navActions) return;
 
-        // Evita duplicatas
         if (document.getElementById('chatToggleBtn')) return;
 
         const chatBtn = document.createElement('a');
@@ -21,7 +30,6 @@
             <span class="badge-dot" id="chatBadge" style="display:none;">0</span>
         `;
 
-        // Inserir antes das notificações (se houver) ou antes do perfil
         const notifBell = document.getElementById('notifBellWrapper');
         const userProfile = navActions.querySelector('.user-profile');
 
@@ -34,18 +42,9 @@
         }
     }
 
-    function injetarEstilosExtra() {
-        // Redundantes, agora usamos .btn-circle do global.css
-    }
-
-    // Inicialização
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-            injetarEstilosExtra();
-            injetarBotaoChat();
-        });
+        document.addEventListener('DOMContentLoaded', tryInit);
     } else {
-        injetarEstilosExtra();
-        injetarBotaoChat();
+        tryInit();
     }
 })();
