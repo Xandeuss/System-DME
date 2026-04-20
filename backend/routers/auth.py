@@ -10,7 +10,7 @@ from fastapi.responses import JSONResponse
 from backend.config import get_settings
 from backend.models.auth import LoginRequest, RegisterRequest, AuthResponse, UserInfo
 from backend.services.auth_service import hash_password, verify_password, create_jwt
-from backend.services.supabase_client import get_supabase
+from backend.services.local_store import get_store
 from backend.dependencies import get_current_user, ADMINS_FIXOS
 
 logger = logging.getLogger("dme.auth")
@@ -23,70 +23,23 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 async def login(body: LoginRequest):
     """
     Autentica o usuário e seta o cookie JWT httpOnly.
-    Fluxo:
-      1. Busca o militar no Supabase pelo nick
-      2. Verifica a senha com bcrypt
-      3. Checa se o status é 'ativo'
-      4. Gera JWT e seta como cookie httpOnly
+    Usa o store local em memória.
     """
     settings = get_settings()
-
-    # ── DEV BYPASS ───────────────────────────────────────────────────────────
-    # Ativo somente quando DEV_MODE=true E Supabase não está configurado.
-    # Aceita nick="dev" senha="dev123" (admin) ou nick="user" senha="dev123" (user).
-    # NUNCA chegará em produção porque DEV_MODE=false lá.
-    # ─────────────────────────────────────────────────────────────────────────
-    if settings.DEV_MODE:
-        DEV_USERS = {
-            "dev":  {"senha": "dev123", "role": "admin", "patente": "Comandante-Geral", "corpo": "militar"},
-            "user": {"senha": "dev123", "role": "user",  "patente": "Soldado",          "corpo": "militar"},
-        }
-        dev_user = DEV_USERS.get(body.nick.lower())
-        if dev_user and body.password == dev_user["senha"]:
-            token = create_jwt(body.nick, dev_user["role"])
-            response = JSONResponse(content={"ok": True, "message": "[DEV] Login de teste realizado"})
-            response.set_cookie(
-                key=settings.COOKIE_NAME, value=token,
-                httponly=settings.COOKIE_HTTPONLY, secure=settings.COOKIE_SECURE,
-                samesite=settings.COOKIE_SAMESITE, max_age=settings.COOKIE_MAX_AGE, path="/",
-            )
-            logger.warning(f"[DEV] Login de teste: {body.nick} (role={dev_user['role']})")
-            return response
-        raise HTTPException(status_code=401, detail="[DEV] Use nick='dev' ou 'user' com senha='dev123'")
-
-    sb = get_supabase()
+    store = get_store()
 
     # 1. Busca o usuário
-    try:
-        result = sb.table("militares").select("*").eq("nick", body.nick).maybe_single().execute()
-        user = result.data
-    except Exception as e:
-        logger.error(f"Erro ao buscar usuário {body.nick}: {e}")
-        raise HTTPException(status_code=500, detail="Erro interno ao consultar o banco")
-
+    user = store.get_militar(body.nick)
     if not user:
         raise HTTPException(status_code=401, detail="Usuário não encontrado")
 
     # 2. Verifica a senha
     senha_hash = user.get("senha_hash", "")
     if not senha_hash:
-        # Usuário antigo sem hash — aceita a senha antiga e migra o hash
-        # (compatibilidade com senhas "123456" do sistema legado)
-        senha_legado = user.get("senha", "123456")
-        if body.password != senha_legado:
-            raise HTTPException(status_code=401, detail="Senha incorreta")
+        raise HTTPException(status_code=401, detail="Senha não configurada para este usuário")
 
-        # Migra: grava o hash da senha que o usuário digitou
-        novo_hash = hash_password(body.password)
-        try:
-            sb.table("militares").update({"senha_hash": novo_hash}).eq("nick", body.nick).execute()
-            logger.info(f"Senha migrada para bcrypt: {body.nick}")
-        except Exception as e:
-            logger.warning(f"Falha ao migrar hash de {body.nick}: {e}")
-    else:
-        # Caminho normal: verifica com bcrypt
-        if not verify_password(body.password, senha_hash):
-            raise HTTPException(status_code=401, detail="Senha incorreta")
+    if not verify_password(body.password, senha_hash):
+        raise HTTPException(status_code=401, detail="Senha incorreta")
 
     # 3. Checa status
     user_status = (user.get("status") or "ativo").lower()
@@ -123,47 +76,30 @@ async def login(body: LoginRequest):
 @router.post("/register", response_model=AuthResponse)
 async def register(body: RegisterRequest):
     """
-    Registra um novo militar.
-    Fluxo:
-      1. Verifica se o nick já existe
-      2. Faz hash da senha
-      3. Insere no Supabase com status 'pendente'
+    Registra um novo militar no store local.
+    Em dev, o status já é 'ativo' para facilitar testes.
     """
-    sb = get_supabase()
+    store = get_store()
 
     # 1. Verifica duplicidade
-    try:
-        result = sb.table("militares").select("nick").eq("nick", body.nick).maybe_single().execute()
-        if result.data:
-            raise HTTPException(status_code=409, detail="Este nome de usuário já está em uso")
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Erro ao verificar nick {body.nick}: {e}")
-        raise HTTPException(status_code=500, detail="Erro interno ao consultar o banco")
+    if store.get_militar(body.nick):
+        raise HTTPException(status_code=409, detail="Este nome de usuário já está em uso")
 
-    # 2. Hash da senha
-    senha_hash = hash_password(body.password)
-
-    # 3. Insere
-    novo_militar = {
+    # 2. Hash da senha e insere
+    store.insert_militar({
         "nick": body.nick,
         "email": body.email,
-        "senha_hash": senha_hash,
+        "senha_hash": hash_password(body.password),
         "patente": "Recruta",
         "corpo": "militar",
-        "status": "pendente",
+        "status": "ativo",  # ativo direto em dev (sem aprovação)
         "role": "user",
-    }
+        "tag": "DME",
+        "created_at": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
+    })
 
-    try:
-        sb.table("militares").insert(novo_militar).execute()
-    except Exception as e:
-        logger.error(f"Erro ao registrar {body.nick}: {e}")
-        raise HTTPException(status_code=500, detail="Erro ao realizar cadastro")
-
-    logger.info(f"Registro OK: {body.nick} (status=pendente)")
-    return AuthResponse(ok=True, message="Cadastro realizado! Aguarde aprovação de um administrador.")
+    logger.info(f"Registro OK: {body.nick} (status=ativo)")
+    return AuthResponse(ok=True, message="Cadastro realizado com sucesso! Você já pode fazer login.")
 
 
 # ── POST /api/auth/logout ────────────────────────────
@@ -185,8 +121,5 @@ async def logout():
 # ── GET /api/auth/me ─────────────────────────────────
 @router.get("/me", response_model=UserInfo)
 async def me(user: UserInfo = Depends(get_current_user)):
-    """
-    Retorna os dados do usuário autenticado.
-    O frontend usa isso em vez de localStorage.getItem('dme_username').
-    """
+    """Retorna os dados do usuário autenticado."""
     return user

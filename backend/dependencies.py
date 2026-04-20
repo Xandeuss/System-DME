@@ -7,7 +7,7 @@ from fastapi import Request, HTTPException, status
 
 from backend.config import get_settings
 from backend.services.auth_service import decode_jwt
-from backend.services.supabase_client import get_supabase
+from backend.services.local_store import get_store
 from backend.models.auth import UserInfo
 
 # Nicks que são sempre admin, independente do banco
@@ -38,16 +38,11 @@ async def get_current_user(request: Request) -> UserInfo:
     nick = payload["sub"]
     role = payload.get("role", "user")
 
-    # Busca dados atualizados do Supabase
-    try:
-        sb = get_supabase()
-        result = sb.table("militares").select("*").eq("nick", nick).maybe_single().execute()
-        user_data = result.data
-    except Exception:
-        user_data = None
+    # Busca dados no store local
+    store = get_store()
+    user_data = store.get_militar(nick)
 
     if user_data:
-        # Admin fixo sempre sobrescreve
         is_admin = nick.lower() in ADMINS_FIXOS or role == "admin"
 
         return UserInfo(
@@ -58,7 +53,7 @@ async def get_current_user(request: Request) -> UserInfo:
             role="admin" if is_admin else "user",
         )
 
-    # Usuário não encontrado no banco mas tem token válido
+    # Usuário não encontrado no store mas tem token válido
     return UserInfo(
         nick=nick,
         role="admin" if nick.lower() in ADMINS_FIXOS else role,

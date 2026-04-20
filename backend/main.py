@@ -14,7 +14,7 @@ import logging
 
 from backend.config import get_settings
 from backend.routers.auth import router as auth_router
-from backend.routers.requerimentos import router as requerimentos_router
+from backend.routers.requirements import router as requerimentos_router
 from backend.routers.dashboard import router as dashboard_router
 from backend.dependencies import get_current_user, get_current_admin, ADMINS_FIXOS
 from backend.models.auth import UserInfo
@@ -28,7 +28,6 @@ logger = logging.getLogger("dme")
 
 # ── Validar configuração
 settings = get_settings()
-# Descomente a linha abaixo quando tiver a service key configurada no .env:
 settings.validate()
 
 # ── App 
@@ -126,14 +125,12 @@ def _render_protected(template: str):
     from backend.services.auth_service import decode_jwt
 
     async def handler(request: Request) -> HTMLResponse:
-        # ── DEV BYPASS ───────────────────────────────────────────────────────
         if settings.DEV_MODE:
             return templates.TemplateResponse(template, {
                 "request": request,
                 "user_nick": "dev",
                 "user_role": "admin",
             })
-        # ─────────────────────────────────────────────────────────────────────
 
         token = request.cookies.get(settings.COOKIE_NAME)
         if not token:
@@ -161,14 +158,12 @@ def _render_admin(template: str):
     from backend.services.auth_service import decode_jwt
 
     async def handler(request: Request) -> HTMLResponse:
-        # ── DEV BYPASS ───────────────────────────────────────────────────────
         if settings.DEV_MODE:
             return templates.TemplateResponse(template, {
                 "request": request,
                 "user_nick": "dev",
                 "user_role": "admin",
             })
-        # ─────────────────────────────────────────────────────────────────────
 
         token = request.cookies.get(settings.COOKIE_NAME)
         if not token:
@@ -195,16 +190,14 @@ def _render_admin(template: str):
     return handler
 
 
-# ── Rotas ─────────────────────────────────────────────────────────────────────
-
-# Raiz → redireciona para /login
+# ── Rotas
 @app.get("/", response_class=RedirectResponse, include_in_schema=False)
 async def root():
     if settings.DEV_MODE:
         return RedirectResponse(url="/home")
     return RedirectResponse(url="/login")
 
-# ── Páginas públicas (não exigem login) ──────────────────────────────────────
+# ── Páginas públicas
 @app.get("/login", response_class=HTMLResponse, include_in_schema=False)
 async def login_page(request: Request):
     if settings.DEV_MODE:
@@ -213,7 +206,7 @@ async def login_page(request: Request):
 app.add_api_route("/verificacao", _render("verificacao.html"), methods=["GET"], response_class=HTMLResponse)
 app.add_api_route("/setup_admin", _render("setup_admin.html"), methods=["GET"], response_class=HTMLResponse)
 
-# ── Páginas protegidas (exigem login) ────────────────────────────────────────
+# ── Páginas protegidas
 app.add_api_route("/home",         _render_protected("home.html"),         methods=["GET"], response_class=HTMLResponse)
 app.add_api_route("/perfil",       _render_protected("perfil.html"),       methods=["GET"], response_class=HTMLResponse)
 app.add_api_route("/meu_perfil",   _render_protected("meu_perfil.html"),   methods=["GET"], response_class=HTMLResponse)
@@ -245,6 +238,6 @@ app.add_api_route("/mensagens",   _render_protected("mensagens.html"), methods=[
 app.add_api_route("/chat",        _render_protected("chat.html"),      methods=["GET"], response_class=HTMLResponse)
 app.add_api_route("/chat_global", _render_protected("chat.html"),      methods=["GET"], response_class=HTMLResponse)
 
-# ── Páginas administrativas (exigem role admin) ─────────────────────────────
+# ── Páginas administrativas
 app.add_api_route("/painel",    _render_admin("painel.html"),    methods=["GET"], response_class=HTMLResponse)
 app.add_api_route("/listagens", _render_admin("listagens.html"), methods=["GET"], response_class=HTMLResponse)

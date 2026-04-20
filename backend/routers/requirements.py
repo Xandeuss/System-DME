@@ -16,7 +16,7 @@ from fastapi.responses import JSONResponse
 
 from backend.dependencies import get_current_user, get_current_admin
 from backend.models.auth import UserInfo
-from backend.models.requerimentos import RequerimentoCreate, RequerimentoUpdate, MilitarUpdate
+from backend.models.requirements import RequerimentoCreate, RequerimentoUpdate, MilitarUpdate
 from backend.services.supabase_client import get_supabase
 
 logger = logging.getLogger("dme.requerimentos")

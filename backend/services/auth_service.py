@@ -11,7 +11,7 @@ from passlib.context import CryptContext
 
 from backend.config import get_settings
 
-# ── Hashing de senha com bcrypt ──────────────────────
+# ── Hashing de senha com bcrypt
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -25,7 +25,7 @@ def verify_password(plain: str, hashed: str) -> bool:
     return pwd_context.verify(plain, hashed)
 
 
-# ── JWT ──────────────────────────────────────────────
+# ── JWT
 def create_jwt(nick: str, role: str = "user") -> str:
     """
     Cria um token JWT assinado.
