@@ -232,7 +232,9 @@ if (DOM.loginForm) {
             });
 
             // Login OK — o cookie já foi setado pelo backend.
-            // Redireciona para /home (o servidor vai validar o cookie lá também).
+            // Também guardamos o nick em localStorage para scripts legados que ainda consultam 'dme_username'.
+            try { localStorage.setItem("dme_username", username); } catch (_) {}
+
             window.location.href = "/home";
         } catch (err) {
             console.error("Erro no login:", err);

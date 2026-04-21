@@ -1,28 +1,31 @@
 """
 Serviço de autenticação.
-Gerencia hash de senhas e criação/validação de tokens JWT.
+Gerencia hash de senhas (bcrypt direto) e criação/validação de tokens JWT.
 """
 
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
+import bcrypt
 from jose import jwt, JWTError
-from passlib.context import CryptContext
 
 from backend.config import get_settings
 
-# ── Hashing de senha com bcrypt
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-
+# ── Hashing de senha com bcrypt (sem passlib, evitando incompatibilidades)
 def hash_password(plain: str) -> str:
     """Gera o hash bcrypt de uma senha em texto puro."""
-    return pwd_context.hash(plain)
+    salt = bcrypt.gensalt(rounds=12)
+    hashed = bcrypt.hashpw(plain.encode("utf-8"), salt)
+    return hashed.decode("utf-8")
 
 
 def verify_password(plain: str, hashed: str) -> bool:
     """Compara uma senha em texto puro com o hash armazenado."""
-    return pwd_context.verify(plain, hashed)
+    try:
+        return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
+    except (ValueError, TypeError):
+        return False
 
 
 # ── JWT
@@ -55,7 +58,6 @@ def decode_jwt(token: str) -> Optional[dict]:
             settings.JWT_SECRET,
             algorithms=[settings.JWT_ALGORITHM],
         )
-        # Garante que o campo 'sub' existe
         if payload.get("sub") is None:
             return None
         return payload

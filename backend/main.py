@@ -76,7 +76,7 @@ app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Em produção, substitua pelo domínio real
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -100,9 +100,14 @@ app.include_router(dashboard_router)
 # ── Tratamento global de erros ────────────────────────────────────────────────
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
-    """Redireciona 404 para /login e loga qualquer outro erro HTTP."""
+    """
+    Loga qualquer erro HTTP.
+    Só redireciona 404 -> /login para páginas HTML (não para /api/* nem /scripts/* ou /styles/*).
+    """
     logger.warning(f"HTTP {exc.status_code} em {request.url.path}")
-    if exc.status_code == 404:
+    path = request.url.path
+    is_api_or_asset = path.startswith("/api/") or path.startswith("/scripts/") or path.startswith("/styles/")
+    if exc.status_code == 404 and not is_api_or_asset:
         return RedirectResponse(url="/login")
     return await http_exception_handler(request, exc)
 
