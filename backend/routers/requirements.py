@@ -17,7 +17,7 @@ from fastapi.responses import JSONResponse
 from backend.dependencies import get_current_user, get_current_admin
 from backend.models.auth import UserInfo
 from backend.models.requirements import RequerimentoCreate, RequerimentoUpdate, MilitarUpdate
-from backend.services.supabase_client import get_supabase
+from backend.services.local_store import get_store
 
 logger = logging.getLogger("dme.requerimentos")
 
@@ -36,19 +36,15 @@ async def criar_requerimento(
     O aplicador é extraído do JWT — nunca do body.
     O status inicial é sempre 'pendente'.
     """
-    sb = get_supabase()
+    store = get_store()
 
     registro = body.model_dump(exclude_none=True)
     registro["aplicador"] = user.nick
     registro["status"] = "pendente"
 
-    try:
-        result = sb.table("requerimentos").insert(registro).execute()
-        logger.info(f"Requerimento criado por {user.nick}: tipo={body.tipo}")
-        return {"ok": True, "data": result.data[0] if result.data else None}
-    except Exception as e:
-        logger.error(f"Erro ao criar requerimento: {e}")
-        raise HTTPException(status_code=500, detail="Erro ao salvar requerimento")
+    result = store.insert_requerimento(registro)
+    logger.info(f"Requerimento criado por {user.nick}: tipo={body.tipo}")
+    return {"ok": True, "data": result}
 
 
 # ── GET /api/requerimentos ────────────────────────────────────────────────────
@@ -65,24 +61,10 @@ async def listar_requerimentos(
     - aba='todos': retorna todos (qualquer usuário pode ver).
     Ordenação: mais recente primeiro.
     """
-    sb = get_supabase()
-
-    try:
-        query = (
-            sb.table("requerimentos")
-            .select("*")
-            .eq("tipo", tipo)
-            .order("data_hora", desc=True)
-        )
-
-        if aba == "minhas":
-            query = query.eq("aplicador", user.nick)
-
-        result = query.execute()
-        return {"ok": True, "data": result.data or []}
-    except Exception as e:
-        logger.error(f"Erro ao listar requerimentos: {e}")
-        raise HTTPException(status_code=500, detail="Erro ao carregar requerimentos")
+    store = get_store()
+    aplicador = user.nick if aba == "minhas" else None
+    result = store.list_requerimentos(tipo=tipo, aplicador=aplicador)
+    return {"ok": True, "data": result}
 
 
 # ── GET /api/requerimentos/{req_id} ──────────────────────────────────────────
@@ -93,24 +75,11 @@ async def buscar_requerimento(
     user: UserInfo = Depends(get_current_user),
 ):
     """Busca um requerimento específico pelo ID."""
-    sb = get_supabase()
-
-    try:
-        result = (
-            sb.table("requerimentos")
-            .select("*")
-            .eq("id", req_id)
-            .maybe_single()
-            .execute()
-        )
-        if not result.data:
-            raise HTTPException(status_code=404, detail="Requerimento não encontrado")
-        return {"ok": True, "data": result.data}
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Erro ao buscar requerimento {req_id}: {e}")
-        raise HTTPException(status_code=500, detail="Erro ao buscar requerimento")
+    store = get_store()
+    r = store.get_requerimento(req_id)
+    if not r:
+        raise HTTPException(status_code=404, detail="Requerimento não encontrado")
+    return {"ok": True, "data": r}
 
 
 # ── PATCH /api/requerimentos/{req_id} ────────────────────────────────────────
@@ -126,9 +95,6 @@ async def atualizar_requerimento(
     Aprovar/reprovar/cancelar exige role admin.
     Editar observação pode ser feito pelo próprio aplicador.
     """
-    sb = get_supabase()
-
-    # Operações de workflow (aceitar/negar/cancelar) são restritas a admin
     acoes_admin = {"aprovado", "reprovado", "cancelado"}
     if body.status in acoes_admin and user.role != "admin":
         raise HTTPException(
@@ -140,13 +106,13 @@ async def atualizar_requerimento(
     if not campos:
         raise HTTPException(status_code=400, detail="Nenhum campo para atualizar")
 
-    try:
-        sb.table("requerimentos").update(campos).eq("id", req_id).execute()
-        logger.info(f"Requerimento {req_id} atualizado por {user.nick}: {campos}")
-        return {"ok": True, "message": "Requerimento atualizado com sucesso"}
-    except Exception as e:
-        logger.error(f"Erro ao atualizar requerimento {req_id}: {e}")
-        raise HTTPException(status_code=500, detail="Erro ao atualizar requerimento")
+    store = get_store()
+    r = store.update_requerimento(req_id, campos)
+    if not r:
+        raise HTTPException(status_code=404, detail="Requerimento não encontrado")
+
+    logger.info(f"Requerimento {req_id} atualizado por {user.nick}: {campos}")
+    return {"ok": True, "message": "Requerimento atualizado com sucesso"}
 
 
 # ── DELETE /api/requerimentos/{req_id} ───────────────────────────────────────
@@ -157,15 +123,10 @@ async def deletar_requerimento(
     user: UserInfo = Depends(get_current_admin),
 ):
     """Remove um requerimento. Restrito a administradores."""
-    sb = get_supabase()
-
-    try:
-        sb.table("requerimentos").delete().eq("id", req_id).execute()
-        logger.info(f"Requerimento {req_id} deletado por {user.nick}")
-        return {"ok": True, "message": "Requerimento removido com sucesso"}
-    except Exception as e:
-        logger.error(f"Erro ao deletar requerimento {req_id}: {e}")
-        raise HTTPException(status_code=500, detail="Erro ao deletar requerimento")
+    store = get_store()
+    store.delete_requerimento(req_id)
+    logger.info(f"Requerimento {req_id} deletado por {user.nick}")
+    return {"ok": True, "message": "Requerimento removido com sucesso"}
 
 
 # ── PATCH /api/militares/{nick} ───────────────────────────────────────────────
@@ -178,19 +139,16 @@ async def atualizar_militar(
 ):
     """
     Atualiza patente ou status de um militar.
-    Restrito a administradores — chamado internamente ao aprovar
-    requerimentos de promoção, rebaixamento ou demissão.
+    Restrito a administradores.
     """
-    sb = get_supabase()
-
     campos = body.model_dump(exclude_none=True)
     if not campos:
         raise HTTPException(status_code=400, detail="Nenhum campo para atualizar")
 
-    try:
-        sb.table("militares").update(campos).eq("nick", nick).execute()
-        logger.info(f"Militar {nick} atualizado por {user.nick}: {campos}")
-        return {"ok": True, "message": f"Militar {nick} atualizado com sucesso"}
-    except Exception as e:
-        logger.error(f"Erro ao atualizar militar {nick}: {e}")
-        raise HTTPException(status_code=500, detail="Erro ao atualizar militar")
+    store = get_store()
+    m = store.update_militar(nick, campos)
+    if not m:
+        raise HTTPException(status_code=404, detail="Militar não encontrado")
+
+    logger.info(f"Militar {nick} atualizado por {user.nick}: {campos}")
+    return {"ok": True, "message": f"Militar {nick} atualizado com sucesso"}

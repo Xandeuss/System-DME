@@ -120,7 +120,7 @@ def _render_protected(template: str):
     """
     Atalho para rotas protegidas: valida o cookie JWT antes de servir o template.
     Se não autenticado, redireciona para /login.
-    Em DEV_MODE sem Supabase configurado, pula a autenticação e injeta usuário de teste.
+    Em DEV_MODE, pula a autenticação e injeta usuário de teste.
     """
     from backend.services.auth_service import decode_jwt
 
@@ -153,7 +153,7 @@ def _render_protected(template: str):
 def _render_admin(template: str):
     """
     Atalho para rotas de admin: exige role 'admin' no JWT.
-    Em DEV_MODE sem Supabase configurado, pula a autenticação e injeta admin de teste.
+    Em DEV_MODE, pula a autenticação e injeta admin de teste.
     """
     from backend.services.auth_service import decode_jwt
 

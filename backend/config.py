@@ -17,10 +17,6 @@ load_dotenv(_env_path)
 class Settings:
     """Configurações carregadas das variáveis de ambiente."""
 
-    # ── Supabase ──────────────────────────────────────
-    SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
-    SUPABASE_SERVICE_KEY: str = os.getenv("SUPABASE_SERVICE_KEY", "")
-
     # ── JWT ───────────────────────────────────────────
     JWT_SECRET: str = os.getenv("JWT_SECRET", "INSEGURO-troque-isso")
     JWT_ALGORITHM: str = "HS256"
@@ -29,40 +25,23 @@ class Settings:
     # ── Cookie ────────────────────────────────────────
     COOKIE_NAME: str = "dme_token"
     COOKIE_HTTPONLY: bool = True
-    COOKIE_SECURE: bool = os.getenv("COOKIE_SECURE", "false").lower() == "true"  # False em dev, True em produção (HTTPS)
+    COOKIE_SECURE: bool = os.getenv("COOKIE_SECURE", "false").lower() == "true"
     COOKIE_SAMESITE: str = "lax"
-    COOKIE_MAX_AGE: int = JWT_EXPIRE_MINUTES * 60  # em segundos
+    COOKIE_MAX_AGE: int = JWT_EXPIRE_MINUTES * 60
 
     # ── Ambiente ──────────────────────────────────────
     DEV_MODE: bool = os.getenv("DEV_MODE", "true").lower() == "true"
 
     def validate(self) -> None:
-        """
-        Verifica se as variáveis essenciais estão configuradas.
-        Em DEV_MODE=true, emite avisos no console em vez de travar o servidor.
-        Em produção (DEV_MODE=false), lança RuntimeError se algo estiver faltando.
-        """
         import logging
         logger = logging.getLogger("dme.config")
 
-        erros = []
-        if not self.SUPABASE_URL:
-            erros.append("SUPABASE_URL não configurada")
-        if not self.SUPABASE_SERVICE_KEY or self.SUPABASE_SERVICE_KEY == "COLE_SUA_SERVICE_ROLE_KEY_AQUI":
-            erros.append("SUPABASE_SERVICE_KEY não configurada")
         if self.JWT_SECRET == "INSEGURO-troque-isso":
-            erros.append("JWT_SECRET não configurada (gere com: openssl rand -hex 32)")
-
-        if erros:
+            msg = "JWT_SECRET não configurada (gere com: openssl rand -hex 32)"
             if self.DEV_MODE:
-                for e in erros:
-                    logger.warning(f"[DEV] Configuração ausente: {e}")
-                logger.warning("[DEV] Servidor iniciado com configuração incompleta. Defina DEV_MODE=false em produção.")
+                logger.warning(f"[DEV] Configuração ausente: {msg}")
             else:
-                raise RuntimeError(
-                    "Configuração incompleta. Verifique o arquivo .env:\n  - "
-                    + "\n  - ".join(erros)
-                )
+                raise RuntimeError(f"Configuração incompleta. Verifique o arquivo .env:\n  - {msg}")
 
 
 @lru_cache()

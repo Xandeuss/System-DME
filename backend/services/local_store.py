@@ -1,9 +1,6 @@
 """
-Store local em memória — substitui o Supabase durante desenvolvimento.
+Store local em memória — banco de dados principal do sistema.
 Dados persistem apenas enquanto o servidor estiver rodando.
-
-Para reconectar ao Supabase depois, basta trocar os imports de volta
-para supabase_client.py nos arquivos que usam get_store().
 """
 
 import logging
@@ -19,6 +16,17 @@ class LocalStore:
     def __init__(self):
         # ── Militares (usuários) ─────────────────────────
         self.militares = [
+            {
+                "nick": "-079",
+                "email": "079@dme.com",
+                "senha_hash": hash_password("123456"),
+                "patente": "Recruta",
+                "corpo": "militar",
+                "status": "ativo",
+                "role": "user",
+                "tag": "DME",
+                "created_at": "2025-01-01T00:00:00Z",
+            },
             {
                 "nick": "Xandelicado",
                 "email": "xandelicado@dme.com",
@@ -40,17 +48,6 @@ class LocalStore:
                 "role": "admin",
                 "tag": "DME",
                 "created_at": "2025-02-15T00:00:00Z",
-            },
-            {
-                "nick": "Soldado01",
-                "email": "soldado@dme.com",
-                "senha_hash": hash_password("123456"),
-                "patente": "Soldado",
-                "corpo": "militar",
-                "status": "ativo",
-                "role": "user",
-                "tag": "DME",
-                "created_at": "2025-06-10T00:00:00Z",
             },
         ]
 

@@ -7,8 +7,5 @@ python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 bcrypt==4.2.0
 
-# Supabase (acesso server-side)
-supabase==2.10.0
-
 # Variáveis de ambiente
 python-dotenv==1.0.1
