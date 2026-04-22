@@ -13,9 +13,6 @@ from backend.models.auth import UserInfo
 
 logger = logging.getLogger("dme.deps")
 
-# Nicks que são sempre admin, independente do banco
-ADMINS_FIXOS = {"xandelicado", "rafacv", "ronaldo"}
-
 
 async def get_current_user(request: Request) -> UserInfo:
     """
@@ -31,6 +28,7 @@ async def get_current_user(request: Request) -> UserInfo:
             corpo="militar",
             status="ativo",
             role="admin",
+            centros=["corregedoria", "centro_instrucao"],
         )
 
     token = request.cookies.get(settings.COOKIE_NAME)
@@ -50,35 +48,58 @@ async def get_current_user(request: Request) -> UserInfo:
         )
 
     nick = payload["sub"]
-    role = payload.get("role", "user")
-    is_admin_fixo = nick.lower() in ADMINS_FIXOS
+    role_jwt = payload.get("role", "user")
+    centros_jwt = payload.get("centros", [])
 
     pool = get_pool()
     if pool:
         try:
             async with pool.connection() as conn:
+                # 1. Buscar status e role na tabela 'usuarios'
                 cur = await conn.execute(
-                    "SELECT nick, patente, corpo, status, role FROM militares WHERE LOWER(nick) = LOWER(%s)",
+                    "SELECT status, role FROM usuarios WHERE LOWER(nick) = LOWER(%s)",
                     (nick,),
                 )
-                row = await cur.fetchone()
-            if row:
-                nick_db, patente, corpo, user_status, role_db = row
-                is_admin = is_admin_fixo or role == "admin" or role_db == "admin"
-                return UserInfo(
-                    nick=nick_db,
-                    patente=patente or "Recruta",
-                    corpo=corpo or "militar",
-                    status=user_status or "ativo",
-                    role="admin" if is_admin else "user",
-                )
+                row_user = await cur.fetchone()
+                
+                if row_user:
+                    user_status, role_db = row_user
+                    
+                    # Se não estiver ativo, barramos o acesso mesmo com JWT válido
+                    if (user_status or "ativo").lower() != "ativo":
+                        raise HTTPException(
+                            status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Conta desativada ou banida",
+                        )
+                    
+                    # 2. Buscar dados RPG na tabela 'militares'
+                    cur = await conn.execute(
+                        "SELECT nick, patente, corpo FROM militares WHERE LOWER(nick) = LOWER(%s)",
+                        (nick,),
+                    )
+                    row_mil = await cur.fetchone()
+                    
+                    if row_mil:
+                        nick_db, patente, corpo = row_mil
+                        is_admin = (role_db == "admin")
+                        return UserInfo(
+                            nick=nick_db,
+                            patente=patente or "Recruta",
+                            corpo=corpo or "militar",
+                            status=user_status,
+                            role="admin" if is_admin else "user",
+                            centros=centros_jwt,
+                        )
+        except HTTPException:
+            raise
         except Exception as exc:
-            logger.error(f"[AUTH] Erro ao buscar militar no PostgreSQL: {exc}")
+            logger.error(f"[AUTH] Erro ao buscar dados do usuário: {exc}")
 
-    # Token válido mas militar não encontrado (ex: admin fixo sem registro)
+    # Token válido mas sem registro completo no banco
     return UserInfo(
         nick=nick,
-        role="admin" if is_admin_fixo else role,
+        role=role_jwt,
+        centros=centros_jwt,
     )
 
 

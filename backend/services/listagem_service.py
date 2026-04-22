@@ -69,33 +69,49 @@ def _parse_dt(value: Any) -> datetime | None:
 # ── Upsert de militar ─────────────────────────────────────────────────────────
 
 async def upsert_militar(conn, militar: dict[str, Any]) -> None:
-    """Insere ou atualiza um militar. Usado por scripts de seed e por aprovações."""
+    """Insere ou atualiza um militar. Sincroniza 'usuarios' e 'militares'."""
+    nick = militar["nick"]
+    patente = militar["patente"]
+    
+    # 1. Upsert em USUARIOS
     await conn.execute(
         """
-        INSERT INTO militares (nick, email, senha_hash, patente, patente_ordem,
-                               corpo, status, role, tag, banido_ate, created_at)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO usuarios (nick, email, senha_hash, role, status, banido_ate, created_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        ON CONFLICT (nick) DO UPDATE SET
+            email      = EXCLUDED.email,
+            role       = EXCLUDED.role,
+            status     = EXCLUDED.status,
+            banido_ate = EXCLUDED.banido_ate
+        """,
+        (
+            nick,
+            militar.get("email"),
+            militar.get("senha_hash", ""),
+            militar.get("role", "user"),
+            militar.get("status", "ativo"),
+            _parse_dt(militar.get("banido_ate")),
+            _parse_dt(militar.get("created_at")) or datetime.now(timezone.utc),
+        ),
+    )
+
+    # 2. Upsert em MILITARES
+    await conn.execute(
+        """
+        INSERT INTO militares (nick, patente, patente_ordem, corpo, tag)
+        VALUES (%s, %s, %s, %s, %s)
         ON CONFLICT (nick) DO UPDATE SET
             patente       = EXCLUDED.patente,
             patente_ordem = EXCLUDED.patente_ordem,
             corpo         = EXCLUDED.corpo,
-            status        = EXCLUDED.status,
-            role          = EXCLUDED.role,
-            tag           = EXCLUDED.tag,
-            banido_ate    = EXCLUDED.banido_ate
+            tag           = EXCLUDED.tag
         """,
         (
-            militar["nick"],
-            militar.get("email"),
-            militar.get("senha_hash", ""),
-            militar["patente"],
-            patente_ordem(militar["patente"]),
-            militar.get("corpo", "militar"),
-            militar.get("status", "ativo"),
-            militar.get("role", "user"),
+            nick,
+            patente,
+            patente_ordem(patente),
+            militar.get("corpo", detectar_corpo(patente)),
             militar.get("tag", "DME"),
-            _parse_dt(militar.get("banido_ate")),
-            _parse_dt(militar.get("created_at")) or datetime.now(timezone.utc),
         ),
     )
 
@@ -105,7 +121,6 @@ async def upsert_militar(conn, militar: dict[str, Any]) -> None:
 async def aplicar_aprovacao(req: dict[str, Any], militar_atual: dict[str, Any] | None) -> None:
     """
     Persiste os efeitos de um requerimento aprovado nas tabelas de listagem.
-    Chamado pelo router de requerimentos após alterar o status para 'aprovado'.
     """
     pool = get_pool()
     if pool is None:
@@ -120,6 +135,8 @@ async def aplicar_aprovacao(req: dict[str, Any], militar_atual: dict[str, Any] |
                 await _aplicar_mudanca_patente(conn, req)
             elif tipo in ("entrada", "cadetes", "contrato"):
                 await _aplicar_entrada(conn, req, militar_atual)
+            elif tipo == "remover_cadete":
+                await _aplicar_remover_cadete(conn, req)
             elif tipo in ("demissao", "exoneracao"):
                 await _aplicar_desligamento(conn, req)
             elif tipo == "transferencia":
@@ -130,6 +147,10 @@ async def aplicar_aprovacao(req: dict[str, Any], militar_atual: dict[str, Any] |
             await conn.commit()
 
         logger.info("Aprovação persistida no PostgreSQL: tipo=%s req_id=%s", tipo, req.get("id"))
+        
+        # Invalida cache de listagem para que as mudanças apareçam na hora
+        from backend.utils.cache import cache
+        cache.invalidate()
 
     except Exception as exc:
         logger.error("Erro ao persistir aprovação no PostgreSQL: %s", exc, exc_info=True)
@@ -140,7 +161,6 @@ async def aplicar_aprovacao(req: dict[str, Any], militar_atual: dict[str, Any] |
 async def _aplicar_mudanca_patente(conn, req: dict) -> None:
     nova_patente = req.get("novaPatente")
     if not nova_patente:
-        logger.warning("Requerimento de promoção/rebaixamento sem novaPatente: %s", req.get("id"))
         return
 
     corpo = detectar_corpo(nova_patente, req.get("tipo", ""))
@@ -156,11 +176,6 @@ async def _aplicar_mudanca_patente(conn, req: dict) -> None:
 
 
 async def _aplicar_entrada(conn, req: dict, militar: dict | None) -> None:
-    """
-    Ativa (ou cria) militares listados em tags_envolvidos.
-    Se o militar ainda não existe no banco, cria um registro "shell" sem
-    email/senha — o usuário completa esses dados ao se registrar.
-    """
     tipo = req.get("tipo", "")
     nova_patente = req.get("novaPatente")
     corpo = detectar_corpo(nova_patente or "", tipo)
@@ -168,18 +183,41 @@ async def _aplicar_entrada(conn, req: dict, militar: dict | None) -> None:
     ordem_final = patente_ordem(patente_final)
 
     for nick in req.get("tags_envolvidos") or []:
+        # 1. Garantir registro em 'usuarios' (sem senha por enquanto)
         await conn.execute(
-            """
-            INSERT INTO militares (nick, email, senha_hash, patente, patente_ordem, corpo, status)
-            VALUES (%s, NULL, '', %s, %s, %s, 'ativo')
+            "INSERT INTO usuarios (nick, senha_hash) VALUES (%s, '') ON CONFLICT (nick) DO NOTHING",
+            (nick,),
+        )
+
+        # 2. Se é ingresso de Cadete e o militar já existia em outro corpo,
+        #    preserva a patente atual em `patente_anterior` para permitir
+        #    restauração via "remover_cadete".
+        patente_anterior_sql = ""
+        patente_anterior_val: list = []
+        if tipo == "cadetes":
+            row = await (await conn.execute(
+                "SELECT patente, corpo FROM militares WHERE LOWER(nick) = LOWER(%s)",
+                (nick,),
+            )).fetchone()
+            if row and row[1] != "cadetes":
+                patente_anterior_sql = ", patente_anterior = %s"
+                patente_anterior_val = [row[0]]
+
+        # 3. Ativar/Criar em 'militares'
+        await conn.execute(
+            f"""
+            INSERT INTO militares (nick, patente, patente_ordem, corpo)
+            VALUES (%s, %s, %s, %s)
             ON CONFLICT (nick) DO UPDATE SET
                 patente       = EXCLUDED.patente,
                 patente_ordem = EXCLUDED.patente_ordem,
-                corpo         = EXCLUDED.corpo,
-                status        = 'ativo'
+                corpo         = EXCLUDED.corpo
+                {patente_anterior_sql}
             """,
-            (nick, patente_final, ordem_final, corpo),
+            (nick, patente_final, ordem_final, corpo, *patente_anterior_val),
         )
+        # 4. Marcar usuario como ativo
+        await conn.execute("UPDATE usuarios SET status = 'ativo' WHERE LOWER(nick) = LOWER(%s)", (nick,))
 
     if tipo == "contrato":
         for nick in req.get("tags_envolvidos") or []:
@@ -192,10 +230,48 @@ async def _aplicar_entrada(conn, req: dict, militar: dict | None) -> None:
             )
 
 
+async def _aplicar_remover_cadete(conn, req: dict) -> None:
+    """Restaura a patente anterior de um cadete. Remove da listagem de cadetes."""
+    for nick in req.get("tags_envolvidos") or []:
+        row = await (await conn.execute(
+            "SELECT patente_anterior, corpo FROM militares WHERE LOWER(nick) = LOWER(%s)",
+            (nick,),
+        )).fetchone()
+        if not row:
+            logger.warning("remover_cadete: nick não encontrado: %s", nick)
+            continue
+
+        patente_anterior, corpo_atual = row[0], row[1]
+        if corpo_atual != "cadetes":
+            logger.warning("remover_cadete: %s não está em cadetes (corpo=%s)", nick, corpo_atual)
+            continue
+
+        if patente_anterior:
+            # Restaura patente pré-Cadete
+            novo_corpo = detectar_corpo(patente_anterior)
+            await conn.execute(
+                """
+                UPDATE militares
+                   SET patente          = %s,
+                       patente_ordem    = %s,
+                       corpo            = %s,
+                       patente_anterior = NULL
+                 WHERE LOWER(nick) = LOWER(%s)
+                """,
+                (patente_anterior, patente_ordem(patente_anterior), novo_corpo, nick),
+            )
+        else:
+            # Sem histórico: remove da listagem (status=desativado).
+            await conn.execute(
+                "UPDATE usuarios SET status = 'desativado' WHERE LOWER(nick) = LOWER(%s)",
+                (nick,),
+            )
+
+
 async def _aplicar_desligamento(conn, req: dict) -> None:
     for nick in req.get("tags_envolvidos") or []:
         await conn.execute(
-            "UPDATE militares SET status = 'desativado' WHERE LOWER(nick) = LOWER(%s)",
+            "UPDATE usuarios SET status = 'desativado' WHERE LOWER(nick) = LOWER(%s)",
             (nick,),
         )
 
@@ -219,6 +295,6 @@ async def _aplicar_banimento(conn, req: dict) -> None:
     banido_ate = _parse_dt(req.get("banido_ate"))
     for nick in req.get("tags_envolvidos") or []:
         await conn.execute(
-            "UPDATE militares SET status = 'banido', banido_ate = %s WHERE LOWER(nick) = LOWER(%s)",
+            "UPDATE usuarios SET status = 'banido', banido_ate = %s WHERE LOWER(nick) = LOWER(%s)",
             (banido_ate, nick),
         )

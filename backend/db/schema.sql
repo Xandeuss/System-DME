@@ -25,6 +25,10 @@ CREATE TABLE IF NOT EXISTS militares (
     updated_at      TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
 
+-- patente_anterior: guardada ao virar Cadete para permitir restauração
+-- via requerimento "remover_cadete". NULL quando não aplicável.
+ALTER TABLE militares ADD COLUMN IF NOT EXISTS patente_anterior VARCHAR(64);
+
 CREATE INDEX IF NOT EXISTS idx_militares_listagem ON militares (corpo, status, patente_ordem);
 CREATE INDEX IF NOT EXISTS idx_militares_status   ON militares (status);
 

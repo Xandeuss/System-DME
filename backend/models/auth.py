@@ -57,3 +57,4 @@ class UserInfo(BaseModel):
     corpo: str = "militar"
     status: str = "ativo"
     role: str = "user"
+    centros: list[str] = []

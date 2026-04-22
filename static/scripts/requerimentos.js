@@ -90,6 +90,7 @@ const fieldConfig = {
     permissao: { novaPatente: false, selectOpcoes: false, anexoProvas: false, banidoAte: false, permissor: false, datahora: false, nickAutorizado: true, nickPromovido: true },
     transferencia: { novaPatente: true, selectOpcoes: false, anexoProvas: false, banidoAte: false, permissor: false, datahora: false },
     cadetes: { novaPatente: true, selectOpcoes: false, anexoProvas: false, banidoAte: false, permissor: false, datahora: false, patenteFixa: "Cadete" },
+    remover_cadete: { novaPatente: false, selectOpcoes: true, anexoProvas: false, banidoAte: false, permissor: false, datahora: false, labelOpcao: "Motivo" },
 };
 // Padrão para tipos que não possuem config específica (contrato, venda, licença, etc.)
 const defaultFieldConfig = { novaPatente: false, selectOpcoes: true, anexoProvas: false, banidoAte: false, permissor: true, datahora: true };
@@ -165,6 +166,12 @@ const configForm = {
         tipoForm: "rh",
         getOpcoes: () => ["Ingresso de Cadete", "Formatura de Cadete", "Expulsão de Cadete", "Promoção Interna", "Outro"]
     },
+    remover_cadete: {
+        titulo: "Remover Cadete",
+        label: "Motivo",
+        tipoForm: "rh",
+        getOpcoes: () => ["Formatura", "Expulsão", "Desistência", "Outro"]
+    },
 };
 
 // Carregar tipos customizados do localStorage (admin)
@@ -196,6 +203,7 @@ const tipoNome = {
     'permissao': 'Permissão',
     'transferencia': 'Transferência',
     'cadetes': 'Cadetes',
+    'remover_cadete': 'Remover Cadete',
 };
 // Adicionar tipos customizados ao tipoNome
 getCustomTipos().forEach(ct => { tipoNome[ct.id] = ct.titulo; });
@@ -205,6 +213,9 @@ getCustomTipos().forEach(ct => { tipoNome[ct.id] = ct.titulo; });
 let tipoAtual = 'promocao';
 let corpoAtual = null;
 let abaAtual = 'aplicar';
+// 'registrar' quando a aba Cadetes está em modo de ingresso (tipo=cadetes),
+// 'remover' quando está em modo de remoção (tipo=remover_cadete).
+let modoCadete = 'registrar';
 
 function mudarTipo(tipo) {
     tipoAtual = tipo;
@@ -215,7 +226,7 @@ function mudarTipo(tipo) {
     document.getElementById('form-area').style.display = 'block';
     document.getElementById('historico-area').style.display = 'none';
 
-    document.querySelectorAll('.req-tab').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.req-tab[data-aba]').forEach(btn => btn.classList.remove('active'));
     document.querySelector('.req-tab[data-aba="aplicar"]').classList.add('active');
 
     document.getElementById('form-title').textContent = config.titulo;
@@ -292,14 +303,34 @@ function mudarTipo(tipo) {
     }
 
     document.querySelectorAll('.req-nav-item').forEach(item => item.classList.remove('active'));
-    const navItem = document.querySelector(`.req-nav-item[data-tipo="${tipo}"]`);
+    // remover_cadete compartilha o nav-item "cadetes" no sidebar
+    const navTipo = tipo === 'remover_cadete' ? 'cadetes' : tipo;
+    const navItem = document.querySelector(`.req-nav-item[data-tipo="${navTipo}"]`);
     if (navItem) navItem.classList.add('active');
+
+    // Submenu só aparece nas variantes de Cadetes
+    const submenu = document.getElementById('cadetes-submenu');
+    if (submenu) {
+        const ehCadetes = tipo === 'cadetes' || tipo === 'remover_cadete';
+        submenu.style.display = ehCadetes ? 'flex' : 'none';
+        if (ehCadetes) {
+            modoCadete = tipo === 'remover_cadete' ? 'remover' : 'registrar';
+            submenu.querySelectorAll('[data-modo-cadete]').forEach(b => {
+                b.classList.toggle('active', b.getAttribute('data-modo-cadete') === modoCadete);
+            });
+        }
+    }
+}
+
+function setModoCadete(modo) {
+    modoCadete = modo;
+    mudarTipo(modo === 'remover' ? 'remover_cadete' : 'cadetes');
 }
 
 function mudarAba(aba) {
     abaAtual = aba;
 
-    document.querySelectorAll('.req-tab').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.req-tab[data-aba]').forEach(btn => btn.classList.remove('active'));
     document.querySelector(`.req-tab[data-aba="${aba}"]`).classList.add('active');
 
     document.getElementById('form-area').style.display = aba === 'aplicar' ? 'block' : 'none';
@@ -757,6 +788,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.req-tab[data-aba]').forEach(btn => {
         btn.addEventListener('click', function () {
             mudarAba(this.getAttribute('data-aba'));
+        });
+    });
+
+    document.querySelectorAll('[data-modo-cadete]').forEach(btn => {
+        btn.addEventListener('click', function () {
+            setModoCadete(this.getAttribute('data-modo-cadete'));
         });
     });
 

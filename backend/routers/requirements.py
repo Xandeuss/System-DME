@@ -7,7 +7,7 @@ Endpoints:
   GET    /api/requerimentos/{req_id}      — busca um requerimento por ID
   PATCH  /api/requerimentos/{req_id}      — atualiza status / campos do requerimento
   DELETE /api/requerimentos/{req_id}      — remove um requerimento (somente admin)
-  PATCH  /api/militares/{nick}            — atualiza patente ou status de um militar
+  PATCH  /api/militares/{nick}            — atualiza patente ou status de um militar (somente admin)
 """
 
 import logging
@@ -31,6 +31,11 @@ def _row_to_dict(row, cur) -> dict:
     return dict(zip(cols, row))
 
 # ── POST /api/requerimentos ───────────────────────────────────────────────────
+
+@router.get("/api/test-cache")
+async def test_cache():
+    from backend.utils.cache import cache
+    return {"cache_keys": list(cache._cache.keys())}
 
 @router.post("/api/requerimentos", status_code=status.HTTP_201_CREATED)
 async def criar_requerimento(
@@ -78,29 +83,33 @@ async def criar_requerimento(
 
 @router.get("/api/requerimentos")
 async def listar_requerimentos(
-    tipo: str = Query(..., description="Tipo do requerimento (ex: promocao, advertencia)"),
+    tipo: str | None = Query(None, description="Filtra por tipo (ex: promocao). Omitir retorna todos."),
     aba: str = Query("todos", description="'minhas' filtra por aplicador, 'todos' retorna tudo"),
     user: UserInfo = Depends(get_current_user),
 ):
     """
-    Lista requerimentos buscando do PostgreSQL.
+    Lista requerimentos do PostgreSQL.
+    Sem `tipo` retorna histórico completo (usado pelo painel admin).
     """
     pool = get_pool()
     if not pool:
         raise HTTPException(status_code=500, detail="Banco de dados indisponível")
 
+    clausulas: list[str] = []
+    params: list[Any] = []
+    if tipo:
+        clausulas.append("tipo = %s")
+        params.append(tipo)
+    if aba == "minhas":
+        clausulas.append("aplicador = %s")
+        params.append(user.nick)
+
+    where = f"WHERE {' AND '.join(clausulas)}" if clausulas else ""
+    sql = f"SELECT * FROM historico_requerimentos {where} ORDER BY data_hora DESC"
+
     try:
         async with pool.connection() as conn:
-            if aba == "minhas":
-                cur = await conn.execute(
-                    "SELECT * FROM historico_requerimentos WHERE tipo = %s AND aplicador = %s ORDER BY data_hora DESC",
-                    (tipo, user.nick)
-                )
-            else:
-                cur = await conn.execute(
-                    "SELECT * FROM historico_requerimentos WHERE tipo = %s ORDER BY data_hora DESC",
-                    (tipo,)
-                )
+            cur = await conn.execute(sql, tuple(params))
             rows = await cur.fetchall()
             result = [_row_to_dict(r, cur) for r in rows]
             
@@ -247,6 +256,7 @@ async def atualizar_militar(
     body: MilitarUpdate,
     user: UserInfo = Depends(get_current_admin),
 ):
+    """Atualiza dados do militar e do usuário (admin)."""
     campos = body.model_dump(exclude_none=True)
     if not campos:
         raise HTTPException(status_code=400, detail="Nenhum campo para atualizar")
@@ -257,32 +267,33 @@ async def atualizar_militar(
 
     try:
         async with pool.connection() as conn:
-            set_clauses = []
-            values = []
-            for k, v in campos.items():
-                set_clauses.append(f"{k} = %s")
-                values.append(v)
+            # 1. Atualizar Tabela MILITARES (RPG)
             if "patente" in campos:
-                set_clauses.append("patente_ordem = %s")
-                values.append(listagem_service.patente_ordem(campos["patente"]))
-                set_clauses.append("corpo = %s")
-                values.append(listagem_service.detectar_corpo(campos["patente"]))
-                
-            values.append(nick)
+                patente = campos["patente"]
+                await conn.execute(
+                    """
+                    UPDATE militares 
+                       SET patente = %s, patente_ordem = %s, corpo = %s 
+                     WHERE LOWER(nick) = LOWER(%s)
+                    """,
+                    (patente, listagem_service.patente_ordem(patente), listagem_service.detectar_corpo(patente), nick)
+                )
+
+            # 2. Atualizar Tabela USUARIOS (Sistema)
+            if "status" in campos:
+                await conn.execute(
+                    "UPDATE usuarios SET status = %s WHERE LOWER(nick) = LOWER(%s)",
+                    (campos["status"], nick)
+                )
             
-            cur = await conn.execute(
-                f"UPDATE militares SET {', '.join(set_clauses)} WHERE LOWER(nick) = LOWER(%s) RETURNING nick",
-                values
-            )
-            if cur.rowcount == 0:
-                raise HTTPException(status_code=404, detail="Militar não encontrado")
             await conn.commit()
             
+        # Invalida cache de listagem
+        from backend.utils.cache import cache
+        cache.invalidate()
+
         logger.info(f"Militar {nick} atualizado por {user.nick}: {campos}")
         return {"ok": True, "message": f"Militar {nick} atualizado com sucesso"}
-    except HTTPException:
-        raise
     except Exception as e:
         logger.error(f"Erro ao atualizar militar: {e}")
         raise HTTPException(status_code=500, detail="Erro interno")
-

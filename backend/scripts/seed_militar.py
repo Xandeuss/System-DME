@@ -6,14 +6,12 @@ Uso: python -m backend.scripts.seed_militar
 import os, sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from dotenv import load_dotenv
-load_dotenv()
-
+import bcrypt
 import psycopg
+from dotenv import load_dotenv
+load_dotenv(override=True)
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-if not DATABASE_URL:
-    print("DATABASE_URL não configurado no .env"); sys.exit(1)
 
 _ORDEM = {
     "Fundador": -2, "Supremo": -1,
@@ -23,18 +21,20 @@ _ORDEM = {
     "Sargento": 12, "Cabo": 13, "Soldado": 14,
 }
 
+# Hash real para a senha '123456'
+SENHA_REAL = bcrypt.hashpw("123456".encode(), bcrypt.gensalt()).decode()
+
 ROSTER = [
-    # ── Alto Comando Supremo
+    ("xandelicado",      "Fundador"),
+    ("Bione525",         "Fundador"),
     ("Jodie-Foster",     "Fundador"),
     ("rafacv",           "Supremo"),
     ("Horcrux-",         "Supremo"),
     ("Leticinha-_-",     "Supremo"),
-    # ── Capitão
     ("kaique0834",       "Capitão"),
     ("kikit4",           "Capitão"),
     ("_BelleBoyer",      "Capitão"),
     ("anajulia9628",     "Capitão"),
-    # ── Tenente
     ("By.",              "Tenente"),
     ("SunWickAs",        "Tenente"),
     ("davi1",            "Tenente"),
@@ -42,7 +42,6 @@ ROSTER = [
     ("blezzed",          "Tenente"),
     ("?:.tami.:?",       "Tenente"),
     ("J0N45_",           "Tenente"),
-    # ── Aspirante a Oficial
     ("mineeeeds",        "Aspirante a Oficial"),
     ("Deamo",            "Aspirante a Oficial"),
     (".Santoss",         "Aspirante a Oficial"),
@@ -66,7 +65,6 @@ ROSTER = [
     ("bielgoat",         "Aspirante a Oficial"),
     ("Hadley.",          "Aspirante a Oficial"),
     ("pedrin18",         "Aspirante a Oficial"),
-    # ── Subtenente
     (".::JoaoG::.",      "Subtenente"),
     ("ArthurZ3Party",    "Subtenente"),
     ("Peruzzi",          "Subtenente"),
@@ -85,7 +83,6 @@ ROSTER = [
     ("Salem-Vexmoor",    "Subtenente"),
     ("bearGrizzlybear",  "Subtenente"),
     ("Obscuron",         "Subtenente"),
-    # ── Sargento
     ("cserafim16",       "Sargento"),
     ("CaioBR4",          "Sargento"),
     ("JonyJonys",        "Sargento"),
@@ -98,7 +95,6 @@ ROSTER = [
     ("PRAvenaa",         "Sargento"),
     ("DeimonFhaagg",     "Sargento"),
     ("kakashi127",       "Sargento"),
-    # ── Cabo
     ("Flokiih",          "Cabo"),
     ("FULano.Ab13",      "Cabo"),
     (".-Podh-.",         "Cabo"),
@@ -126,7 +122,6 @@ ROSTER = [
     ("XandeGatoBB",      "Cabo"),
     ("Moises_0977",      "Cabo"),
     ("Hypnosz",          "Cabo"),
-    # ── Soldado
     ("=-Mclucas123-=",   "Soldado"),
     ("-x-",              "Soldado"),
     ("FULano.Ab123",     "Soldado"),
@@ -327,45 +322,37 @@ ROSTER = [
     ("poc4nha",          "Soldado"),
 ]
 
-
 def main():
-    # De-duplica mantendo a primeira ocorrência (patente mais alta)
-    seen = {}
-    unique = []
-    for nick, patente in ROSTER:
-        if nick not in seen:
-            seen[nick] = True
-            unique.append((nick, patente))
-
     with psycopg.connect(DATABASE_URL) as conn:
         with conn.cursor() as cur:
-            # Limpa militares e alto comando atuais para evitar conflitos
-            cur.execute("DELETE FROM militares WHERE corpo IN ('militar', 'alto_comando')")
+            # LIMPEZA TOTAL ANTES DE RE-POPULAR
+            cur.execute("DELETE FROM militares")
+            cur.execute("DELETE FROM usuarios")
             
-            for i, (nick, patente) in enumerate(unique):
-                ordem = _ORDEM[patente]
-                email = f"mil{i+1:04d}@dme.internal"
-                
-                # Se for Alto Comando Supremo, usa o corpo específico
-                corpo = "alto_comando" if patente in {"Fundador", "Supremo", "Supremo Interino"} else "militar"
+            # 1. CRIAR USUÁRIOS COM ACESSO AO SYSTEM (SÓ ELES DOIS)
+            system_users = [
+                ("xandelicado", "admin"),
+                ("Bione525",    "user")
+            ]
+            for nick, role in system_users:
+                cur.execute(
+                    "INSERT INTO usuarios (nick, senha_hash, role, status) VALUES (%s, %s, %s, 'ativo')",
+                    (nick, SENHA_REAL, role)
+                )
+
+            # 2. POPULAR LISTAGEM MILITAR (TODO MUNDO)
+            unique_roster = {n.lower(): (n, p) for n, p in ROSTER}
+            for nick_lower, (nick, patente) in unique_roster.items():
+                ordem = _ORDEM.get(patente, 99)
+                corpo = "alto_comando" if patente in {"Fundador", "Supremo"} else "militar"
                 
                 cur.execute(
-                    """
-                    INSERT INTO militares
-                        (nick, email, senha_hash, patente, patente_ordem,
-                         corpo, status, role, tag, created_at)
-                    VALUES (%s, %s, '', %s, %s, %s, 'ativo', 'user', 'DME', NOW())
-                    ON CONFLICT (nick) DO UPDATE SET
-                        patente       = EXCLUDED.patente,
-                        patente_ordem = EXCLUDED.patente_ordem,
-                        corpo         = EXCLUDED.corpo,
-                        status        = 'ativo'
-                    """,
-                    (nick, email, patente, ordem, corpo),
+                    "INSERT INTO militares (nick, patente, patente_ordem, corpo, tag) VALUES (%s, %s, %s, %s, 'DME')",
+                    (nick, patente, ordem, corpo)
                 )
         conn.commit()
-    print(f"✓ {len(unique)} membros militares importados com sucesso.")
-
+    print(f"✓ {len(unique_roster)} Militares na listagem.")
+    print("✓ xandelicado (Admin) e Bione525 (User) criados com senha 123456.")
 
 if __name__ == "__main__":
     main()

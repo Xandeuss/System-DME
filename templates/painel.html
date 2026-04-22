@@ -885,32 +885,25 @@
 
     <script>
 
-        // Auth Guard
+        // ── Estado global vindo do backend (/api/auth/me)
+        let username = '';
+        let isAdmin = false;
 
-        const username = localStorage.getItem('dme_username');
-
-        const adminsList = JSON.parse(localStorage.getItem('dme_admins')) || ["Xandelicado", "rafacv", "Ronaldo"];
-
-        const isAdmin = adminsList.includes(username);
-
-
-
-        if (!username) window.location.href = '/';
-
-        if (!isAdmin) window.location.href = '/';
-
-        // Cache de dados da API
+        // ── Caches de dados ─────────────────────────────────
         let _militaresCache = [];
         let _listagemCache  = {};
+        let _historicoCache = [];
 
         async function _carregarCaches() {
             try {
-                const [r1, r2] = await Promise.all([
+                const [r1, r2, r3] = await Promise.all([
                     fetch('/api/militares'),
                     fetch('/api/listagens'),
+                    fetch('/api/requerimentos'),
                 ]);
                 if (r1.ok) _militaresCache = (await r1.json()).data || [];
                 if (r2.ok) _listagemCache  = (await r2.json()).data || {};
+                if (r3.ok) _historicoCache = (await r3.json()).data || [];
             } catch (e) { console.warn('Erro ao carregar caches da API:', e); }
         }
 
@@ -920,83 +913,24 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body),
             });
-            if (!r.ok) { const d = await r.json(); throw new Error(d.detail || r.statusText); }
+            if (!r.ok) { const d = await r.json().catch(() => ({})); throw new Error(d.detail || r.statusText); }
             return r.json();
         }
 
-
-
-        function logout() { localStorage.removeItem('dme_username'); window.location.href = '/'; }
-
-
-
-        // -- DEFINIÇÕES DE PERMISSÕES --
-
-        const LISTA_PERMISSOES = [
-
-            { id: 'painel.geral', label: 'Ver Resumo Geral' },
-
-            { id: 'painel.usuarios', label: 'Gerir Usuários (Aprovar/Banir)' },
-
-            { id: 'painel.militares', label: 'Gerir Painel Militares' },
-
-            { id: 'painel.ips', label: 'Verificar IPs' },
-
-            { id: 'painel.funcoes', label: 'Gerir Funções/Cargos' },
-
-            { id: 'painel.historico', label: 'Ver Histórico Total' }
-
-        ];
-
-
-
-        function temPermissao(permId) {
-
-            if (isAdmin) return true;
-
-            const users = JSON.parse(localStorage.getItem('dme_users')) || [];
-
-            const me = users.find(u => (u.username || '').toString().toLowerCase() === username.toLowerCase());
-
-            if (!me || !me.funcoesIds) return false;
-
-            const funcoes = JSON.parse(localStorage.getItem('dme_funcoes')) || [];
-
-            const minhasFuncoes = funcoes.filter(f => me.funcoesIds.includes(f.id));
-
-            return minhasFuncoes.some(f => (f.permissoes || []).includes(permId));
-
+        async function logout() {
+            try { await fetch('/api/auth/logout', { method: 'POST' }); } catch (e) {}
+            window.location.href = '/login';
         }
 
 
 
-        function registrarAcao(acao, detalhes, categoria = 'outros') {
+        // Permissões: por enquanto o backend só diferencia role=admin vs user.
+        // A tabela granular de funções/permissões virá em fase 2.
+        function temPermissao() { return isAdmin; }
 
-            const hist = JSON.parse(localStorage.getItem('dme_historico_acoes')) || [];
-
-            const users = JSON.parse(localStorage.getItem('dme_users')) || [];
-
-            const me = users.find(u => (u.username || '').toLowerCase() === username.toLowerCase());
-
-            hist.unshift({
-
-                data: new Date().toLocaleString('pt-BR'),
-
-                usuario: username,
-
-                cargo: (me && me.cargo) || 'Admin',
-
-                acao,
-
-                detalhes,
-
-                categoria
-
-            });
-
-            localStorage.setItem('dme_historico_acoes', JSON.stringify(hist.slice(0, 1000)));
-
-        }
+        // Sem backend para log de ações administrativas ainda — no-op.
+        // Quando a tabela `acoes_admin` existir, trocamos por POST /api/acoes-admin.
+        function registrarAcao() { /* no-op */ }
 
 
 
@@ -1049,37 +983,23 @@
         function atualizarStats() {
 
             const pendentes = _militaresCache.filter(u => u.status === 'pendente').length;
-
             const ativos    = _militaresCache.filter(u => u.status === 'ativo').length;
 
-            const hist = JSON.parse(localStorage.getItem('dme_historico_acoes')) || [];
-
-
+            const hoje = new Date().toISOString().slice(0, 10);
+            const acoesHoje = _historicoCache.filter(h => (h.data_hora || '').slice(0, 10) === hoje).length;
 
             document.getElementById('stat-total-usuarios').textContent = _militaresCache.filter(u => u.is_system_user).length;
-
             document.getElementById('stat-usuarios-pendentes').textContent = pendentes;
-
             document.getElementById('stat-militares-ativos').textContent = ativos;
-
-            document.getElementById('stat-acoes-dia').textContent = hist.filter(h => h.data.startsWith(new Date().toLocaleDateString('pt-BR'))).length;
-
-
+            document.getElementById('stat-acoes-dia').textContent = acoesHoje;
 
             const badge = document.getElementById('badge-pendentes');
-
             if (pendentes > 0) {
-
                 badge.textContent = pendentes;
-
                 badge.style.display = 'inline-block';
-
             } else {
-
                 badge.style.display = 'none';
-
             }
-
         }
 
 
@@ -1296,233 +1216,34 @@
 
 
 
-        // -- ABA IPs --
-
+        // -- ABA IPs (em construção) --
+        // Quando a tabela `login_log` existir, essa aba consumirá GET /api/login-log.
         function carregarAbaIps() {
-
-            const termo = document.getElementById('ipsSearch').value.toLowerCase().trim();
-
-            const log = JSON.parse(localStorage.getItem('dme_login_log')) || [];
-
-            const porIp = {};
-
-            log.forEach(e => {
-
-                if (!porIp[e.ip]) porIp[e.ip] = { users: new Set(), last: '', isVpn: false, isp: 'Desconhecido' };
-
-                porIp[e.ip].users.add(e.username);
-
-                if (e.isVpn) porIp[e.ip].isVpn = true;
-
-                if (e.isp) porIp[e.ip].isp = e.isp;
-
-                if (e.date > porIp[e.ip].last) porIp[e.ip].last = e.date;
-
-            });
-
-
-
-            let entries = Object.entries(porIp).map(([ip, d]) => ({
-
-                ip,
-
-                users: Array.from(d.users),
-
-                last: d.last,
-
-                isVpn: d.isVpn,
-
-                isp: d.isp
-
-            }));
-
-
-
-            if (termo) entries = entries.filter(e => e.ip.includes(termo) || e.users.some(u => u.toLowerCase().includes(termo)));
-
-
-
-            const duplos = entries.filter(e => e.users.length > 1);
-
-            const alerta = document.getElementById('ips-duplicados-alerta');
-
-            if (duplos.length > 0) {
-
-                alerta.style.display = 'flex';
-
-                document.getElementById('ips-duplicados-lista').innerHTML = duplos.map(d => `
-
-                    <div class="ip-duplicado-item">
-
-                        <div class="ip-val">${d.ip} ${d.isVpn ? '<span class="badge-vpn-mini">VPN</span>' : ''}</div>
-
-                        <div class="ip-contas">${d.users.map(u => `<span>${u}</span>`).join('')}</div>
-
-                    </div>
-
-                `).join('');
-
-            } else alerta.style.display = 'none';
-
-
-
-            document.getElementById('ipsTableBody').innerHTML = entries.map(e => `
-
-                <tr>
-
-                    <td>
-
-                        <strong>${e.ip}</strong>
-
-                        ${e.isVpn ? '<br><span class="badge-status banido" style="font-size:10px; padding:2px 6px">VPN/PROXY</span>' : ''}
-
-                    <td><div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center">${e.users.map(u => `<span style="background:rgba(255,255,255,.05);padding:2px 6px;border-radius:4px;font-size:12px;border:1px solid var(--b2)">${u}</span>`).join('')}</div></td>
-
-                    <td><span style="font-size:12px; color:var(--t2)">${e.isp}</span></td>
-
-                    <td>
-
-                        ${e.users.length > 1 ? '<span class="badge-status desativado">Multicontas</span>' : ''}
-
-                        ${e.isVpn ? '<span class="badge-status pendente">Proxy</span>' : ''}
-
-                        ${(e.users.length === 1 && !e.isVpn) ? '<span class="badge-status ativo">Seguro</span>' : ''}
-
-                    </td>
-
-                </tr>
-
-            `).join('');
-
+            document.getElementById('ips-duplicados-alerta').style.display = 'none';
+            document.getElementById('ipsTableBody').innerHTML = '';
+            const empty = document.getElementById('ipsEmpty');
+            empty.style.display = 'block';
+            empty.querySelector('.empty-text').textContent =
+                'Monitoramento de IPs em construção — aguardando backend de log de sessões.';
         }
 
-        document.getElementById('ipsSearch').oninput = carregarAbaIps;
 
 
-
-        // -- ABA FUNÇÕES --
-
+        // -- ABA FUNÇÕES (em construção) --
+        // Fase 2: tabelas `funcoes` + `usuario_funcoes` + endpoints CRUD.
         function carregarFuncoes() {
-
             const list = document.getElementById('funcoesLista');
-
-            const funcoes = JSON.parse(localStorage.getItem('dme_funcoes')) || [];
-
-            if (funcoes.length === 0) { list.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--t3)">Nenhum cargo customizado criado.</div>`; return; }
-
-            list.innerHTML = funcoes.map(f => {
-
-                const perms = (f.permissoes || []).map(pid => LISTA_PERMISSOES.find(p => p.id === pid)).filter(Boolean).map(p => p.label);
-
-                return `<div class="funcao-card">
-
-                    <div>
-
-                        <h4>${f.nome}</h4>
-
-                        <p>${f.descricao || 'Sem descrição'}</p>
-
-                        <div class="funcao-card-badges">${perms.map(p => `<span>${p}</span>`).join('')}</div>
-
-                    </div>
-
-                    <div style="margin-top:20px;display:flex;gap:8px">
-
-                        <button class="btn-secondary" style="flex:1" onclick="abrirModalFuncao('${f.id}')">Editar</button>
-
-                        <button class="btn-secondary" style="flex:1;background:rgba(239,68,68,.1);color:#ef4444;border-color:#ef4444" onclick="excluirFuncao('${f.id}')">Excluir</button>
-
-                    </div>
-
-                </div>`;
-
-            }).join('');
-
+            list.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--t3)">
+                Gestão de funções/permissões em construção.<br>
+                <small>Aguardando backend. Por enquanto, admins são definidos via coluna <code>usuarios.role</code>.</small>
+            </div>`;
+            const btn = document.getElementById('btnNovaFuncao');
+            if (btn) btn.disabled = true;
         }
 
-
-
-        function abrirModalFuncao(id) {
-
-            const modal = document.getElementById('funcaoModal');
-
-            document.getElementById('modalFuncaoId').value = id || '';
-
-            document.getElementById('modalFuncaoNome').value = '';
-
-            document.getElementById('modalFuncaoDesc').value = '';
-
-            const f = id ? (JSON.parse(localStorage.getItem('dme_funcoes')) || []).find(x => x.id === id) : null;
-
-            if (f) {
-
-                document.getElementById('modalFuncaoTitulo').textContent = 'Editar Função';
-
-                document.getElementById('modalFuncaoNome').value = f.nome;
-
-                document.getElementById('modalFuncaoDesc').value = f.descricao || '';
-
-            } else {
-
-                document.getElementById('modalFuncaoTitulo').textContent = 'Nova Função';
-
-            }
-
-            document.getElementById('modalFuncaoPermissoes').innerHTML = LISTA_PERMISSOES.map(p => `<label class="perm-check"><input type="checkbox" data-perm="${p.id}" ${f && (f.permissoes || []).includes(p.id) ? 'checked' : ''}> ${p.label}</label>`).join('');
-
-            modal.style.display = 'flex';
-
-        }
-
-
-
-        function salvarFuncaoModal() {
-
-            const id = document.getElementById('modalFuncaoId').value;
-
-            const nome = document.getElementById('modalFuncaoNome').value.trim();
-
-            const desc = document.getElementById('modalFuncaoDesc').value.trim();
-
-            if (!nome) return alert('Nome é obrigatório');
-
-            const perms = Array.from(document.querySelectorAll('#modalFuncaoPermissoes input:checked')).map(cb => cb.getAttribute('data-perm'));
-
-            let list = JSON.parse(localStorage.getItem('dme_funcoes')) || [];
-
-            if (id) {
-
-                const idx = list.findIndex(x => x.id === id);
-
-                list[idx] = { ...list[idx], nome, descricao: desc, permissoes: perms };
-
-            } else {
-
-                list.push({ id: Date.now().toString(36), nome, descricao: desc, permissoes: perms });
-
-            }
-
-            localStorage.setItem('dme_funcoes', JSON.stringify(list));
-
-            document.getElementById('funcaoModal').style.display = 'none';
-
-            carregarFuncoes();
-
-        }
-
-
-
-        function excluirFuncao(id) {
-
-            if (!confirm('Deseja excluir esta função? Usuários associados perderão estas permissões.')) return;
-
-            let list = JSON.parse(localStorage.getItem('dme_funcoes')) || [];
-
-            localStorage.setItem('dme_funcoes', JSON.stringify(list.filter(x => x.id !== id)));
-
-            carregarFuncoes();
-
-        }
+        function abrirModalFuncao() { alert('Gestão de funções indisponível — em construção.'); }
+        function salvarFuncaoModal() {}
+        function excluirFuncao() {}
 
 
 
@@ -1532,19 +1253,17 @@
 
             const todos = _militaresCache.filter(x => x.status === 'ativo');
 
-            const admins = JSON.parse(localStorage.getItem('dme_admins')) || [];
-
-
-
-            document.getElementById('adminTableBody').innerHTML = todos.map(x => `<tr>
+            document.getElementById('adminTableBody').innerHTML = todos.map(x => {
+                const isAdminUser = (x.role || 'user') === 'admin';
+                return `<tr>
 
                 <td><strong>${x.nick}</strong></td>
 
-                <td>${x.patente}</td>
+                <td>${x.patente || '-'}</td>
 
-                <td><span class="badge-status ${x.corpo === 'militar' ? 'ativo' : 'pendente'}">${x.corpo === 'militar' ? 'Militar' : 'Empresarial'}</span></td>
+                <td><span class="badge-status ${x.corpo === 'militar' ? 'ativo' : 'pendente'}">${x.corpo || '-'}</span></td>
 
-                <td>${admins.includes(x.nick) ? '<span class="badge-status banido">Admin</span>' : '-'}</td>
+                <td>${isAdminUser ? '<span class="badge-status banido">Admin</span>' : '-'}</td>
 
                 <td>
 
@@ -1552,11 +1271,10 @@
 
                     <button class="btn-user-action" style="color:#ef4444" onclick="apagarMilitar('${x.nick}')">✕</button>
 
-                    <button class="btn-user-action" onclick="toggleAdmin('${x.nick}')">${admins.includes(x.nick) ? 'Remover Admin' : 'Dar Admin'}</button>
-
                 </td>
 
-            </tr>`).join('');
+            </tr>`;
+            }).join('');
 
         }
 
@@ -1600,22 +1318,9 @@
 
 
 
-        function toggleAdmin(nick) {
-
-            let admins = JSON.parse(localStorage.getItem('dme_admins')) || [];
-
-            if (admins.includes(nick)) {
-
-                if (admins.length === 1) return alert('O sistema precisa de ao menos um admin');
-
-                admins = admins.filter(a => a !== nick);
-
-            } else admins.push(nick);
-
-            localStorage.setItem('dme_admins', JSON.stringify(admins));
-
-            carregarPainel();
-
+        // Promover/rebaixar admin depende de endpoint PATCH /api/usuarios/{nick} (role) — em construção.
+        function toggleAdmin(_nick) {
+            alert('Alteração de papel (admin/user) indisponível — em construção no backend.');
         }
 
 
@@ -1626,104 +1331,68 @@
 
         function carregarHistorico() {
 
-            const termo = document.getElementById('historicoSearch').value.toLowerCase().trim();
+            const termo = (document.getElementById('historicoSearch').value || '').toLowerCase().trim();
 
-            let hist = JSON.parse(localStorage.getItem('dme_historico_acoes')) || [];
+            let hist = [..._historicoCache];
 
-            if (filtroHistoricoAtual !== 'todos') hist = hist.filter(h => h.categoria === filtroHistoricoAtual);
+            // Mapeia tipo do requerimento → categoria da UI (todos|usuarios|militares|sistema)
+            const categoriaDe = (tipo) => {
+                if (!tipo) return 'sistema';
+                if (tipo === 'entrada' || tipo === 'demissao' || tipo === 'banimento') return 'usuarios';
+                if (tipo === 'promocao' || tipo === 'transferencia' || tipo === 'cadetes') return 'militares';
+                return 'sistema';
+            };
 
-            if (termo) hist = hist.filter(h => h.usuario.toLowerCase().includes(termo) || h.acao.toLowerCase().includes(termo));
+            if (filtroHistoricoAtual !== 'todos') hist = hist.filter(h => categoriaDe(h.tipo) === filtroHistoricoAtual);
 
-
-
-            document.getElementById('historicoTableBody').innerHTML = hist.slice(0, 200).map(h => `<tr>
-
-                <td style="white-space:nowrap">${h.data}</td>
-
-                <td><strong>${h.usuario}</strong></td>
-
-                <td><span class="badge-status desativado" style="font-size:.6rem">${h.cargo}</span></td>
-
-                <td><span class="badge-status ativo">${h.acao}</span></td>
-
-                <td style="font-size:.8rem;color:var(--t2)">${h.detalhes}</td>
-
-            </tr>`).join('');
-
-        }
+            if (termo) hist = hist.filter(h =>
+                (h.aplicador || '').toLowerCase().includes(termo) ||
+                (h.tipo || '').toLowerCase().includes(termo) ||
+                (h.acao || '').toLowerCase().includes(termo)
+            );
 
 
 
-        // Modais helper logic
+            document.getElementById('historicoTableBody').innerHTML = hist.slice(0, 200).map(h => {
+                const data = h.data_hora ? new Date(h.data_hora).toLocaleString('pt-BR') : '-';
+                const usuario = h.aplicador || '-';
+                const tipo = h.tipo || '-';
+                const statusBadge = h.status || 'pendente';
+                const envolvidos = Array.isArray(h.tags_envolvidos) ? h.tags_envolvidos.join(', ') : '';
+                const detalhes = [h.acao, h.novaPatente ? `→ ${h.novaPatente}` : '', envolvidos ? `(${envolvidos})` : '']
+                    .filter(Boolean).join(' ');
+                return `<tr>
 
-        let currentModalUser = '';
+                    <td style="white-space:nowrap">${data}</td>
 
-        function abrirModalAtribuirFuncoes(nick) {
+                    <td><strong>${usuario}</strong></td>
 
-            currentModalUser = nick;
+                    <td><span class="badge-status desativado" style="font-size:.6rem">${tipo}</span></td>
 
-            const users = JSON.parse(localStorage.getItem('dme_users')) || [];
+                    <td><span class="badge-status ${statusBadge}">${statusBadge}</span></td>
 
-            const me = users.find(u => (u.username || '').toLowerCase() === nick.toLowerCase());
+                    <td style="font-size:.8rem;color:var(--t2)">${detalhes.replace(/</g, '&lt;')}</td>
 
-            const myIds = (me && me.funcoesIds) || [];
-
-            const funcoes = JSON.parse(localStorage.getItem('dme_funcoes')) || [];
-
-            document.getElementById('modalAtribuirUser').textContent = 'Militar: ' + nick;
-
-            document.getElementById('modalAtribuirCheckboxes').innerHTML = funcoes.map(f => `<label class="perm-check"><input type="checkbox" data-id="${f.id}" ${myIds.includes(f.id) ? 'checked' : ''}> ${f.nome}</label>`).join('');
-
-            document.getElementById('modalAtribuirFuncoes').style.display = 'flex';
+                </tr>`;
+            }).join('');
 
         }
 
+
+
+        // Modais de atribuição de funções / cargo dependem das tabelas `funcoes` e
+        // `usuario_funcoes` — em construção. Stubbed para não quebrar os listeners.
+        function abrirModalAtribuirFuncoes(_nick) {
+            alert('Atribuição de funções indisponível — em construção no backend.');
+        }
         function salvarAtribuirFuncoes() {
-
-            const ids = Array.from(document.querySelectorAll('#modalAtribuirCheckboxes input:checked')).map(cb => cb.getAttribute('data-id'));
-
-            let users = JSON.parse(localStorage.getItem('dme_users')) || [];
-
-            const idx = users.findIndex(u => (u.username || '').toLowerCase() === currentModalUser.toLowerCase());
-
-            if (idx !== -1) { users[idx].funcoesIds = ids; localStorage.setItem('dme_users', JSON.stringify(users)); }
-
             document.getElementById('modalAtribuirFuncoes').style.display = 'none';
-
-            carregarUsuarios();
-
         }
-
-        function abrirModalEditarCargo(nick) {
-
-            currentModalUser = nick;
-
-            const users = JSON.parse(localStorage.getItem('dme_users')) || [];
-
-            const me = users.find(u => (u.username || '').toLowerCase() === nick.toLowerCase());
-
-            document.getElementById('modalEditarCargoUser').textContent = 'Militar: ' + nick;
-
-            document.getElementById('modalEditarCargoInput').value = (me && me.cargo) || '';
-
-            document.getElementById('modalEditarCargo').style.display = 'flex';
-
+        function abrirModalEditarCargo(_nick) {
+            alert('Edição de cargo indisponível — em construção no backend.');
         }
-
         function salvarCargoUsuario() {
-
-            const cargo = document.getElementById('modalEditarCargoInput').value.trim();
-
-            let users = JSON.parse(localStorage.getItem('dme_users')) || [];
-
-            const idx = users.findIndex(u => (u.username || '').toLowerCase() === currentModalUser.toLowerCase());
-
-            if (idx !== -1) { users[idx].cargo = cargo; localStorage.setItem('dme_users', JSON.stringify(users)); }
-
             document.getElementById('modalEditarCargo').style.display = 'none';
-
-            carregarUsuarios();
-
         }
 
 
@@ -1731,6 +1400,16 @@
         // INIT UI
 
         document.addEventListener('DOMContentLoaded', async () => {
+
+            // Bootstrap sessão via cookie httpOnly
+            try {
+                const meRes = await fetch('/api/auth/me');
+                if (!meRes.ok) { window.location.href = '/login'; return; }
+                const me = await meRes.json();
+                username = me.nick || '';
+                isAdmin  = me.role === 'admin';
+                if (!isAdmin) { alert('Acesso restrito a administradores.'); window.location.href = '/'; return; }
+            } catch (e) { window.location.href = '/login'; return; }
 
             await _carregarCaches();
 

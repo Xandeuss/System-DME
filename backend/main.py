@@ -24,7 +24,7 @@ from backend.config import get_settings
 from backend.routers.auth import router as auth_router
 from backend.routers.requirements import router as requerimentos_router
 from backend.routers.dashboard import router as dashboard_router
-from backend.dependencies import get_current_user, get_current_admin, ADMINS_FIXOS
+from backend.dependencies import get_current_user, get_current_admin
 from backend.models.auth import UserInfo
 from backend.db import pool as db_pool
 
@@ -199,7 +199,7 @@ def _render_admin(template: str):
 
         nick = payload.get("sub", "")
         role = payload.get("role", "user")
-        is_admin = role == "admin" or nick.lower() in ADMINS_FIXOS
+        is_admin = (role == "admin")
 
         if not is_admin:
             return RedirectResponse(url="/home")
