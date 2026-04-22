@@ -29,6 +29,9 @@ class Settings:
     COOKIE_SAMESITE: str = "lax"
     COOKIE_MAX_AGE: int = JWT_EXPIRE_MINUTES * 60
 
+    # ── PostgreSQL ────────────────────────────────────
+    DATABASE_URL: str | None = os.getenv("DATABASE_URL")
+
     # ── Ambiente ──────────────────────────────────────
     DEV_MODE: bool = os.getenv("DEV_MODE", "true").lower() == "true"
 

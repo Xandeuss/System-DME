@@ -4,13 +4,15 @@ Endpoints: login, register, logout, me.
 """
 
 import logging
-from fastapi import APIRouter, HTTPException, Request, Depends, status
+from datetime import datetime, timezone
+from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import JSONResponse
 
 from backend.config import get_settings
 from backend.models.auth import LoginRequest, RegisterRequest, AuthResponse, UserInfo
 from backend.services.auth_service import hash_password, verify_password, create_jwt
-from backend.services.local_store import get_store
+from backend.services.listagem_service import patente_ordem, detectar_corpo
+from backend.db.pool import get_pool
 from backend.dependencies import get_current_user, ADMINS_FIXOS
 
 logger = logging.getLogger("dme.auth")
@@ -21,28 +23,31 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 # ── POST /api/auth/login ─────────────────────────────
 @router.post("/login", response_model=AuthResponse)
 async def login(body: LoginRequest):
-    """
-    Autentica o usuário e seta o cookie JWT httpOnly.
-    Usa o store local em memória.
-    """
+    """Autentica o usuário contra o PostgreSQL e seta o cookie JWT."""
     settings = get_settings()
-    store = get_store()
+    pool = get_pool()
+    if not pool:
+        raise HTTPException(status_code=503, detail="Banco de dados indisponível")
 
-    # 1. Busca o usuário
-    user = store.get_militar(body.nick)
-    if not user:
+    async with pool.connection() as conn:
+        cur = await conn.execute(
+            "SELECT nick, senha_hash, status, role FROM militares WHERE LOWER(nick) = LOWER(%s)",
+            (body.nick,),
+        )
+        row = await cur.fetchone()
+
+    if not row:
         raise HTTPException(status_code=401, detail="Usuário não encontrado")
 
-    # 2. Verifica a senha
-    senha_hash = user.get("senha_hash", "")
+    nick_db, senha_hash, user_status, role_db = row
+
     if not senha_hash:
         raise HTTPException(status_code=401, detail="Senha não configurada para este usuário")
 
     if not verify_password(body.password, senha_hash):
         raise HTTPException(status_code=401, detail="Senha incorreta")
 
-    # 3. Checa status
-    user_status = (user.get("status") or "ativo").lower()
+    user_status = (user_status or "ativo").lower()
     if user_status != "ativo":
         mensagens = {
             "pendente": "Sua conta está aguardando aprovação de um administrador.",
@@ -52,10 +57,9 @@ async def login(body: LoginRequest):
         detail = mensagens.get(user_status, "Acesso negado. Conta não está ativa.")
         raise HTTPException(status_code=403, detail=detail)
 
-    # 4. Gera JWT e seta cookie
-    is_admin = body.nick.lower() in ADMINS_FIXOS or user.get("role") == "admin"
+    is_admin = body.nick.lower() in ADMINS_FIXOS or role_db == "admin"
     role = "admin" if is_admin else "user"
-    token = create_jwt(body.nick, role)
+    token = create_jwt(nick_db, role)
 
     response = JSONResponse(content={"ok": True, "message": "Login realizado com sucesso"})
     response.set_cookie(
@@ -68,7 +72,7 @@ async def login(body: LoginRequest):
         path="/",
     )
 
-    logger.info(f"Login OK: {body.nick} (role={role})")
+    logger.info(f"Login OK: {nick_db} (role={role})")
     return response
 
 
@@ -76,27 +80,52 @@ async def login(body: LoginRequest):
 @router.post("/register", response_model=AuthResponse)
 async def register(body: RegisterRequest):
     """
-    Registra um novo militar no store local.
-    Em dev, o status já é 'ativo' para facilitar testes.
+    Registra um novo militar diretamente no PostgreSQL.
+    Se já existir um registro "shell" (criado por requerimento de entrada),
+    completa os dados de conta (email, senha) e mantém status/patente.
     """
-    store = get_store()
+    pool = get_pool()
+    if not pool:
+        raise HTTPException(status_code=503, detail="Banco de dados indisponível")
 
-    # 1. Verifica duplicidade
-    if store.get_militar(body.nick):
-        raise HTTPException(status_code=409, detail="Este nome de usuário já está em uso")
+    patente_inicial = "Recruta"
+    corpo_inicial = detectar_corpo(patente_inicial)
+    senha = hash_password(body.password)
+    now = datetime.now(timezone.utc)
 
-    # 2. Hash da senha e insere
-    store.insert_militar({
-        "nick": body.nick,
-        "email": body.email,
-        "senha_hash": hash_password(body.password),
-        "patente": "Recruta",
-        "corpo": "militar",
-        "status": "ativo",  # ativo direto em dev (sem aprovação)
-        "role": "user",
-        "tag": "DME",
-        "created_at": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
-    })
+    async with pool.connection() as conn:
+        cur = await conn.execute(
+            "SELECT nick, senha_hash FROM militares WHERE LOWER(nick) = LOWER(%s)",
+            (body.nick,),
+        )
+        existente = await cur.fetchone()
+
+        if existente and existente[1]:
+            raise HTTPException(status_code=409, detail="Este nome de usuário já está em uso")
+
+        if existente:
+            # Shell record criado por requerimento de entrada — completa dados de conta
+            await conn.execute(
+                """
+                UPDATE militares
+                   SET email = %s, senha_hash = %s
+                 WHERE LOWER(nick) = LOWER(%s)
+                """,
+                (body.email, senha, body.nick),
+            )
+        else:
+            await conn.execute(
+                """
+                INSERT INTO militares
+                    (nick, email, senha_hash, patente, patente_ordem, corpo, status, role, tag, created_at)
+                VALUES (%s, %s, %s, %s, %s, %s, 'ativo', 'user', 'DME', %s)
+                """,
+                (
+                    body.nick, body.email, senha,
+                    patente_inicial, patente_ordem(patente_inicial), corpo_inicial, now,
+                ),
+            )
+        await conn.commit()
 
     logger.info(f"Registro OK: {body.nick} (status=ativo)")
     return AuthResponse(ok=True, message="Cadastro realizado com sucesso! Você já pode fazer login.")

@@ -11,18 +11,24 @@ Endpoints:
 """
 
 import logging
+from typing import Any
 from fastapi import APIRouter, HTTPException, Depends, Query, status
 from fastapi.responses import JSONResponse
 
 from backend.dependencies import get_current_user, get_current_admin
 from backend.models.auth import UserInfo
 from backend.models.requirements import RequerimentoCreate, RequerimentoUpdate, MilitarUpdate
-from backend.services.local_store import get_store
+from backend.db.pool import get_pool
+from backend.services import listagem_service
 
 logger = logging.getLogger("dme.requerimentos")
 
 router = APIRouter(tags=["requerimentos"])
 
+def _row_to_dict(row, cur) -> dict:
+    """Converte row para dicionário baseado nos nomes das colunas."""
+    cols = [col.name for col in cur.description]
+    return dict(zip(cols, row))
 
 # ── POST /api/requerimentos ───────────────────────────────────────────────────
 
@@ -32,19 +38,40 @@ async def criar_requerimento(
     user: UserInfo = Depends(get_current_user),
 ):
     """
-    Cria um novo requerimento.
-    O aplicador é extraído do JWT — nunca do body.
-    O status inicial é sempre 'pendente'.
+    Cria um novo requerimento diretamente no PostgreSQL.
     """
-    store = get_store()
+    pool = get_pool()
+    if not pool:
+        raise HTTPException(status_code=500, detail="Banco de dados indisponível")
 
     registro = body.model_dump(exclude_none=True)
-    registro["aplicador"] = user.nick
-    registro["status"] = "pendente"
+    aplicador = user.nick
 
-    result = store.insert_requerimento(registro)
-    logger.info(f"Requerimento criado por {user.nick}: tipo={body.tipo}")
-    return {"ok": True, "data": result}
+    try:
+        async with pool.connection() as conn:
+            cur = await conn.execute(
+                """
+                INSERT INTO historico_requerimentos 
+                    (tipo, aplicador, status, acao, nova_patente, tags_envolvidos, permissor, observacao, anexo_provas, valor, banido_ate)
+                VALUES (%s, %s, 'pendente', %s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING id
+                """,
+                (
+                    registro.get("tipo"), aplicador, registro.get("acao"), registro.get("novaPatente"), 
+                    registro.get("tags_envolvidos", []), registro.get("permissor"), 
+                    registro.get("observacao"), registro.get("anexo_provas"), 
+                    registro.get("valor"), registro.get("banido_ate")
+                )
+            )
+            row = await cur.fetchone()
+            req_id = row[0]
+            await conn.commit()
+            
+        logger.info(f"Requerimento {req_id} criado por {user.nick}: tipo={body.tipo}")
+        return {"ok": True, "data": {"id": str(req_id)}}
+    except Exception as e:
+        logger.error(f"Erro ao criar requerimento: {e}")
+        raise HTTPException(status_code=500, detail="Erro interno ao criar requerimento")
 
 
 # ── GET /api/requerimentos ────────────────────────────────────────────────────
@@ -56,15 +83,37 @@ async def listar_requerimentos(
     user: UserInfo = Depends(get_current_user),
 ):
     """
-    Lista requerimentos por tipo.
-    - aba='minhas': retorna apenas os do usuário logado.
-    - aba='todos': retorna todos (qualquer usuário pode ver).
-    Ordenação: mais recente primeiro.
+    Lista requerimentos buscando do PostgreSQL.
     """
-    store = get_store()
-    aplicador = user.nick if aba == "minhas" else None
-    result = store.list_requerimentos(tipo=tipo, aplicador=aplicador)
-    return {"ok": True, "data": result}
+    pool = get_pool()
+    if not pool:
+        raise HTTPException(status_code=500, detail="Banco de dados indisponível")
+
+    try:
+        async with pool.connection() as conn:
+            if aba == "minhas":
+                cur = await conn.execute(
+                    "SELECT * FROM historico_requerimentos WHERE tipo = %s AND aplicador = %s ORDER BY data_hora DESC",
+                    (tipo, user.nick)
+                )
+            else:
+                cur = await conn.execute(
+                    "SELECT * FROM historico_requerimentos WHERE tipo = %s ORDER BY data_hora DESC",
+                    (tipo,)
+                )
+            rows = await cur.fetchall()
+            result = [_row_to_dict(r, cur) for r in rows]
+            
+            for item in result:
+                item["id"] = str(item["id"])
+                if item.get("data_hora"):
+                    item["data_hora"] = item["data_hora"].isoformat()
+                item["novaPatente"] = item.pop("nova_patente", None)
+            
+            return {"ok": True, "data": result}
+    except Exception as e:
+        logger.error(f"Erro ao listar requerimentos: {e}")
+        raise HTTPException(status_code=500, detail="Erro interno ao buscar requerimentos")
 
 
 # ── GET /api/requerimentos/{req_id} ──────────────────────────────────────────
@@ -74,12 +123,25 @@ async def buscar_requerimento(
     req_id: str,
     user: UserInfo = Depends(get_current_user),
 ):
-    """Busca um requerimento específico pelo ID."""
-    store = get_store()
-    r = store.get_requerimento(req_id)
-    if not r:
-        raise HTTPException(status_code=404, detail="Requerimento não encontrado")
-    return {"ok": True, "data": r}
+    pool = get_pool()
+    if not pool:
+        raise HTTPException(status_code=500, detail="Banco de dados indisponível")
+        
+    try:
+        async with pool.connection() as conn:
+            cur = await conn.execute("SELECT * FROM historico_requerimentos WHERE id = %s", (req_id,))
+            row = await cur.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail="Requerimento não encontrado")
+            r = _row_to_dict(row, cur)
+            r["id"] = str(r["id"])
+            r["novaPatente"] = r.pop("nova_patente", None)
+            return {"ok": True, "data": r}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erro ao buscar requerimento: {e}")
+        raise HTTPException(status_code=500, detail="Erro interno")
 
 
 # ── PATCH /api/requerimentos/{req_id} ────────────────────────────────────────
@@ -90,11 +152,6 @@ async def atualizar_requerimento(
     body: RequerimentoUpdate,
     user: UserInfo = Depends(get_current_user),
 ):
-    """
-    Atualiza campos de um requerimento existente.
-    Aprovar/reprovar/cancelar exige role admin.
-    Editar observação pode ser feito pelo próprio aplicador.
-    """
     acoes_admin = {"aprovado", "reprovado", "cancelado"}
     if body.status in acoes_admin and user.role != "admin":
         raise HTTPException(
@@ -106,13 +163,59 @@ async def atualizar_requerimento(
     if not campos:
         raise HTTPException(status_code=400, detail="Nenhum campo para atualizar")
 
-    store = get_store()
-    r = store.update_requerimento(req_id, campos)
-    if not r:
-        raise HTTPException(status_code=404, detail="Requerimento não encontrado")
+    pool = get_pool()
+    if not pool:
+        raise HTTPException(status_code=500, detail="Banco de dados indisponível")
 
-    logger.info(f"Requerimento {req_id} atualizado por {user.nick}: {campos}")
-    return {"ok": True, "message": "Requerimento atualizado com sucesso"}
+    try:
+        async with pool.connection() as conn:
+            # 1. Build UPDATE query
+            set_clauses = []
+            values = []
+            for k, v in campos.items():
+                col = "nova_patente" if k == "novaPatente" else k
+                set_clauses.append(f"{col} = %s")
+                values.append(v)
+            
+            if "status" in campos and campos["status"] in ("aprovado", "reprovado", "cancelado"):
+                set_clauses.append("resolvido_em = NOW()")
+            
+            values.append(req_id)
+            set_query = ", ".join(set_clauses)
+            
+            cur = await conn.execute(f"UPDATE historico_requerimentos SET {set_query} WHERE id = %s RETURNING id", values)
+            if cur.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Requerimento não encontrado")
+            
+            # 2. Fetch updated to pass to listagem_service
+            cur = await conn.execute("SELECT * FROM historico_requerimentos WHERE id = %s", (req_id,))
+            updated_row = await cur.fetchone()
+            updated_req = _row_to_dict(updated_row, cur)
+            updated_req["id"] = str(updated_req["id"])
+            updated_req["novaPatente"] = updated_req.pop("nova_patente", None)
+            
+            await conn.commit()
+
+        # Se foi aprovado, reflete nas listagens (militar, corpo, etc)
+        if body.status == "aprovado":
+            primeiro_envolvido = (updated_req.get("tags_envolvidos") or [None])[0]
+            militar_atual = None
+            if primeiro_envolvido:
+                async with pool.connection() as conn:
+                    c = await conn.execute("SELECT * FROM militares WHERE LOWER(nick) = LOWER(%s)", (primeiro_envolvido,))
+                    m_row = await c.fetchone()
+                    if m_row:
+                        militar_atual = _row_to_dict(m_row, c)
+            await listagem_service.aplicar_aprovacao(updated_req, militar_atual)
+
+        logger.info(f"Requerimento {req_id} atualizado por {user.nick}: {campos}")
+        return {"ok": True, "message": "Requerimento atualizado com sucesso"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erro ao atualizar requerimento: {e}")
+        raise HTTPException(status_code=500, detail="Erro ao atualizar requerimento")
 
 
 # ── DELETE /api/requerimentos/{req_id} ───────────────────────────────────────
@@ -122,11 +225,18 @@ async def deletar_requerimento(
     req_id: str,
     user: UserInfo = Depends(get_current_admin),
 ):
-    """Remove um requerimento. Restrito a administradores."""
-    store = get_store()
-    store.delete_requerimento(req_id)
-    logger.info(f"Requerimento {req_id} deletado por {user.nick}")
-    return {"ok": True, "message": "Requerimento removido com sucesso"}
+    pool = get_pool()
+    if not pool:
+        raise HTTPException(status_code=500, detail="Banco de dados indisponível")
+    try:
+        async with pool.connection() as conn:
+            await conn.execute("DELETE FROM historico_requerimentos WHERE id = %s", (req_id,))
+            await conn.commit()
+        logger.info(f"Requerimento {req_id} deletado por {user.nick}")
+        return {"ok": True, "message": "Requerimento removido com sucesso"}
+    except Exception as e:
+        logger.error(f"Erro ao remover requerimento: {e}")
+        raise HTTPException(status_code=500, detail="Erro interno")
 
 
 # ── PATCH /api/militares/{nick} ───────────────────────────────────────────────
@@ -137,18 +247,42 @@ async def atualizar_militar(
     body: MilitarUpdate,
     user: UserInfo = Depends(get_current_admin),
 ):
-    """
-    Atualiza patente ou status de um militar.
-    Restrito a administradores.
-    """
     campos = body.model_dump(exclude_none=True)
     if not campos:
         raise HTTPException(status_code=400, detail="Nenhum campo para atualizar")
 
-    store = get_store()
-    m = store.update_militar(nick, campos)
-    if not m:
-        raise HTTPException(status_code=404, detail="Militar não encontrado")
+    pool = get_pool()
+    if not pool:
+        raise HTTPException(status_code=500, detail="Banco de dados indisponível")
 
-    logger.info(f"Militar {nick} atualizado por {user.nick}: {campos}")
-    return {"ok": True, "message": f"Militar {nick} atualizado com sucesso"}
+    try:
+        async with pool.connection() as conn:
+            set_clauses = []
+            values = []
+            for k, v in campos.items():
+                set_clauses.append(f"{k} = %s")
+                values.append(v)
+            if "patente" in campos:
+                set_clauses.append("patente_ordem = %s")
+                values.append(listagem_service.patente_ordem(campos["patente"]))
+                set_clauses.append("corpo = %s")
+                values.append(listagem_service.detectar_corpo(campos["patente"]))
+                
+            values.append(nick)
+            
+            cur = await conn.execute(
+                f"UPDATE militares SET {', '.join(set_clauses)} WHERE LOWER(nick) = LOWER(%s) RETURNING nick",
+                values
+            )
+            if cur.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Militar não encontrado")
+            await conn.commit()
+            
+        logger.info(f"Militar {nick} atualizado por {user.nick}: {campos}")
+        return {"ok": True, "message": f"Militar {nick} atualizado com sucesso"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erro ao atualizar militar: {e}")
+        raise HTTPException(status_code=500, detail="Erro interno")
+

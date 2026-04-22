@@ -278,23 +278,9 @@
 
 
 
-            <!-- Terminal admin -->
+            <!-- Ações da listagem -->
 
             <div class="terminal-row">
-
-                <button class="btn-secondary btn-sm" id="btn-terminal" onclick="toggleTerminal()">
-
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
-
-                        <polyline points="16 18 22 12 16 6" />
-
-                        <polyline points="8 6 2 12 8 18" />
-
-                    </svg>
-
-                    Terminal de Dados
-
-                </button>
 
                 <button class="btn-secondary btn-sm" onclick="location.reload()">
 
@@ -309,106 +295,6 @@
                     </svg>
 
                     Atualizar dados
-
-                </button>
-
-            </div>
-
-
-
-            <div id="terminal-panel" class="terminal-panel">
-
-                <div class="terminal-header">
-
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14">
-
-                        <polyline points="16 18 22 12 16 6" />
-
-                        <polyline points="8 6 2 12 8 18" />
-
-                    </svg>
-
-                    Terminal de Dados
-
-                    <span class="terminal-hint">Cole as listagens e clique em Executar</span>
-
-                </div>
-
-                <div class="terminal-fields">
-
-                    <div class="terminal-field">
-
-                        <label class="g-label">Hierarquia Militar</label>
-
-                        <textarea id="input-militar" class="g-textarea"
-
-                            placeholder="Cole a listagem militar..."></textarea>
-
-                    </div>
-
-                    <div class="terminal-field">
-
-                        <label class="g-label">Hierarquia Empresarial</label>
-
-                        <textarea id="input-empresarial" class="g-textarea"
-
-                            placeholder="Cole a listagem empresarial..."></textarea>
-
-                    </div>
-
-                    <div class="terminal-field">
-
-                        <label class="g-label">Alto Comando Supremo</label>
-
-                        <textarea id="input-alto_comando" class="g-textarea"
-
-                            placeholder="Cole o alto comando..."></textarea>
-
-                    </div>
-
-                    <div class="terminal-field">
-
-                        <label class="g-label">Cadetes</label>
-
-                        <textarea id="input-cadetes" class="g-textarea"
-
-                            placeholder="Cole a listagem de cadetes..."></textarea>
-
-                    </div>
-
-                    <div class="terminal-field">
-
-                        <label class="g-label">Contas Oficiais</label>
-
-                        <textarea id="input-contas_oficiais" class="g-textarea"
-
-                            placeholder="Nick por linha..."></textarea>
-
-                    </div>
-
-                    <div class="terminal-field">
-
-                        <label class="g-label">Exonerados</label>
-
-                        <textarea id="input-exonerados" class="g-textarea" placeholder="Nick por linha..."></textarea>
-
-                    </div>
-
-                </div>
-
-                <button class="btn-primary" style="width:100%;justify-content:center" onclick="salvarListas()">
-
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14">
-
-                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-
-                        <polyline points="17 21 17 13 7 13 7 21" />
-
-                        <polyline points="7 3 7 8 15 8" />
-
-                    </svg>
-
-                    Executar Atualização
 
                 </button>
 
@@ -502,7 +388,7 @@
 
     <script src="/scripts/notificacoes.js"></script>
 
-    <script src="/scripts/listagens.js"></script>
+    <script src="/scripts/listagens.js?v=7"></script>
 
 </body>
 

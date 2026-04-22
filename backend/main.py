@@ -9,8 +9,16 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 
+from contextlib import asynccontextmanager
 from pathlib import Path
 import logging
+import sys
+
+# psycopg3 não suporta ProactorEventLoop (padrão do Windows).
+# Forçar SelectorEventLoop antes do uvicorn criar o loop.
+if sys.platform == "win32":
+    import asyncio
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 from backend.config import get_settings
 from backend.routers.auth import router as auth_router
@@ -18,6 +26,7 @@ from backend.routers.requirements import router as requerimentos_router
 from backend.routers.dashboard import router as dashboard_router
 from backend.dependencies import get_current_user, get_current_admin, ADMINS_FIXOS
 from backend.models.auth import UserInfo
+from backend.db import pool as db_pool
 
 # ── Login
 logging.basicConfig(
@@ -30,13 +39,23 @@ logger = logging.getLogger("dme")
 settings = get_settings()
 settings.validate()
 
-# ── App 
+
+# ── Lifespan ──────────────────────────────────────────────────────────────────
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await db_pool.init_pool()
+    yield
+    await db_pool.close_pool()
+
+
+# ── App
 app = FastAPI(
     title="DME System",
     description="Sistema de RPG policial do DME no Habbo Hotel.",
     version="2.0.0",
     docs_url=None,
     redoc_url=None,
+    lifespan=lifespan,
 )
 
 

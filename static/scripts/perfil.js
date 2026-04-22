@@ -32,21 +32,13 @@ const params = new URLSearchParams(location.search);
 const targetNick = params.get('nick') || '';
 
 /* ── data sources ────────────────────────── */
-const militar = JSON.parse(localStorage.getItem('dme_militar')) || [];
-const empresarial = JSON.parse(localStorage.getItem('dme_empresarial')) || [];
 const historico = JSON.parse(localStorage.getItem('dme_historico_req')) || [];
 const turnos = JSON.parse(localStorage.getItem('dme_turnos')) || [];
 const aulas = JSON.parse(localStorage.getItem('dme_aulas')) || [];
 const recrutamentos = JSON.parse(localStorage.getItem('dme_recrutamentos')) || [];
 
-const todos = [...militar, ...empresarial];
-const found = todos.find(m => m.nick?.toLowerCase() === targetNick.toLowerCase());
-
-if (!targetNick || !found) {
-    // Militar não encontrado — redireciona
-    alert('Militar não encontrado. Voltando para a home.');
-    location.href = '/home';
-}
+let found = null;
+let empresarial = [];
 
 /* ── navbar ──────────────────────────────── */
 function initNavbar() {
@@ -87,7 +79,7 @@ function buildSidebar() {
         ? 'Empresarial' : 'Militar';
     const tag = found.tag || 'DME';
     const status = found.status || 'Ativo';
-    const desde = found.desde || found.dataCadastro || '—';
+    const desde = found.created_at || found.desde || found.dataCadastro || '—';
 
     // breadcrumb & title
     document.title = `${nick} — DME System`;
@@ -146,7 +138,7 @@ function buildSidebar() {
 function buildAbout() {
     const nick = found.nick;
     const corp = empresarial.some(m => m.nick?.toLowerCase() === nick.toLowerCase()) ? 'Empresarial' : 'Militar';
-    const desde = found.desde || found.dataCadastro || '—';
+    const desde = found.created_at || found.desde || found.dataCadastro || '—';
 
     const totalHoras = turnos
         .filter(t => t.usuario?.toLowerCase() === nick.toLowerCase())
@@ -357,7 +349,28 @@ function copiarInfoListagem() {
 window.copiarInfoListagem = copiarInfoListagem;
 
 /* ── init ────────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    if (!targetNick) { location.href = '/home'; return; }
+
+    try {
+        const res = await fetch('/api/militares');
+        if (!res.ok) throw new Error('API indisponível');
+        const todos = (await res.json()).data || [];
+        empresarial = todos.filter(m => m.corpo === 'empresarial');
+        found = todos.find(m => m.nick?.toLowerCase() === targetNick.toLowerCase());
+    } catch (_) {
+        // fallback ao localStorage legado se a API falhar
+        const militar = JSON.parse(localStorage.getItem('dme_militar')) || [];
+        empresarial   = JSON.parse(localStorage.getItem('dme_empresarial')) || [];
+        found = [...militar, ...empresarial].find(m => m.nick?.toLowerCase() === targetNick.toLowerCase());
+    }
+
+    if (!found) {
+        alert('Militar não encontrado. Voltando para a home.');
+        location.href = '/home';
+        return;
+    }
+
     initNavbar();
     initSidebar();
     buildSidebar();
