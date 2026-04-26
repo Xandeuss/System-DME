@@ -14,7 +14,7 @@ load_dotenv(override=True)
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 _ORDEM = {
-    "Fundador": -2, "Supremo": -1,
+    "Fundador": -100, "Supremo": -99, "Supremo Interino": -98,
     "Comandante-Geral": 0, "Comandante": 1, "Subcomandante": 2, "Marechal": 3,
     "General": 4, "Coronel": 5, "Tenente-Coronel": 6, "Major": 7,
     "Capitão": 8, "Tenente": 9, "Aspirante a Oficial": 10, "Subtenente": 11,
@@ -25,12 +25,11 @@ _ORDEM = {
 SENHA_REAL = bcrypt.hashpw("123456".encode(), bcrypt.gensalt()).decode()
 
 ROSTER = [
-    ("xandelicado",      "Fundador"),
-    ("Bione525",         "Fundador"),
     ("Jodie-Foster",     "Fundador"),
     ("rafacv",           "Supremo"),
     ("Horcrux-",         "Supremo"),
     ("Leticinha-_-",     "Supremo"),
+    ("Bione525",         "Tenente-Coronel"),
     ("kaique0834",       "Capitão"),
     ("kikit4",           "Capitão"),
     ("_BelleBoyer",      "Capitão"),

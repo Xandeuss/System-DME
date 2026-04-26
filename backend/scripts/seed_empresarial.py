@@ -122,22 +122,18 @@ ROSTER = [
 def main():
     with psycopg.connect(DATABASE_URL) as conn:
         with conn.cursor() as cur:
-            for i, (nick, patente) in enumerate(ROSTER):
+            for nick, patente in ROSTER:
                 ordem = _ORDEM[patente]
-                email = f"emp{i+1:04d}@dme.internal"
                 cur.execute(
                     """
-                    INSERT INTO militares
-                        (nick, email, senha_hash, patente, patente_ordem,
-                         corpo, status, role, tag, created_at)
-                    VALUES (%s, %s, '', %s, %s, 'empresarial', 'ativo', 'user', 'DME', NOW())
+                    INSERT INTO militares (nick, patente, patente_ordem, corpo, tag, created_at)
+                    VALUES (%s, %s, %s, 'empresarial', 'DME', NOW())
                     ON CONFLICT (nick) DO UPDATE SET
                         patente       = EXCLUDED.patente,
                         patente_ordem = EXCLUDED.patente_ordem,
-                        corpo         = EXCLUDED.corpo,
-                        status        = 'ativo'
+                        corpo         = EXCLUDED.corpo
                     """,
-                    (nick, email, patente, ordem),
+                    (nick, patente, ordem),
                 )
         conn.commit()
     print(f"✓ {len(ROSTER)} membros empresariais importados com sucesso.")

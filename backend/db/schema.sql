@@ -4,6 +4,31 @@
 -- requerimento é aprovado (via listagem_service.py).
 -- ============================================================
 
+-- ── Usuários do sistema ───────────────────────────────────────
+-- Contas que podem fazer login no System-DME.
+-- Um militar pode existir na listagem sem ter conta aqui.
+CREATE TABLE IF NOT EXISTS usuarios (
+    nick        VARCHAR(64)  PRIMARY KEY,
+    email       VARCHAR(128),
+    senha_hash  TEXT         NOT NULL DEFAULT '',
+    role        VARCHAR(8)   NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin')),
+    status      VARCHAR(16)  NOT NULL DEFAULT 'ativo'
+                             CHECK (status IN ('ativo', 'pendente', 'desativado', 'banido')),
+    banido_ate  TIMESTAMPTZ,
+    created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_usuarios_nick ON usuarios (LOWER(nick));
+
+
+-- ── Centros vinculados a usuários ─────────────────────────────
+CREATE TABLE IF NOT EXISTS usuario_centros (
+    nick    VARCHAR(64) NOT NULL REFERENCES usuarios(nick) ON DELETE CASCADE,
+    centro  VARCHAR(64) NOT NULL,
+    PRIMARY KEY (nick, centro)
+);
+
+
 -- ── Militares ────────────────────────────────────────────────
 -- patente_ordem: índice numérico da hierarquia (0 = mais alto).
 -- Permite ORDER BY patente_ordem ASC sem lógica no app.
