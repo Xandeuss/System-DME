@@ -1,503 +1,1006 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consultar Promoção  DME System</title>
-    <link rel="stylesheet" href="/styles/global.css">
-    <link rel="stylesheet" href="/styles/consulta_promocao.css">
-    <script src="/scripts/theme.js"></script>
-</head>
-
-<body>
-
-    <!-- ââ SIDEBAR ââââââââââââââââââââââââââââââââââââââ -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-    <div class="mobile-sidebar" id="mobileSidebar">
-        <div class="sidebar-header">
-            <span class="sidebar-title">DME System</span>
-            <button class="sidebar-close" id="sidebarClose">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M18 6 6 18M6 6l12 12" />
-                </svg>
-            </button>
-        </div>
-        <div class="sidebar-section">
-            <div class="sidebar-section-label">Principal</div>
-            <a href="/home" class="sidebar-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                    <polyline points="9 22 9 12 15 12 15 22" />
-                </svg>
-                PÃ¡gina Inicial
-            </a>
-            <a href="/listagens" class="sidebar-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="8" y1="6" x2="21" y2="6" />
-                    <line x1="8" y1="12" x2="21" y2="12" />
-                    <line x1="8" y1="18" x2="21" y2="18" />
-                    <line x1="3" y1="6" x2="3.01" y2="6" />
-                    <line x1="3" y1="12" x2="3.01" y2="12" />
-                    <line x1="3" y1="18" x2="3.01" y2="18" />
-                </svg>
-                Listagens
-            </a>
-            <a href="/requerimentos" class="sidebar-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    <polyline points="14 2 14 8 20 8" />
-                </svg>
-                Requerimentos
-            </a>
-            <a href="/sabatina" class="sidebar-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
-                </svg>
-                Sabatina
-            </a>
-            <a href="/consulta_promocao" class="sidebar-item active">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-                    <polyline points="16 7 22 7 22 13" />
-                </svg>
-                Consultar PromoÃ§Ã£o
-            </a>
-        </div>
-        <div class="sidebar-section">
-            <div class="sidebar-section-label">Ferramentas</div>
-            <a href="/ponto_servico" class="sidebar-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <polyline points="12 6 12 12 16 14" />
-                </svg>
-                Ponto de ServiÃ§o
-            </a>
-            <a href="/loja" class="sidebar-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                    <line x1="3" y1="6" x2="21" y2="6" />
-                    <path d="M16 10a4 4 0 0 1-8 0" />
-                </svg>
-                Loja
-            </a>
-            <a href="/documentos" class="sidebar-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                </svg>
-                Documentos
-            </a>
-            <a href="/centro_tarefas_orgaos" class="sidebar-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 10v11M16 10v11M12 10v11" />
-                </svg>
-                Centros e ÃrgÃ£os
-            </a>
-            <a href="/recrutamentos" class="sidebar-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                </svg>
-                Recrutamentos
-            </a>
-            <a href="/ouvidoria" class="sidebar-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                </svg>
-                Ouvidoria
-            </a>
-            <a href="/setor_legislativo" class="sidebar-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="m18 16 4-4-4-4" />
-                    <path d="m6 8-4 4 4 4" />
-                    <path d="m14.5 4-5 16" />
-                </svg>
-                Setor Legislativo
-            </a>
-            <a href="/postar_aula" class="sidebar-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
-                </svg>
-                Postar Aula
-            </a>
-        </div>
-    </div>
-
-    <!-- -- NAVBAR ---------------------------------------- -->
-    <nav class="navbar">
-        <div class="logo-section">
-            <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
-            <div class="logo-mark">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                </svg>
-            </div>
-            <div class="logo-text">DME<em>System</em></div>
-        </div>
-        <div class="user-profile" id="userProfileBtn">
-            <div class="user-avatar"><img id="navUserImage" src="" alt=""></div>
-            <span class="user-name" id="navUserName">Usuário</span>
-            <div class="user-dropdown" id="userDropdown">
-                <div class="dropdown-header">
-                    <div class="dropdown-user-info">
-                        <div class="dropdown-avatar"><img id="dropdownUserImage" src="" alt=""></div>
-                        <div class="dropdown-user-details">
-                            <h4 id="dropdownName">Usuário</h4>
-                            <p>Militar DME</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="dropdown-menu">
-                    <a href="/painel" class="dropdown-item" id="dropdownPainel" style="display:none">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="7" height="7" />
-                            <rect x="14" y="3" width="7" height="7" />
-                            <rect x="14" y="14" width="7" height="7" />
-                            <rect x="3" y="14" width="7" height="7" />
-                        </svg>
-                        Painel Admin
-                    </a>
-                    <a onclick="toggleTheme()" class="dropdown-item">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="5" />
-                            <line x1="12" y1="1" x2="12" y2="3" />
-                            <line x1="12" y1="21" x2="12" y2="23" />
-                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                            <line x1="1" y1="12" x2="3" y2="12" />
-                            <line x1="21" y1="12" x2="23" y2="12" />
-                        </svg>
-                        <span id="themeText">Modo Claro</span>
-                    </a>
-                    <div class="dropdown-divider" id="dropdownDivider" style="display:none"></div>
-                    <a onclick="logout()" class="dropdown-item danger">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                            <polyline points="16 17 21 12 16 7" />
-                            <line x1="21" y1="12" x2="9" y2="12" />
-                        </svg>
-                        Sair
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- -- CONTEÚDO ---------------------------------------- -->
-    <div class="promo-container">
-        <div class="promo-header">
-            <h1 class="page-title">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28">
-                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-                    <polyline points="16 7 22 7 22 13" />
-                </svg>
-                Consultar Promoção
-            </h1>
-            <p class="page-subtitle">Sistema de Análise Técnica de Promoções</p>
-        </div>
-
-        <div class="promo-section">
-            <h2 class="section-title">1. Identificação de Carreira</h2>
-            <div class="g-form-group">
-                <label class="g-label">Nick do Militar</label>
-                <input type="text" class="g-input" id="nick" placeholder="Ex: Fulano.Ab13">
-            </div>
-            <div class="g-form-group">
-                <label class="g-label">Corpo Hierárquico</label>
-                <div class="opt-grid">
-                    <div class="opt-btn" id="corpo_mil" onclick="mudarCorpo('militar')">Militar</div>
-                    <div class="opt-btn" id="corpo_emp" onclick="mudarCorpo('empresarial')">Empresarial</div>
-                </div>
-            </div>
-            <div class="g-form-group">
-                <label class="g-label">Promoção Pretendida</label>
-                <select class="g-select" id="patente" onchange="atualizarInterface()">
-                    <option value="">Selecione o corpo acima...</option>
-                </select>
-            </div>
-            <div class="g-form-group">
-                <label class="g-label">Data da Última Promoção</label>
-                <input type="date" class="g-input" id="dataPromo">
-            </div>
-        </div>
-
-        <div id="box-projeto" class="promo-section" style="display:none;">
-            <h2 class="section-title">Requisito de Alto Escalão</h2>
-            <div class="g-form-group">
-                <label class="g-label">Possui projeto aprovado pelo STM para esta promoção?</label>
-                <div class="opt-grid">
-                    <div class="opt-btn" id="pro_sim" onclick="selecionar('pro', true)">Sim, Aprovado</div>
-                    <div class="opt-btn" id="pro_nao" onclick="selecionar('pro', false)">Não possui</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="promo-section">
-            <h2 class="section-title">2. Gestão de Licenças</h2>
-            <div class="g-form-group">
-                <label class="g-label">Houve afastamento/licença nesta patente?</label>
-                <div class="opt-grid">
-                    <div class="opt-btn" id="lic_sim" onclick="selecionar('lic', true)">Houve Licença</div>
-                    <div class="opt-btn" id="lic_nao" onclick="selecionar('lic', false)">Sem Afastamentos</div>
-                </div>
-            </div>
-            <div id="box-licenca" style="display:none; margin-top:16px;">
-                <div class="two-col">
-                    <div class="g-form-group">
-                        <label class="g-label">Total de Dias</label>
-                        <input type="number" class="g-input" id="diasLic" placeholder="Ex: 7">
-                    </div>
-                    <div class="g-form-group">
-                        <label class="g-label">Data do Retorno</label>
-                        <input type="date" class="g-input" id="dataRetorno">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="promo-section">
-            <h2 class="section-title">3. Desempenho e Educação</h2>
-            <div id="area-educacao" class="g-form-group" style="display:none;">
-                <label class="g-label" id="label-educacao">Requisito Educacional</label>
-                <div class="opt-grid">
-                    <div class="opt-btn" id="cur_sim" onclick="selecionar('cur', true)">Concluído</div>
-                    <div class="opt-btn" id="cur_nao" onclick="selecionar('cur', false)">Pendente</div>
-                </div>
-            </div>
-            <div class="g-form-group">
-                <label class="g-label">Metas Semanais</label>
-                <div class="opt-grid">
-                    <div class="opt-btn" id="met_sim" onclick="selecionar('met', true)">Batidas</div>
-                    <div class="opt-btn" id="met_nao" onclick="selecionar('met', false)">Insuficientes</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="promo-section">
-            <h2 class="section-title">4. Registros Disciplinares</h2>
-            <div class="g-form-group">
-                <label class="g-label">Possui Advertência Ativa?</label>
-                <div class="opt-grid">
-                    <div class="opt-btn" id="adv_sim" onclick="selecionar('adv', true)">Sim, possui</div>
-                    <div class="opt-btn" id="adv_nao" onclick="selecionar('adv', false)">Ficha Limpa</div>
-                </div>
-            </div>
-            <div id="box-advertencia" style="display:none; margin-top:16px;">
-                <div class="g-form-group">
-                    <label class="g-label">Data da Advertência</label>
-                    <input type="date" class="g-input" id="dataAdv">
-                </div>
-            </div>
-        </div>
-
-        <button class="btn-primary btn-analyze" onclick="gerarDiagnostico()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16">
-                <path d="M9 11l3 3L22 4" />
-                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-            </svg>
-            Analisar Promoção
-        </button>
-
-        <div id="display-resultado" class="resultado-box" style="display:none;">
-            <h3 id="res-header" class="result-header"></h3>
-            <div id="res-lista"></div>
-            <button class="btn-secondary btn-copy" id="btnCopiar" onclick="copiarTexto()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15">
-                    <rect x="9" y="9" width="13" height="13" rx="2" />
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                </svg>
-                Copiar Diagnóstico
-            </button>
-        </div>
-    </div>
-
-    <script src="/scripts/notificacoes.js"></script>
-    <script>
-        function logout() { localStorage.removeItem('dme_username'); window.location.href = '/'; }
-
-        // Dados de patentes
-        const patentesMilitares = [
-            { n: "Comandante a Comandante-Geral (30d)", v: 30, p: false, d: true, praca: false },
-            { n: "Subcomandante a Comandante (30d)", v: 30, p: false, d: true, praca: false },
-            { n: "Marechal a Subcomandante (25d)", v: 25, p: true, d: true, praca: false },
-            { n: "General a Marechal (25d)", v: 25, p: false, d: true, praca: false },
-            { n: "Coronel a General (20d)", v: 20, p: false, d: true, praca: false },
-            { n: "Tenente-Coronel a Coronel (16d)", v: 16, p: false, d: false, praca: false },
-            { n: "Major a Tenente-Coronel (14d)", v: 14, p: false, d: false, praca: false },
-            { n: "Capitão a Major (12d)", v: 12, p: false, d: false, praca: false },
-            { n: "Tenente a Capitão (10d)", v: 10, p: false, d: false, praca: false },
-            { n: "Aspirante a Oficial a Tenente (7d)", v: 7, p: false, d: false, praca: false },
-            { n: "Subtenente a Aspirante a Oficial (4d)", v: 4, p: false, d: false, praca: true },
-            { n: "Sargento a Subtenente (2d)", v: 2, p: false, d: false, praca: true },
-            { n: "Cabo a Sargento (1d)", v: 1, p: false, d: false, praca: true },
-            { n: "Soldado a Cabo (0d)", v: 0, p: false, d: false, praca: true },
-            { n: "Recruta a Soldado (0d)", v: 0, p: false, d: false, praca: true }
-        ];
-
-        const patentesEmpresariais = [
-            { n: "Presidente a Chanceler (30d)", v: 30, p: true, d: true, praca: false },
-            { n: "Vice-Presidente a Presidente (30d)", v: 30, p: true, d: true, praca: false },
-            { n: "Ministro a Vice-Presidente (25d)", v: 25, p: true, d: true, praca: false },
-            { n: "Comissário a Ministro (20d)", v: 20, p: false, d: true, praca: false },
-            { n: "Delegado a Comissário (15d)", v: 15, p: false, d: true, praca: false },
-            { n: "Executivo a Delegado (15d)", v: 15, p: false, d: false, praca: false },
-            { n: "Diretor a Executivo (10d)", v: 10, p: false, d: false, praca: false },
-            { n: "Coordenador a Diretor (10d)", v: 10, p: false, d: false, praca: false },
-            { n: "Supervisor a Coordenador (10d)", v: 10, p: false, d: false, praca: false },
-            { n: "Escrivão a Supervisor (7d)", v: 7, p: false, d: false, praca: true },
-            { n: "Analista a Escrivão (4d)", v: 4, p: false, d: false, praca: true },
-            { n: "Inspetor a Analista (2d)", v: 2, p: false, d: false, praca: true },
-            { n: "Sócio a Inspetor (1d)", v: 1, p: false, d: false, praca: true },
-            { n: "Agente a Sócio (0d)", v: 0, p: false, d: false, praca: true }
-        ];
-
-        let estado = { lic: null, cur: null, met: null, adv: null, pro: null, corpo: null };
-
-        function mudarCorpo(tipo) {
-            estado.corpo = tipo;
-            document.getElementById('corpo_mil').className = 'opt-btn' + (tipo === 'militar' ? ' active-green' : '');
-            document.getElementById('corpo_emp').className = 'opt-btn' + (tipo === 'empresarial' ? ' active-green' : '');
-            const select = document.getElementById('patente');
-            select.innerHTML = '<option value="">Selecione...</option>';
-            const lista = tipo === 'militar' ? patentesMilitares : patentesEmpresariais;
-            lista.forEach(p => {
-                let opt = document.createElement('option');
-                opt.value = p.v; opt.text = p.n; opt.dataset.projeto = p.p;
-                opt.dataset.diploma = p.d; opt.dataset.praca = p.praca;
-                select.appendChild(opt);
-            });
-            atualizarInterface();
-        }
-
-        function atualizarInterface() {
-            const sel = document.getElementById('patente');
-            const opt = sel.options[sel.selectedIndex];
-            if (!opt || opt.value === "") return;
-            const precisaProjeto = opt.dataset.projeto === "true";
-            const precisaDiploma = opt.dataset.diploma === "true";
-            const ehPraca = opt.dataset.praca === "true";
-            document.getElementById('box-projeto').style.display = precisaProjeto ? 'block' : 'none';
-            estado.pro = precisaProjeto ? null : true;
-            if (ehPraca || precisaDiploma) {
-                document.getElementById('area-educacao').style.display = 'block';
-                document.getElementById('label-educacao').innerText = precisaDiploma ? "Possui Diploma Militar?" : "Cursos e Aulas Concluídos?";
-                estado.cur = null;
-            } else {
-                document.getElementById('area-educacao').style.display = 'none';
-                estado.cur = true;
-            }
-        }
-
-        function selecionar(campo, valor) {
-            estado[campo] = valor;
-            document.getElementById(campo + '_sim').className = 'opt-btn';
-            document.getElementById(campo + '_nao').className = 'opt-btn';
-            if (campo === 'adv' || (campo === 'pro' && !valor)) {
-                valor ? document.getElementById(campo + '_sim').classList.add('active-red') : document.getElementById(campo + '_nao').classList.add('active-green');
-            } else {
-                valor ? document.getElementById(campo + '_sim').classList.add('active-green') : document.getElementById(campo + '_nao').classList.add('active-red');
-            }
-            if (campo === 'lic') document.getElementById('box-licenca').style.display = valor ? 'block' : 'none';
-            if (campo === 'adv') document.getElementById('box-advertencia').style.display = valor ? 'block' : 'none';
-        }
-
-        function gerarDiagnostico() {
-            const nick = document.getElementById('nick').value;
-            if (!nick) { alert('Por favor, informe o nick do militar!'); return; }
-            const prazoPatente = parseInt(document.getElementById('patente').value);
-            if (isNaN(prazoPatente)) { alert('Por favor, selecione a promoção pretendida!'); return; }
-
-            const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
-            const dataPromoInput = new Date(document.getElementById('dataPromo').value);
-            dataPromoInput.setMinutes(dataPromoInput.getMinutes() + dataPromoInput.getTimezoneOffset());
-            const diasDePraca = Math.floor((hoje - dataPromoInput) / (1000 * 60 * 60 * 24));
-
-            let erros = [], diasAdicionais = 0;
-
-            if (estado.lic) {
-                const diasF = parseInt(document.getElementById('diasLic').value) || 0;
-                diasAdicionais = diasF >= 21 ? 15 : (diasF >= 14 ? 10 : (diasF >= 7 ? 5 : 0));
-            }
-            if (estado.adv) {
-                const dataAdvInput = new Date(document.getElementById('dataAdv').value);
-                dataAdvInput.setMinutes(dataAdvInput.getMinutes() + dataAdvInput.getTimezoneOffset());
-                const diasDesdeAdv = Math.floor((hoje - dataAdvInput) / (1000 * 60 * 60 * 24));
-                if (diasDesdeAdv < 7) erros.push(`<b>DISCIPLINA:</b> Bloqueio de 7 dias ativo.`);
-                else if (diasDesdeAdv < 30) erros.push(`<b>DISCIPLINA:</b> Advertência ativa (${30 - diasDesdeAdv} dias restantes).`);
-            }
-
-            const meta = prazoPatente + diasAdicionais;
-            if (diasDePraca < meta) erros.push(`<b>INTERSTÍCIO:</b> ${diasDePraca}/${meta} dias cumpridos.`);
-            if (!estado.cur) erros.push(`<b>REQUISITOS:</b> Pendência educacional.`);
-            if (estado.pro === false) erros.push("<b>PROJETO:</b> Falta projeto STM.");
-            if (!estado.met) erros.push("<b>METAS:</b> Metas não atingidas.");
-
-            const res = document.getElementById('display-resultado');
-            res.style.display = 'block';
-            const h = document.getElementById('res-header'); const l = document.getElementById('res-lista');
-            l.innerHTML = "";
-
-            if (erros.length === 0) {
-                h.innerText = "? PARECER FAVORÁVEL"; h.style.color = "var(--green)";
-                l.innerHTML = `<div class="motivo-item" style="text-align:center; color:var(--green)">O militar <b style="color:var(--green)">${nick}</b> está apto para a promoção.</div>`;
-            } else {
-                h.innerText = "? PARECER CONTRÁRIO"; h.style.color = "#ef4444";
-                erros.forEach(e => l.innerHTML += `<div class="motivo-item">${e}</div>`);
-            }
-            res.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function copiarTexto() {
-            const header = document.getElementById('res-header').innerText;
-            const nick = document.getElementById('nick').value;
-            const motivos = Array.from(document.querySelectorAll('.motivo-item')).map(el => el.innerText.replace('>', '')).join('\n');
-            const textoFinal = `DIAGNÓSTICO TÉCNICO - DME\nMilitar: ${nick}\nStatus: ${header}\n\nDetalhes:\n${motivos}`;
-            navigator.clipboard.writeText(textoFinal).then(() => {
-                const btn = document.getElementById('btnCopiar');
-                btn.innerText = "Copiado!";
-                setTimeout(() => btn.innerText = "Copiar Diagnóstico", 2000);
-            });
-        }
-
-        // -- INIT --
-        document.addEventListener('DOMContentLoaded', () => {
-            const username = localStorage.getItem('dme_username');
-            if (!username) { window.location.href = '/'; return; }
-
-            document.getElementById('navUserName').textContent = username;
-            document.getElementById('dropdownName').textContent = username;
-            document.getElementById('navUserImage').src = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${username}&headonly=1&size=m&gesture=std&head_direction=2`;
-            document.getElementById('dropdownUserImage').src = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${username}&size=m&direction=2&head_direction=2&gesture=std`;
-
-            const admins = JSON.parse(localStorage.getItem('dme_admins')) || ['Xandelicado'];
-            if (admins.includes(username)) {
-                document.getElementById('dropdownPainel').style.display = 'flex';
-                document.getElementById('dropdownDivider').style.display = 'block';
-            }
-
-            // Dropdown
-            const userProfileBtn = document.getElementById('userProfileBtn');
-            const userDropdown = document.getElementById('userDropdown');
-            userProfileBtn.addEventListener('click', e => { e.stopPropagation(); userDropdown.classList.toggle('active'); });
-            document.addEventListener('click', () => userDropdown.classList.remove('active'));
-
-            // Sidebar / Hamburger
-            const hamburger = document.getElementById('hamburger');
-            const mobileSidebar = document.getElementById('mobileSidebar');
-            const sidebarOverlay = document.getElementById('sidebarOverlay');
-            const sidebarClose = document.getElementById('sidebarClose');
-            const toggleSidebar = () => { mobileSidebar.classList.toggle('active'); sidebarOverlay.classList.toggle('active'); };
-            if (hamburger) hamburger.addEventListener('click', toggleSidebar);
-            if (sidebarClose) sidebarClose.addEventListener('click', toggleSidebar);
-            if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
-        });
-    </script>
-
-</body>
-
-</html>
+<!DOCTYPE html>
+
+<html lang="pt-br">
+
+
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Consultar Promoção - DME System</title>
+
+    <link rel="stylesheet" href="/styles/global.css">
+
+    <link rel="stylesheet" href="/styles/consulta_promocao.css">
+
+    <script src="/scripts/theme.js"></script>
+
+</head>
+
+
+
+<body>
+
+
+
+    <!-- ══ SIDEBAR ══════════════════════════════════════ -->
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="mobile-sidebar" id="mobileSidebar">
+
+        <div class="sidebar-header">
+
+            <span class="sidebar-title">DME System</span>
+
+            <button class="sidebar-close" id="sidebarClose">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                    <path d="M18 6 6 18M6 6l12 12" />
+
+                </svg>
+
+            </button>
+
+        </div>
+
+        <div class="sidebar-section">
+
+            <div class="sidebar-section-label">Principal</div>
+
+            <a href="/home" class="sidebar-item">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+
+                    <polyline points="9 22 9 12 15 12 15 22" />
+
+                </svg>
+
+                Página Inicial
+
+            </a>
+
+            <a href="/listagens" class="sidebar-item">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                    <line x1="8" y1="6" x2="21" y2="6" />
+
+                    <line x1="8" y1="12" x2="21" y2="12" />
+
+                    <line x1="8" y1="18" x2="21" y2="18" />
+
+                    <line x1="3" y1="6" x2="3.01" y2="6" />
+
+                    <line x1="3" y1="12" x2="3.01" y2="12" />
+
+                    <line x1="3" y1="18" x2="3.01" y2="18" />
+
+                </svg>
+
+                Listagens
+
+            </a>
+
+            <a href="/requerimentos" class="sidebar-item">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+
+                    <polyline points="14 2 14 8 20 8" />
+
+                </svg>
+
+                Requerimentos
+
+            </a>
+
+            <a href="/sabatina" class="sidebar-item">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+
+                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+
+                </svg>
+
+                Sabatina
+
+            </a>
+
+            <a href="/consulta_promocao" class="sidebar-item active">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+
+                    <polyline points="16 7 22 7 22 13" />
+
+                </svg>
+
+                Consultar Promoção
+
+            </a>
+
+        </div>
+
+        <div class="sidebar-section">
+
+            <div class="sidebar-section-label">Ferramentas</div>
+
+            <a href="/ponto_servico" class="sidebar-item">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                    <circle cx="12" cy="12" r="10" />
+
+                    <polyline points="12 6 12 12 16 14" />
+
+                </svg>
+
+                Ponto de Serviço
+
+            </a>
+
+            <a href="/loja" class="sidebar-item">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+
+                    <line x1="3" y1="6" x2="21" y2="6" />
+
+                    <path d="M16 10a4 4 0 0 1-8 0" />
+
+                </svg>
+
+                Loja
+
+            </a>
+
+            <a href="/documentos" class="sidebar-item">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+
+                </svg>
+
+                Documentos
+
+            </a>
+
+            <a href="/centro_tarefas_orgaos" class="sidebar-item">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                    <path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 10v11M16 10v11M12 10v11" />
+
+                </svg>
+
+                Centros e Órgãos
+
+            </a>
+
+            <a href="/recrutamentos" class="sidebar-item">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+
+                    <circle cx="9" cy="7" r="4" />
+
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+
+                </svg>
+
+                Recrutamentos
+
+            </a>
+
+            <a href="/ouvidoria" class="sidebar-item">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+
+                </svg>
+
+                Ouvidoria
+
+            </a>
+
+            <a href="/setor_legislativo" class="sidebar-item">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                    <path d="m18 16 4-4-4-4" />
+
+                    <path d="m6 8-4 4 4 4" />
+
+                    <path d="m14.5 4-5 16" />
+
+                </svg>
+
+                Setor Legislativo
+
+            </a>
+
+            <a href="/postar_aula" class="sidebar-item">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+
+                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+
+                </svg>
+
+                Postar Aula
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- -- NAVBAR ---------------------------------------- -->
+
+    <nav class="navbar">
+
+        <div class="logo-section">
+
+            <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+
+            <div class="logo-mark">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5">
+
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+
+                </svg>
+
+            </div>
+
+            <div class="logo-text">DME<em>System</em></div>
+
+        </div>
+
+        <div class="user-profile" id="userProfileBtn">
+
+            <div class="user-avatar"><img id="navUserImage" src="" alt=""></div>
+
+            <span class="user-name" id="navUserName">Usuário</span>
+
+            <div class="user-dropdown" id="userDropdown">
+
+                <div class="dropdown-header">
+
+                    <div class="dropdown-user-info">
+
+                        <div class="dropdown-avatar"><img id="dropdownUserImage" src="" alt=""></div>
+
+                        <div class="dropdown-user-details">
+
+                            <h4 id="dropdownName">Usuário</h4>
+
+                            <p>Militar DME</p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="dropdown-menu">
+
+                    <a href="/painel" class="dropdown-item" id="dropdownPainel" style="display:none">
+
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                            <rect x="3" y="3" width="7" height="7" />
+
+                            <rect x="14" y="3" width="7" height="7" />
+
+                            <rect x="14" y="14" width="7" height="7" />
+
+                            <rect x="3" y="14" width="7" height="7" />
+
+                        </svg>
+
+                        Painel Admin
+
+                    </a>
+
+                    <a onclick="toggleTheme()" class="dropdown-item">
+
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                            <circle cx="12" cy="12" r="5" />
+
+                            <line x1="12" y1="1" x2="12" y2="3" />
+
+                            <line x1="12" y1="21" x2="12" y2="23" />
+
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+
+                            <line x1="1" y1="12" x2="3" y2="12" />
+
+                            <line x1="21" y1="12" x2="23" y2="12" />
+
+                        </svg>
+
+                        <span id="themeText">Modo Claro</span>
+
+                    </a>
+
+                    <div class="dropdown-divider" id="dropdownDivider" style="display:none"></div>
+
+                    <a onclick="logout()" class="dropdown-item danger">
+
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+
+                            <polyline points="16 17 21 12 16 7" />
+
+                            <line x1="21" y1="12" x2="9" y2="12" />
+
+                        </svg>
+
+                        Sair
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- -- CONTEÚDO ---------------------------------------- -->
+
+    <div class="promo-container">
+
+        <div class="promo-header">
+
+            <h1 class="page-title">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28">
+
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+
+                    <polyline points="16 7 22 7 22 13" />
+
+                </svg>
+
+                Consultar Promoção
+
+            </h1>
+
+            <p class="page-subtitle">Sistema de Análise Técnica de Promoções</p>
+
+        </div>
+
+
+
+        <div class="promo-section">
+
+            <h2 class="section-title">1. Identificação de Carreira</h2>
+
+            <div class="g-form-group">
+
+                <label class="g-label">Nick do Militar</label>
+
+                <input type="text" class="g-input" id="nick" placeholder="Ex: Fulano.Ab13">
+
+            </div>
+
+            <div class="g-form-group">
+
+                <label class="g-label">Corpo Hierárquico</label>
+
+                <div class="opt-grid">
+
+                    <div class="opt-btn" id="corpo_mil" onclick="mudarCorpo('militar')">Militar</div>
+
+                    <div class="opt-btn" id="corpo_emp" onclick="mudarCorpo('empresarial')">Empresarial</div>
+
+                </div>
+
+            </div>
+
+            <div class="g-form-group">
+
+                <label class="g-label">Promoção Pretendida</label>
+
+                <select class="g-select" id="patente" onchange="atualizarInterface()">
+
+                    <option value="">Selecione o corpo acima...</option>
+
+                </select>
+
+            </div>
+
+            <div class="g-form-group">
+
+                <label class="g-label">Data da Última Promoção</label>
+
+                <input type="date" class="g-input" id="dataPromo">
+
+            </div>
+
+        </div>
+
+
+
+        <div id="box-projeto" class="promo-section" style="display:none;">
+
+            <h2 class="section-title">Requisito de Alto Escalão</h2>
+
+            <div class="g-form-group">
+
+                <label class="g-label">Possui projeto aprovado pelo STM para esta promoção?</label>
+
+                <div class="opt-grid">
+
+                    <div class="opt-btn" id="pro_sim" onclick="selecionar('pro', true)">Sim, Aprovado</div>
+
+                    <div class="opt-btn" id="pro_nao" onclick="selecionar('pro', false)">Não possui</div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="promo-section">
+
+            <h2 class="section-title">2. Gestão de Licenças</h2>
+
+            <div class="g-form-group">
+
+                <label class="g-label">Houve afastamento/licença nesta patente?</label>
+
+                <div class="opt-grid">
+
+                    <div class="opt-btn" id="lic_sim" onclick="selecionar('lic', true)">Houve Licença</div>
+
+                    <div class="opt-btn" id="lic_nao" onclick="selecionar('lic', false)">Sem Afastamentos</div>
+
+                </div>
+
+            </div>
+
+            <div id="box-licenca" style="display:none; margin-top:16px;">
+
+                <div class="two-col">
+
+                    <div class="g-form-group">
+
+                        <label class="g-label">Total de Dias</label>
+
+                        <input type="number" class="g-input" id="diasLic" placeholder="Ex: 7">
+
+                    </div>
+
+                    <div class="g-form-group">
+
+                        <label class="g-label">Data do Retorno</label>
+
+                        <input type="date" class="g-input" id="dataRetorno">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="promo-section">
+
+            <h2 class="section-title">3. Desempenho e Educação</h2>
+
+            <div id="area-educacao" class="g-form-group" style="display:none;">
+
+                <label class="g-label" id="label-educacao">Requisito Educacional</label>
+
+                <div class="opt-grid">
+
+                    <div class="opt-btn" id="cur_sim" onclick="selecionar('cur', true)">Concluído</div>
+
+                    <div class="opt-btn" id="cur_nao" onclick="selecionar('cur', false)">Pendente</div>
+
+                </div>
+
+            </div>
+
+            <div class="g-form-group">
+
+                <label class="g-label">Metas Semanais</label>
+
+                <div class="opt-grid">
+
+                    <div class="opt-btn" id="met_sim" onclick="selecionar('met', true)">Batidas</div>
+
+                    <div class="opt-btn" id="met_nao" onclick="selecionar('met', false)">Insuficientes</div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="promo-section">
+
+            <h2 class="section-title">4. Registros Disciplinares</h2>
+
+            <div class="g-form-group">
+
+                <label class="g-label">Possui Advertência Ativa?</label>
+
+                <div class="opt-grid">
+
+                    <div class="opt-btn" id="adv_sim" onclick="selecionar('adv', true)">Sim, possui</div>
+
+                    <div class="opt-btn" id="adv_nao" onclick="selecionar('adv', false)">Ficha Limpa</div>
+
+                </div>
+
+            </div>
+
+            <div id="box-advertencia" style="display:none; margin-top:16px;">
+
+                <div class="g-form-group">
+
+                    <label class="g-label">Data da Advertência</label>
+
+                    <input type="date" class="g-input" id="dataAdv">
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <button class="btn-primary btn-analyze" onclick="gerarDiagnostico()">
+
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16">
+
+                <path d="M9 11l3 3L22 4" />
+
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+
+            </svg>
+
+            Analisar Promoção
+
+        </button>
+
+
+
+        <div id="display-resultado" class="resultado-box" style="display:none;">
+
+            <h3 id="res-header" class="result-header"></h3>
+
+            <div id="res-lista"></div>
+
+            <button class="btn-secondary btn-copy" id="btnCopiar" onclick="copiarTexto()">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15">
+
+                    <rect x="9" y="9" width="13" height="13" rx="2" />
+
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+
+                </svg>
+
+                Copiar Diagnóstico
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+    <script src="/scripts/notificacoes.js"></script>
+
+    <script>
+
+        function logout() { localStorage.removeItem('dme_username'); window.location.href = '/'; }
+
+
+
+        // Dados de patentes
+
+        const patentesMilitares = [
+
+            { n: "Comandante a Comandante-Geral (30d)", v: 30, p: false, d: true, praca: false },
+
+            { n: "Subcomandante a Comandante (30d)", v: 30, p: false, d: true, praca: false },
+
+            { n: "Marechal a Subcomandante (25d)", v: 25, p: true, d: true, praca: false },
+
+            { n: "General a Marechal (25d)", v: 25, p: false, d: true, praca: false },
+
+            { n: "Coronel a General (20d)", v: 20, p: false, d: true, praca: false },
+
+            { n: "Tenente-Coronel a Coronel (16d)", v: 16, p: false, d: false, praca: false },
+
+            { n: "Major a Tenente-Coronel (14d)", v: 14, p: false, d: false, praca: false },
+
+            { n: "Capitão a Major (12d)", v: 12, p: false, d: false, praca: false },
+
+            { n: "Tenente a Capitão (10d)", v: 10, p: false, d: false, praca: false },
+
+            { n: "Aspirante a Oficial a Tenente (7d)", v: 7, p: false, d: false, praca: false },
+
+            { n: "Subtenente a Aspirante a Oficial (4d)", v: 4, p: false, d: false, praca: true },
+
+            { n: "Sargento a Subtenente (2d)", v: 2, p: false, d: false, praca: true },
+
+            { n: "Cabo a Sargento (1d)", v: 1, p: false, d: false, praca: true },
+
+            { n: "Soldado a Cabo (0d)", v: 0, p: false, d: false, praca: true },
+
+            { n: "Recruta a Soldado (0d)", v: 0, p: false, d: false, praca: true }
+
+        ];
+
+
+
+        const patentesEmpresariais = [
+
+            { n: "Presidente a Chanceler (30d)", v: 30, p: true, d: true, praca: false },
+
+            { n: "Vice-Presidente a Presidente (30d)", v: 30, p: true, d: true, praca: false },
+
+            { n: "Ministro a Vice-Presidente (25d)", v: 25, p: true, d: true, praca: false },
+
+            { n: "Comissário a Ministro (20d)", v: 20, p: false, d: true, praca: false },
+
+            { n: "Delegado a Comissário (15d)", v: 15, p: false, d: true, praca: false },
+
+            { n: "Executivo a Delegado (15d)", v: 15, p: false, d: false, praca: false },
+
+            { n: "Diretor a Executivo (10d)", v: 10, p: false, d: false, praca: false },
+
+            { n: "Coordenador a Diretor (10d)", v: 10, p: false, d: false, praca: false },
+
+            { n: "Supervisor a Coordenador (10d)", v: 10, p: false, d: false, praca: false },
+
+            { n: "Escrivão a Supervisor (7d)", v: 7, p: false, d: false, praca: true },
+
+            { n: "Analista a Escrivão (4d)", v: 4, p: false, d: false, praca: true },
+
+            { n: "Inspetor a Analista (2d)", v: 2, p: false, d: false, praca: true },
+
+            { n: "Sócio a Inspetor (1d)", v: 1, p: false, d: false, praca: true },
+
+            { n: "Agente a Sócio (0d)", v: 0, p: false, d: false, praca: true }
+
+        ];
+
+
+
+        let estado = { lic: null, cur: null, met: null, adv: null, pro: null, corpo: null };
+
+
+
+        function mudarCorpo(tipo) {
+
+            estado.corpo = tipo;
+
+            document.getElementById('corpo_mil').className = 'opt-btn' + (tipo === 'militar' ? ' active-green' : '');
+
+            document.getElementById('corpo_emp').className = 'opt-btn' + (tipo === 'empresarial' ? ' active-green' : '');
+
+            const select = document.getElementById('patente');
+
+            select.innerHTML = '<option value="">Selecione...</option>';
+
+            const lista = tipo === 'militar' ? patentesMilitares : patentesEmpresariais;
+
+            lista.forEach(p => {
+
+                let opt = document.createElement('option');
+
+                opt.value = p.v; opt.text = p.n; opt.dataset.projeto = p.p;
+
+                opt.dataset.diploma = p.d; opt.dataset.praca = p.praca;
+
+                select.appendChild(opt);
+
+            });
+
+            atualizarInterface();
+
+        }
+
+
+
+        function atualizarInterface() {
+
+            const sel = document.getElementById('patente');
+
+            const opt = sel.options[sel.selectedIndex];
+
+            if (!opt || opt.value === "") return;
+
+            const precisaProjeto = opt.dataset.projeto === "true";
+
+            const precisaDiploma = opt.dataset.diploma === "true";
+
+            const ehPraca = opt.dataset.praca === "true";
+
+            document.getElementById('box-projeto').style.display = precisaProjeto ? 'block' : 'none';
+
+            estado.pro = precisaProjeto ? null : true;
+
+            if (ehPraca || precisaDiploma) {
+
+                document.getElementById('area-educacao').style.display = 'block';
+
+                document.getElementById('label-educacao').innerText = precisaDiploma ? "Possui Diploma Militar?" : "Cursos e Aulas Concluídos?";
+
+                estado.cur = null;
+
+            } else {
+
+                document.getElementById('area-educacao').style.display = 'none';
+
+                estado.cur = true;
+
+            }
+
+        }
+
+
+
+        function selecionar(campo, valor) {
+
+            estado[campo] = valor;
+
+            document.getElementById(campo + '_sim').className = 'opt-btn';
+
+            document.getElementById(campo + '_nao').className = 'opt-btn';
+
+            if (campo === 'adv' || (campo === 'pro' && !valor)) {
+
+                valor ? document.getElementById(campo + '_sim').classList.add('active-red') : document.getElementById(campo + '_nao').classList.add('active-green');
+
+            } else {
+
+                valor ? document.getElementById(campo + '_sim').classList.add('active-green') : document.getElementById(campo + '_nao').classList.add('active-red');
+
+            }
+
+            if (campo === 'lic') document.getElementById('box-licenca').style.display = valor ? 'block' : 'none';
+
+            if (campo === 'adv') document.getElementById('box-advertencia').style.display = valor ? 'block' : 'none';
+
+        }
+
+
+
+        function gerarDiagnostico() {
+
+            const nick = document.getElementById('nick').value;
+
+            if (!nick) { alert('Por favor, informe o nick do militar!'); return; }
+
+            const prazoPatente = parseInt(document.getElementById('patente').value);
+
+            if (isNaN(prazoPatente)) { alert('Por favor, selecione a promoção pretendida!'); return; }
+
+
+
+            const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+
+            const dataPromoInput = new Date(document.getElementById('dataPromo').value);
+
+            dataPromoInput.setMinutes(dataPromoInput.getMinutes() + dataPromoInput.getTimezoneOffset());
+
+            const diasDePraca = Math.floor((hoje - dataPromoInput) / (1000 * 60 * 60 * 24));
+
+
+
+            let erros = [], diasAdicionais = 0;
+
+
+
+            if (estado.lic) {
+
+                const diasF = parseInt(document.getElementById('diasLic').value) || 0;
+
+                diasAdicionais = diasF >= 21 ? 15 : (diasF >= 14 ? 10 : (diasF >= 7 ? 5 : 0));
+
+            }
+
+            if (estado.adv) {
+
+                const dataAdvInput = new Date(document.getElementById('dataAdv').value);
+
+                dataAdvInput.setMinutes(dataAdvInput.getMinutes() + dataAdvInput.getTimezoneOffset());
+
+                const diasDesdeAdv = Math.floor((hoje - dataAdvInput) / (1000 * 60 * 60 * 24));
+
+                if (diasDesdeAdv < 7) erros.push(`<b>DISCIPLINA:</b> Bloqueio de 7 dias ativo.`);
+
+                else if (diasDesdeAdv < 30) erros.push(`<b>DISCIPLINA:</b> Advertência ativa (${30 - diasDesdeAdv} dias restantes).`);
+
+            }
+
+
+
+            const meta = prazoPatente + diasAdicionais;
+
+            if (diasDePraca < meta) erros.push(`<b>INTERSTÍCIO:</b> ${diasDePraca}/${meta} dias cumpridos.`);
+
+            if (!estado.cur) erros.push(`<b>REQUISITOS:</b> Pendência educacional.`);
+
+            if (estado.pro === false) erros.push("<b>PROJETO:</b> Falta projeto STM.");
+
+            if (!estado.met) erros.push("<b>METAS:</b> Metas não atingidas.");
+
+
+
+            const res = document.getElementById('display-resultado');
+
+            res.style.display = 'block';
+
+            const h = document.getElementById('res-header'); const l = document.getElementById('res-lista');
+
+            l.innerHTML = "";
+
+
+
+            if (erros.length === 0) {
+
+                h.innerText = "? PARECER FAVORÁVEL"; h.style.color = "var(--green)";
+
+                l.innerHTML = `<div class="motivo-item" style="text-align:center; color:var(--green)">O militar <b style="color:var(--green)">${nick}</b> está apto para a promoção.</div>`;
+
+            } else {
+
+                h.innerText = "? PARECER CONTRÁRIO"; h.style.color = "#ef4444";
+
+                erros.forEach(e => l.innerHTML += `<div class="motivo-item">${e}</div>`);
+
+            }
+
+            res.scrollIntoView({ behavior: 'smooth' });
+
+        }
+
+
+
+        function copiarTexto() {
+
+            const header = document.getElementById('res-header').innerText;
+
+            const nick = document.getElementById('nick').value;
+
+            const motivos = Array.from(document.querySelectorAll('.motivo-item')).map(el => el.innerText.replace('>', '')).join('\n');
+
+            const textoFinal = `DIAGNÓSTICO TÉCNICO - DME\nMilitar: ${nick}\nStatus: ${header}\n\nDetalhes:\n${motivos}`;
+
+            navigator.clipboard.writeText(textoFinal).then(() => {
+
+                const btn = document.getElementById('btnCopiar');
+
+                btn.innerText = "Copiado!";
+
+                setTimeout(() => btn.innerText = "Copiar Diagnóstico", 2000);
+
+            });
+
+        }
+
+
+
+        // -- INIT --
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const username = localStorage.getItem('dme_username');
+
+            if (!username) { window.location.href = '/'; return; }
+
+
+
+            document.getElementById('navUserName').textContent = username;
+
+            document.getElementById('dropdownName').textContent = username;
+
+            document.getElementById('navUserImage').src = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${username}&headonly=1&size=m&gesture=std&head_direction=2`;
+
+            document.getElementById('dropdownUserImage').src = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${username}&size=m&direction=2&head_direction=2&gesture=std`;
+
+
+
+            const admins = JSON.parse(localStorage.getItem('dme_admins')) || ['Xandelicado'];
+
+            if (admins.includes(username)) {
+
+                document.getElementById('dropdownPainel').style.display = 'flex';
+
+                document.getElementById('dropdownDivider').style.display = 'block';
+
+            }
+
+
+
+            // Dropdown
+
+            const userProfileBtn = document.getElementById('userProfileBtn');
+
+            const userDropdown = document.getElementById('userDropdown');
+
+            userProfileBtn.addEventListener('click', e => { e.stopPropagation(); userDropdown.classList.toggle('active'); });
+
+            document.addEventListener('click', () => userDropdown.classList.remove('active'));
+
+
+
+            // Sidebar / Hamburger
+
+            const hamburger = document.getElementById('hamburger');
+
+            const mobileSidebar = document.getElementById('mobileSidebar');
+
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+            const sidebarClose = document.getElementById('sidebarClose');
+
+            const toggleSidebar = () => { mobileSidebar.classList.toggle('active'); sidebarOverlay.classList.toggle('active'); };
+
+            if (hamburger) hamburger.addEventListener('click', toggleSidebar);
+
+            if (sidebarClose) sidebarClose.addEventListener('click', toggleSidebar);
+
+            if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        });
+
+    </script>
+
+
+
+</body>
+
+
+
+</html>
+
