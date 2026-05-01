@@ -19,6 +19,8 @@ class RequerimentoCreate(BaseModel):
     banido_ate: Optional[str] = None
     tags_envolvidos: Optional[List[str]] = None
     anexo_provas: Optional[str] = None
+    novaPatente: Optional[str] = None
+    valor: Optional[str] = None
     # status é definido pelo backend (sempre 'pendente'), nunca pelo frontend
     # aplicador é injetado a partir do JWT, nunca do body
 

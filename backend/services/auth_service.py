@@ -29,10 +29,10 @@ def verify_password(plain: str, hashed: str) -> bool:
 
 
 # ── JWT
-def create_jwt(nick: str, role: str = "user") -> str:
+def create_jwt(nick: str, role: str = "user", centros: list[str] = None) -> str:
     """
     Cria um token JWT assinado.
-    Payload: { sub: nick, role: "user"|"admin", exp: datetime }
+    Payload: { sub: nick, role: "user"|"admin", centros: [], exp: datetime }
     """
     settings = get_settings()
     expire = datetime.now(timezone.utc) + timedelta(minutes=settings.JWT_EXPIRE_MINUTES)
@@ -40,6 +40,7 @@ def create_jwt(nick: str, role: str = "user") -> str:
     payload = {
         "sub": nick,
         "role": role,
+        "centros": centros or [],
         "exp": expire,
     }
 

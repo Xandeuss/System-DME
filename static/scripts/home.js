@@ -355,6 +355,9 @@ async function init() {
 
     currentUser = meResult;
 
+    // Sincroniza com localStorage para compatibilidade com scripts legados
+    localStorage.setItem('dme_username', currentUser.nick);
+
     // Expor o nick para outros scripts (notificacoes.js, chat_global.js)
     window.dmeCurrentUser = currentUser.nick;
 

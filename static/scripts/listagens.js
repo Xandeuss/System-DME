@@ -7,8 +7,31 @@ function logout() {
     window.location.href = '/login';
 }
 
+// ── CACHE DE DADOS DA API ─────────────────────────────
+let _dadosApi = {};
+let _apiCarregada = false;
+
+// Hierarquia para o Alto Comando Supremo
+const hierarquiaAltoComando = {
+    'Fundador': 100,
+    'Supremo': 99,
+    "Supremo Interino": 98,
+};
+
+async function carregarDadosApi() {
+    try {
+        const res = await fetch('/api/listagens');
+        if (!res.ok) { console.error('API Error:', res.status); return; }
+        const json = await res.json();
+        _dadosApi = json.data || {};
+        _apiCarregada = true;
+    } catch (e) {
+        console.warn('Falha ao carregar listagens da API:', e);
+    }
+}
+
 // ── INIT UI ───────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('navUserName').textContent = username;
     document.getElementById('dropdownName').textContent = username;
 
@@ -42,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sidebarClose) sidebarClose.addEventListener('click', toggleSidebar);
     if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
 
+    await carregarDadosApi();
     renderEscolha();
 });
 
@@ -49,12 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
 const hierarquiaMilitar = {
     'Comandante-Geral': 100, 'Comandante': 99, 'Subcomandante': 98, 'Marechal': 97,
     'General': 96, 'Coronel': 95, 'Tenente-Coronel': 94, 'Major': 93, 'Capitão': 92, 'Tenente': 91,
-    'Aspirante a Oficial': 90, 'Subtenente': 80, 'Sargento': 70, 'Cabo': 60, 'Soldado': 50, 'Recruta': 40
+    'Aspirante a Oficial': 90, 'Subtenente': 80, 'Sargento': 70, 'Cabo': 60, 'Soldado': 50
 };
 const hierarquiaEmpresarial = {
-    'Presidente': 100, 'Vice-Presidente': 99, 'Ministro': 98, 'Comissário': 97, 'Delegado': 96,
-    'Executivo': 95, 'Diretor': 94, 'Coordenador': 93, 'Supervisor': 92, 'Escrivão': 91,
-    'Analista': 90, 'Inspetor': 80, 'Sócio': 70, 'Agente': 60
+    'Chanceler': 101, 'Presidente': 100, 'Vice-Presidente': 99, 'Ministro': 98, 'Comissário': 97,
+    'Delegado': 96, 'Executivo': 95, 'Diretor': 94, 'Coordenador': 93, 'Supervisor': 92,
+    'Escrivão': 91, 'Analista': 90, 'Inspetor': 80, 'Sócio': 70, 'Agente': 60
 };
 const listaOficiais = ['Comandante-Geral', 'Comandante', 'Subcomandante', 'Marechal', 'General', 'Coronel', 'Tenente-Coronel', 'Major', 'Capitão', 'Tenente'];
 
@@ -64,7 +88,6 @@ const LISTAGENS_CONFIG = [
         id: 'militar',
         label: 'Hierarquia Militar',
         desc: 'Corpo Militar completo por patente',
-        storageKey: 'dme_militar',
         hierarquia: hierarquiaMilitar,
         acento: 'green',
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
@@ -75,7 +98,6 @@ const LISTAGENS_CONFIG = [
         id: 'empresarial',
         label: 'Hierarquia Empresarial',
         desc: 'Corpo Empresarial por hierarquia',
-        storageKey: 'dme_empresarial',
         hierarquia: hierarquiaEmpresarial,
         acento: 'green',
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
@@ -87,8 +109,7 @@ const LISTAGENS_CONFIG = [
         id: 'alto_comando',
         label: 'Alto Comando Supremo',
         desc: 'Oficiais de alto escalão do DME',
-        storageKey: 'dme_alto_comando',
-        hierarquia: hierarquiaMilitar,
+        hierarquia: hierarquiaAltoComando,
         acento: 'gold',
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
@@ -98,9 +119,9 @@ const LISTAGENS_CONFIG = [
         id: 'cadetes',
         label: 'Cadetes',
         desc: 'Novos integrantes em formação',
-        storageKey: 'dme_cadetes',
-        hierarquia: hierarquiaMilitar,
+        hierarquia: {},
         acento: 'blue',
+        plano: true,
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
             <circle cx="9" cy="7" r="4"/>
@@ -110,21 +131,21 @@ const LISTAGENS_CONFIG = [
     {
         id: 'contas_oficiais',
         label: 'Contas Oficiais',
-        desc: 'Perfis oficiais e institucionais',
-        storageKey: 'dme_contas_oficiais',
-        hierarquia: {},
+        desc: 'Órgãos e Centros do DME',
+        hierarquia: { 'Órgãos': 10, 'Centros': 5 },
         acento: 'blue',
-        plano: true,  // lista plana sem hierarquia
+        plano: false,
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-            <polyline points="22 4 12 14.01 9 11.01"/>
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
         </svg>`
     },
     {
         id: 'exonerados',
         label: 'Exonerados',
         desc: 'Membros desligados do corpo',
-        storageKey: 'dme_exonerados',
         hierarquia: {},
         acento: 'red',
         plano: true,
@@ -138,8 +159,7 @@ const LISTAGENS_CONFIG = [
 
 // ── DADOS ─────────────────────────────────────────────
 function getDados(id) {
-    const cfg = LISTAGENS_CONFIG.find(c => c.id === id);
-    return JSON.parse(localStorage.getItem(cfg?.storageKey || '')) || [];
+    return _dadosApi[id] || [];
 }
 
 function getHierarquia(id) {
@@ -156,56 +176,11 @@ function obterValorPatente(patente, id) {
     return chave ? mapa[chave] : 0;
 }
 
-// ── PROCESSAR TEXTO ───────────────────────────────────
-function processarTexto(texto, flat = false) {
-    const linhas = texto.split('\n');
-    const resultado = [];
-    let patenteAtual = flat ? 'Membros' : 'Sem Patente';
-    linhas.forEach(linha => {
-        const l = linha.trim();
-        if (!l) return;
-        const ehNickComplicado = /[\d]/.test(l) || l.includes('-=') || l.includes('=-');
-        const ehCargo = !flat && l.length < 30 && !l.includes('[') && !l.includes('(') && !ehNickComplicado;
-        if (ehCargo) {
-            patenteAtual = l.replace('– ', '').replace(/^-\s*/, '').trim();
-        } else {
-            const [nick, ...rest] = l.split(' ');
-            const extra = rest.join(' ').trim();
-            if (nick) resultado.push({ nick, patente: patenteAtual, extra });
-        }
-    });
-    return resultado;
-}
-
-// ── SALVAR LISTAS ─────────────────────────────────────
-function salvarListas() {
-    let salvou = false;
-    LISTAGENS_CONFIG.forEach(cfg => {
-        const el = document.getElementById(`input-${cfg.id}`);
-        if (el && el.value.trim()) {
-            const dados = processarTexto(el.value, cfg.plano);
-            localStorage.setItem(cfg.storageKey, JSON.stringify(dados));
-            salvou = true;
-        }
-    });
-    if (salvou) location.reload();
-}
-
 // ── ESTADO ────────────────────────────────────────────
 let corpoAtivo = null;
 let viewMode = 'avatar';
 let apenasIrregulares = false;
 let analiseRodando = false;
-let terminalOpen = false;
-
-// ── TERMINAL TOGGLE ───────────────────────────────────
-function toggleTerminal() {
-    terminalOpen = !terminalOpen;
-    const panel = document.getElementById('terminal-panel');
-    const btn = document.getElementById('btn-terminal');
-    panel.style.display = terminalOpen ? 'block' : 'none';
-    btn.classList.toggle('active', terminalOpen);
-}
 
 // ── NAVEGAÇÃO ─────────────────────────────────────────
 function abrirListagem(id) {
@@ -220,12 +195,12 @@ function abrirListagem(id) {
     document.getElementById('view-count-badge').textContent =
         `${dados.length} membro${dados.length !== 1 ? 's' : ''}`;
 
-    // Remove acento antigo e aplica novo
     const view = document.getElementById('sec-view');
     view.className = 'l-section view-acento-' + config.acento;
 
+    const toggleBtn = document.getElementById('btn-view-mode');
+    if (toggleBtn) toggleBtn.style.display = id === 'exonerados' ? 'none' : '';
     updateToggleBtn();
-    // painel de análise removido
 
     document.getElementById('sec-escolha').style.display = 'none';
     view.style.display = 'block';
@@ -254,7 +229,6 @@ function renderEscolha() {
         const count = dados.length;
         totalMembros += count;
         const hasData = count > 0;
-        const pct = hasData ? Math.min(100, Math.round((count / 150) * 100)) : 0;
 
         return `
         <div class="listagem-card acento-${cfg.acento}" onclick="abrirListagem('${cfg.id}')">
@@ -266,10 +240,7 @@ function renderEscolha() {
                 <div class="card-title">${cfg.label}</div>
                 <div class="card-desc">${cfg.desc}</div>
             </div>
-            ${hasData ? `
-            <div class="card-bar-wrap">
-                <div class="card-bar" style="width:${pct}%"></div>
-            </div>` : `<div class="card-empty-hint">Sem dados — use o Terminal</div>`}
+            ${!hasData ? `<div class="card-empty-hint">Sem dados — aguardando requerimento aprovado</div>` : ''}
             <div class="card-cta">
                 Visualizar
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12">
@@ -279,7 +250,6 @@ function renderEscolha() {
         </div>`;
     }).join('');
 
-    // Atualiza total no hero
     const totalEl = document.getElementById('hero-total');
     if (totalEl) totalEl.textContent = totalMembros + ' registros';
 }
@@ -362,7 +332,6 @@ function copiarListagem() {
             btn.style.color = '';
         }, 2000);
     }).catch(() => {
-        // Fallback para navegadores sem clipboard API
         const ta = document.createElement('textarea');
         ta.value = texto;
         ta.style.position = 'fixed';
@@ -377,9 +346,9 @@ function copiarListagem() {
 // ── RENDER LISTAGEM ───────────────────────────────────
 function renderListagem() {
     if (!corpoAtivo) return;
+    if (corpoAtivo === 'exonerados') { renderExonerados(); return; }
     viewMode === 'avatar' ? renderAvatares() : renderTexto();
 }
-
 
 function ordenaLista(lista) {
     if (isPlano(corpoAtivo)) return [...lista];
@@ -388,9 +357,29 @@ function ordenaLista(lista) {
 
 function gruparPorPatente(lista) {
     const grupos = new Map();
+    const hierarquia = getHierarquia(corpoAtivo);
+
+    Object.keys(hierarquia).forEach(patente => {
+        grupos.set(patente, []);
+    });
+
+    if (corpoAtivo === 'cadetes') {
+        grupos.set('Cadetes', []);
+    }
+
     for (const m of lista) {
-        if (!grupos.has(m.patente)) grupos.set(m.patente, []);
-        grupos.get(m.patente).push(m);
+        let patenteAlvo;
+        if (corpoAtivo === 'cadetes') {
+            patenteAlvo = 'Cadetes';
+        } else if (corpoAtivo === 'contas_oficiais') {
+            // API retorna corpo 'orgao' ou 'centro' — mapeia para o título visual
+            patenteAlvo = (m.corpo === 'centro') ? 'Centros' : 'Órgãos';
+        } else {
+            patenteAlvo = m.patente;
+        }
+
+        if (!grupos.has(patenteAlvo)) grupos.set(patenteAlvo, []);
+        grupos.get(patenteAlvo).push(m);
     }
     return grupos;
 }
@@ -399,9 +388,13 @@ function gruparPorPatente(lista) {
 function renderAvatares() {
     const area = document.getElementById('render-area');
     const lista = ordenaLista(getDados(corpoAtivo));
-    if (!lista.length) { area.innerHTML = emptyState(); return; }
-
     const grupos = gruparPorPatente(lista);
+
+    if (grupos.size === 0 && lista.length === 0) {
+        area.innerHTML = emptyState();
+        return;
+    }
+
     area.innerHTML = Array.from(grupos.entries()).map(([patente, membros], sIdx) => `
         <div class="av-section" style="animation-delay:${sIdx * .045}s">
             <div class="av-section-hdr">
@@ -409,16 +402,39 @@ function renderAvatares() {
                 <span class="av-rank-count">${membros.length} membro${membros.length !== 1 ? 's' : ''}</span>
             </div>
             <div class="av-grid">
-                ${membros.map((m, i) => `
-                    <div class="av-card" style="animation-delay:${(sIdx * .045) + (i * .028)}s">
-                        <div class="av-card-img">
-                            <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(m.nick)}&size=l&direction=2&head_direction=2&gesture=std&action=std"
+                ${membros.length > 0 ? membros.map((m, i) => {
+                    const displayExtra = (corpoAtivo === 'cadetes')
+                        ? `C${String(i + 1).padStart(3, '0')}`
+                        : (m.extra || '');
+
+                    const isOficial = corpoAtivo === 'contas_oficiais';
+                    let avatarImg = '';
+
+                    if (isOficial) {
+                        const imgUrl = (m.extra || '').trim();
+                        if (imgUrl && imgUrl.startsWith('http')) {
+                            avatarImg = `<img src="${imgUrl}" alt="${m.patente || m.nick}" style="width:100%;height:100%;object-fit:contain;padding:10px;">`;
+                        } else {
+                            avatarImg = `<div class="av-official-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="40" height="40"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>`;
+                        }
+                    } else {
+                        avatarImg = `<img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(m.nick)}&size=l&direction=2&head_direction=2&gesture=std&action=std"
                                  alt="${m.nick}" loading="lazy"
-                                 onerror="this.src='https://www.habbo.com.br/habbo-imaging/avatarimage?user=Guest&size=l&direction=2&head_direction=2'">
+                                 onerror="this.src='https://www.habbo.com.br/habbo-imaging/avatarimage?user=Guest&size=l&direction=2&head_direction=2'">`;
+                    }
+
+                    // Para contas oficiais, o "nome" exibido é o nome_oficial vindo em m.patente
+                    const displayName = isOficial ? (m.patente || m.nick) : m.nick;
+
+                    return `
+                    <div class="av-card" style="animation-delay:${(sIdx * .045) + (i * .028)}s">
+                        <div class="av-card-img ${isOficial ? 'av-card-official' : ''}">
+                            ${avatarImg}
                         </div>
-                        <div class="av-card-name" title="${m.nick}">${m.nick}</div>
-                    </div>
-                `).join('')}
+                        <div class="av-card-name" title="${displayName}">${displayName}</div>
+                        ${displayExtra && !isOficial ? `<div class="av-card-extra">${displayExtra}</div>` : ''}
+                    </div>`;
+                }).join('') : `<div class="card-empty-hint" style="padding: 10px 20px;">Nenhum membro nesta patente</div>`}
             </div>
         </div>
     `).join('');
@@ -428,9 +444,13 @@ function renderAvatares() {
 function renderTexto() {
     const area = document.getElementById('render-area');
     const lista = ordenaLista(getDados(corpoAtivo));
-    if (!lista.length) { area.innerHTML = emptyState(); return; }
-
     const grupos = gruparPorPatente(lista);
+
+    if (grupos.size === 0 && lista.length === 0) {
+        area.innerHTML = emptyState();
+        return;
+    }
+
     area.innerHTML = Array.from(grupos.entries()).map(([patente, membros]) => `
         <div class="txt-section">
             <div class="txt-rank-box">
@@ -447,20 +467,62 @@ function renderTexto() {
                     </div>
                 </div>
                 <div class="txt-list">
-                    ${membros.map((m, i) => `
+                    ${membros.length > 0 ? membros.map((m, i) => {
+                        const isOficial = corpoAtivo === 'contas_oficiais';
+                        const displayExtra = (corpoAtivo === 'cadetes')
+                            ? `C${String(i + 1).padStart(3, '0')}`
+                            : (m.extra || '');
+                        const displayName = isOficial ? (m.patente || m.nick) : m.nick;
+
+                        return `
                         <div class="txt-entry">
-                            <span class="txt-num">${String(i + 1).padStart(2, '0')}</span>
-                            <span class="txt-nick">${m.nick}</span>
-                            ${m.extra ? `<span class="txt-extra">${m.extra}</span>` : ''}
-                        </div>
-                    `).join('')}
+                            ${!isOficial ? `<span class="txt-num">${String(i + 1).padStart(2, '0')}</span>` : ''}
+                            <span class="txt-nick">${displayName}</span>
+                            ${displayExtra && !isOficial ? `<span class="txt-extra">${displayExtra}</span>` : ''}
+                        </div>`;
+                    }).join('') : `<div class="txt-entry cell-muted" style="padding-left: 20px;">Nenhum membro nesta patente</div>`}
                 </div>
             </div>
         </div>
     `).join('');
 }
 
+// ── MODO EXONERADOS ───────────────────────────────────
+function renderExonerados() {
+    const area = document.getElementById('render-area');
+    const lista = getDados('exonerados');
+    if (!lista.length) { area.innerHTML = emptyState(); return; }
 
+    const rows = lista.map(m => {
+        const extra = m.extra || '';
+        const match = extra.match(/^\[([^\]]+)\] \{([^}]+)\} - (.+?) - (.+)$/);
+        const tag    = match ? match[1] : '—';
+        const motivo = match ? match[2] : extra || '—';
+        const dt1    = match ? match[3] : '—';
+        const dt2    = match ? match[4] : '—';
+        return `<tr>
+            <td class="exo-nick">${m.nick}</td>
+            <td><span class="exo-tag">[${tag}]</span></td>
+            <td class="exo-motivo">${motivo}</td>
+            <td class="exo-periodo">${dt1} → ${dt2}</td>
+        </tr>`;
+    }).join('');
+
+    area.innerHTML = `
+        <div class="exo-table-wrap">
+            <table class="exo-table">
+                <thead>
+                    <tr>
+                        <th>Nick</th>
+                        <th>Organização</th>
+                        <th>Motivo</th>
+                        <th>Período</th>
+                    </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>
+        </div>`;
+}
 
 function emptyState() {
     return `<div class="empty-view">
@@ -468,7 +530,7 @@ function emptyState() {
             <path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 10v11M16 10v11M12 10v11"/>
         </svg>
         <strong>Nenhum dado carregado</strong>
-        <p>Volte e use o Terminal de Dados para importar a listagem.</p>
+        <p>As listagens são populadas automaticamente quando um requerimento é aprovado.</p>
     </div>`;
 }
 

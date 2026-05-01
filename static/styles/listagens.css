@@ -253,20 +253,6 @@
     line-height: 1.45;
 }
 
-.card-bar-wrap {
-    height: 3px;
-    background: var(--bg-4);
-    border-radius: 2px;
-    overflow: hidden;
-}
-
-.card-bar {
-    height: 100%;
-    background: var(--card-accent, var(--green));
-    border-radius: 2px;
-    opacity: .65;
-}
-
 .card-empty-hint {
     font-size: .66rem;
     color: var(--t3);
@@ -608,6 +594,66 @@
     background: var(--bg-4);
 }
 
+/* Espaçamento especial para nomes nos cards de Contas Oficiais */
+.view-acento-blue .av-card-name {
+    white-space: normal;
+    line-height: 1.25;
+    padding: 10px 6px;
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .62rem;
+}
+
+.av-card-extra {
+    padding: 2px 4px 6px;
+    font-size: .62rem;
+    font-weight: 800;
+    color: var(--green);
+    text-align: center;
+    background: var(--bg-3);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: .5px;
+    transition: background .2s;
+}
+
+.av-card:hover .av-card-extra {
+    background: var(--bg-4);
+}
+
+/* Estilo para Contas Oficiais */
+.av-card-official {
+    background: linear-gradient(135deg, var(--bg-3) 0%, var(--bg-2) 100%) !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding-top: 0 !important;
+}
+
+.av-official-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(59, 130, 246, .1);
+    border: 1px solid rgba(59, 130, 246, .3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3b82f6;
+    transition: transform .3s, background .3s;
+}
+
+.av-card:hover .av-official-icon {
+    transform: scale(1.1);
+    background: rgba(59, 130, 246, .2);
+    box-shadow: 0 0 20px rgba(59, 130, 246, .2);
+}
+
+.av-official-icon svg {
+    width: 32px;
+    height: 32px;
+}
+
 /* ============================================================
    MODO TEXTO — LIST VIEW COM THUMBS
    ============================================================ */
@@ -722,6 +768,11 @@
 
 .txt-entry:hover .txt-nick {
     color: var(--green);
+}
+
+/* Espaçamento especial para Contas Oficiais no modo lista */
+.view-acento-blue .txt-entry {
+    padding: 14px 24px;
 }
 
 .txt-extra {
@@ -1103,5 +1154,79 @@
 
     .av-card-img {
         height: 88px;
+    }
+}
+/* ── EXONERADOS TABLE ──────────────────────────────── */
+.exo-table-wrap {
+    overflow-x: auto;
+    margin-top: 8px;
+}
+
+.exo-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.exo-table thead th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--t3);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+
+.exo-table tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    transition: background .15s;
+}
+
+.exo-table tbody tr:hover {
+    background: rgba(255,255,255,.03);
+}
+
+.exo-nick {
+    font-weight: 600;
+    color: var(--t1);
+    padding: 10px 14px;
+    white-space: nowrap;
+}
+
+.exo-tag {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    background: rgba(255,255,255,.07);
+    color: var(--t2);
+    white-space: nowrap;
+    font-family: monospace;
+}
+
+.exo-motivo {
+    color: var(--t2);
+    padding: 10px 14px;
+    max-width: 360px;
+}
+
+.exo-periodo {
+    color: var(--t3);
+    padding: 10px 14px;
+    white-space: nowrap;
+    font-size: 12px;
+}
+
+@media (max-width: 600px) {
+    .exo-motivo {
+        max-width: 200px;
+        font-size: 12px;
+    }
+    .exo-periodo {
+        display: none;
     }
 }

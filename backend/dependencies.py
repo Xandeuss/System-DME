@@ -8,13 +8,10 @@ from fastapi import Request, HTTPException, status
 
 from backend.config import get_settings
 from backend.services.auth_service import decode_jwt
-from backend.services.local_store import get_store
+from backend.db.pool import get_pool
 from backend.models.auth import UserInfo
 
 logger = logging.getLogger("dme.deps")
-
-# Nicks que são sempre admin, independente do banco
-ADMINS_FIXOS = {"xandelicado", "rafacv", "ronaldo"}
 
 
 async def get_current_user(request: Request) -> UserInfo:
@@ -23,10 +20,20 @@ async def get_current_user(request: Request) -> UserInfo:
     Retorna um UserInfo ou levanta 401.
     """
     settings = get_settings()
-    token = request.cookies.get(settings.COOKIE_NAME)
 
+    if settings.DEV_MODE:
+        return UserInfo(
+            nick="dev",
+            patente="Comandante-Geral",
+            corpo="militar",
+            status="ativo",
+            role="admin",
+            centros=["corregedoria", "centro_instrucao"],
+        )
+
+    token = request.cookies.get(settings.COOKIE_NAME)
     if not token:
-        logger.warning(f"[AUTH] 401 em {request.url.path}: cookie '{settings.COOKIE_NAME}' ausente. Cookies: {list(request.cookies.keys())}")
+        logger.warning(f"[AUTH] 401 em {request.url.path}: cookie '{settings.COOKIE_NAME}' ausente")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Não autenticado",
@@ -41,27 +48,58 @@ async def get_current_user(request: Request) -> UserInfo:
         )
 
     nick = payload["sub"]
-    role = payload.get("role", "user")
+    role_jwt = payload.get("role", "user")
+    centros_jwt = payload.get("centros", [])
 
-    # Busca dados no store local
-    store = get_store()
-    user_data = store.get_militar(nick)
+    pool = get_pool()
+    if pool:
+        try:
+            async with pool.connection() as conn:
+                # 1. Buscar status e role na tabela 'usuarios'
+                cur = await conn.execute(
+                    "SELECT status, role FROM usuarios WHERE LOWER(nick) = LOWER(%s)",
+                    (nick,),
+                )
+                row_user = await cur.fetchone()
+                
+                if row_user:
+                    user_status, role_db = row_user
+                    
+                    # Se não estiver ativo, barramos o acesso mesmo com JWT válido
+                    if (user_status or "ativo").lower() != "ativo":
+                        raise HTTPException(
+                            status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Conta desativada ou banida",
+                        )
+                    
+                    # 2. Buscar dados RPG na tabela 'militares'
+                    cur = await conn.execute(
+                        "SELECT nick, patente, corpo FROM militares WHERE LOWER(nick) = LOWER(%s)",
+                        (nick,),
+                    )
+                    row_mil = await cur.fetchone()
+                    
+                    if row_mil:
+                        nick_db, patente, corpo = row_mil
+                        is_admin = (role_db == "admin")
+                        return UserInfo(
+                            nick=nick_db,
+                            patente=patente or "Recruta",
+                            corpo=corpo or "militar",
+                            status=user_status,
+                            role="admin" if is_admin else "user",
+                            centros=centros_jwt,
+                        )
+        except HTTPException:
+            raise
+        except Exception as exc:
+            logger.error(f"[AUTH] Erro ao buscar dados do usuário: {exc}")
 
-    if user_data:
-        is_admin = nick.lower() in ADMINS_FIXOS or role == "admin"
-
-        return UserInfo(
-            nick=user_data.get("nick", nick),
-            patente=user_data.get("patente", "Recruta"),
-            corpo=user_data.get("corpo", "militar"),
-            status=user_data.get("status", "ativo"),
-            role="admin" if is_admin else "user",
-        )
-
-    # Usuário não encontrado no store mas tem token válido
+    # Token válido mas sem registro completo no banco
     return UserInfo(
         nick=nick,
-        role="admin" if nick.lower() in ADMINS_FIXOS else role,
+        role=role_jwt,
+        centros=centros_jwt,
     )
 
 
