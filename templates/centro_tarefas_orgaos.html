@@ -411,83 +411,64 @@
 
     <div class="page-container">
 
-        <!-- -- BREADCRUMB -------------------------------------- -->
-
+        <!-- Breadcrumb -->
         <nav class="breadcrumb">
-
             <a href="/home">
-
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-
                     <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-
                 </svg>
-
                 Início
-
             </a>
-
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-
                 <polyline points="9 18 15 12 9 6" />
-
             </svg>
-
             <span>Centros e Órgãos</span>
-
         </nav>
-
-
 
         <section class="funcao-section">
 
-            <div class="page-header">
-
-                <div class="page-title">
-
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-
-                        <path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 10v11M16 10v11M12 10v11" />
-
-                    </svg>
-
-                    Selecione uma Função
-
+            <!-- Hero Header -->
+            <div class="funcao-hero">
+                <div class="funcao-hero-left">
+                    <div class="funcao-hero-eyebrow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 10v11M16 10v11M12 10v11" />
+                        </svg>
+                        DME System · Estrutura Organizacional
+                    </div>
+                    <h1 class="funcao-hero-title">Centros e Órgãos</h1>
+                    <p class="funcao-hero-sub">Selecione o órgão ou setor ao qual você pertence para acessar as ferramentas e funcionalidades específicas.</p>
                 </div>
-
+                <div class="funcao-hero-stats">
+                    <div class="funcao-hero-stat">
+                        <span class="funcao-hero-stat-num" id="statTotalOrgaos">23</span>
+                        <span class="funcao-hero-stat-label">Órgãos</span>
+                    </div>
+                    <div class="funcao-hero-stat">
+                        <span class="funcao-hero-stat-num" id="statSelecionado">—</span>
+                        <span class="funcao-hero-stat-label">Seu Setor</span>
+                    </div>
+                </div>
             </div>
 
-
-
-            <p class="funcao-subtitle">Escolha o órgão ou setor ao qual você faz parte para acessar as ferramentas
-
-                específicas.</p>
-
-
-
-            <div class="funcao-search-wrap">
-
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="funcao-search-icon">
-
-                    <circle cx="11" cy="11" r="8" />
-
-                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
-
-                </svg>
-
-                <input type="text" id="funcaoSearch" class="funcao-search-input"
-
-                    placeholder="Buscar por nome ou sub-setor..." autocomplete="off">
-
+            <!-- Toolbar: busca -->
+            <div class="funcao-toolbar">
+                <div class="funcao-search-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="funcao-search-icon">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input type="text" id="funcaoSearch" class="funcao-search-input"
+                        placeholder="Buscar por nome ou sub-setor..." autocomplete="off">
+                </div>
             </div>
 
-
-
-            <div class="funcao-list" id="funcaoList"></div>
+            <!-- Lista categorizada -->
+            <div class="funcao-categories" id="funcaoList"></div>
 
         </section>
-
     </div>
+
 
 
 
