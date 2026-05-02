@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function loadUserProfile() {
-    const avatarUrl = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(currentUser)}&direction=3&head_direction=3&gesture=sml&action=std`;
+    const avatarUrl = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(currentUser)}&headonly=1&size=m&direction=2&head_direction=2`;
     const navUserName = document.getElementById("navUserName");
     const navUserImage = document.getElementById("navUserImage");
     const dropdownName = document.getElementById("dropdownName");

@@ -23,7 +23,6 @@
         const current = localStorage.getItem('dme_theme') || 'dark';
         window.applyTheme(current === 'dark' ? 'light' : 'dark');
     };
-
     // ── Aplicar imediatamente para evitar flash ──────────────────────────────
     // Adiciona transição suave ANTES de aplicar a classe para não piscar no carregamento
     const saved = localStorage.getItem('dme_theme') || 'dark';

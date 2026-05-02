@@ -16,6 +16,10 @@
  *   - Animações de avatar
  */
 
+// ── Favcon ───────────────────────────────────────────
+
+
+
 // ── Estado ───────────────────────────────────────────
 const appState = {
     formData: { username: "", email: "", password: "", termsAccepted: false },

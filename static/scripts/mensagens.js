@@ -28,7 +28,7 @@ function initNavbar() {
     const dropName = document.getElementById('dropdownName');
 
     if (navName) navName.textContent = username;
-    if (navImg) navImg.src = avBody(username);
+    if (navImg) navImg.src = avHead(username);
     if (dropImg) dropImg.src = avBody(username);
     if (dropName) dropName.textContent = username;
 
