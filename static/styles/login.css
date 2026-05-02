@@ -82,22 +82,33 @@ body {
 }
 
 .panel-shield {
-    width: 96px;
-    height: 96px;
+    width: 80px;
+    height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    filter: drop-shadow(0 0 20px rgba(34,197,94,.25));
     animation: shieldPulse 4s ease-in-out infinite;
 }
 
 @keyframes shieldPulse {
-    0%, 100% { filter: drop-shadow(0 0 16px rgba(34,197,94,.2)); }
-    50%       { filter: drop-shadow(0 0 30px rgba(34,197,94,.45)); }
+    0%, 100% { filter: drop-shadow(0 0 10px rgba(34,197,94,.15)); }
+    50%       { filter: drop-shadow(0 0 22px rgba(34,197,94,.35)); }
 }
 
-.shield-svg { width: 96px; height: 96px; }
+.shield-img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.mobile-shield-img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
 
 .panel-title {
     font-family: 'Rajdhani', sans-serif;
