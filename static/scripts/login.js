@@ -16,10 +16,6 @@
  *   - Animações de avatar
  */
 
-// ── Favcon ───────────────────────────────────────────
-
-
-
 // ── Estado ───────────────────────────────────────────
 const appState = {
     formData: { username: "", email: "", password: "", termsAccepted: false },
@@ -258,15 +254,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (savedTheme === "light") {
         document.documentElement.classList.add("light-mode");
     }
-
-    const avatars = document.querySelectorAll(".avatar-slot");
-    avatars.forEach((avatar, index) => {
-        avatar.style.opacity = "0";
-        avatar.style.transform = "translateY(10px)";
-        setTimeout(() => {
-            avatar.style.transition = "all 0.5s ease";
-            avatar.style.opacity = "1";
-            avatar.style.transform = "translateY(0)";
-        }, 300 + (index * 120));
-    });
+    // Avatares: animação de entrada feita via CSS (animation-delay por nth-child)
+    // Hover wave/idle também é puramente CSS — sem JS necessário
 });

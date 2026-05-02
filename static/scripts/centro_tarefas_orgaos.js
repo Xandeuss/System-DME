@@ -1,65 +1,15 @@
 (function () {
-    const username = localStorage.getItem('dme_username');
-    if (!username) { window.location.href = '/login'; return; }
 
-    /* ── Dados dos órgãos agrupados por categoria ── */
-    const CATEGORIAS = [
-        {
-            nome: 'Centros Operacionais',
-            orgaos: [
-                { id: 'centro-instrucao',   title: 'Centro de Instrução',         sub: '',                     icon: '🛡️' },
-                { id: 'centro-treinamento', title: 'Centro de Treinamento',        sub: '',                     icon: '🛡️' },
-                { id: 'centro-supervisao',  title: 'Centro de Supervisão',         sub: '',                     icon: '🛡️' },
-                { id: 'centro-patrulha',    title: 'Centro de Patrulha',           sub: '',                     icon: '🛡️' },
-                { id: 'guerra-selva',       title: 'Centro de Instrução Guerra na Selva', sub: '',             icon: '🐆' },
-            ]
-        },
-        {
-            nome: 'Academias Militares',
-            orgaos: [
-                { id: 'academia-agulhas-negras', title: 'Academia Militar das Agulhas Negras', sub: '',        icon: '🦅' },
-                { id: 'academia-publicitaria',   title: 'Academia Publicitária Militar',        sub: '',        icon: '📜' },
-                { id: 'instrucao-inicial',        title: 'Aplicar Instrução Inicial',            sub: 'Instrutores', icon: '📖' },
-                { id: 'cadetes',                  title: 'Cadetes',                              sub: '',        icon: '🪖' },
-            ]
-        },
-        {
-            nome: 'Justiça & Fiscalização',
-            orgaos: [
-                { id: 'auditoria-fiscal',    title: 'Auditoria Fiscal',             sub: '',                     icon: '⚖️' },
-                { id: 'ministerio-publico',  title: 'Ministério Público',            sub: '',                     icon: '⚖️' },
-                { id: 'corregedoria',        title: 'Corregedoria',                  sub: '',                     icon: '🦅' },
-                { id: 'stm',                 title: 'Superior Tribunal Militar',     sub: '',                     icon: '⚔️' },
-                { id: 'normas-desligamentos',title: 'Centro de Normas e Desligamentos', sub: '',                 icon: '📄' },
-            ]
-        },
-        {
-            nome: 'Corpos & Inteligência',
-            orgaos: [
-                { id: 'corpo-oficiais-gerais', title: 'Corpo de Oficiais Gerais',   sub: '',                     icon: '⭐' },
-                { id: 'corpo-oficiais',        title: 'Corpo de Oficiais',           sub: 'Setor de Inteligência', icon: '🗡️' },
-                { id: 'abi',                   title: 'Agência Brasileira de Inteligência', sub: '',             icon: '🦅' },
-                { id: 'goe',                   title: 'Grupamento de Operações Especiais', sub: 'Instrutores',   icon: '💀' },
-            ]
-        },
-        {
-            nome: 'Órgãos Sociais & RH',
-            orgaos: [
-                { id: 'centro-rh',           title: 'Centro de Recursos Humanos',   sub: '',                     icon: '👥' },
-                { id: 'portadores-direitos', title: 'Portadores de Direitos',        sub: '',                     icon: '🤝' },
-                { id: 'comando-feminino',    title: 'Comando Feminino',              sub: '',                     icon: '♀️' },
-                { id: 'agencia-eventos',     title: 'Agência de Eventos',            sub: 'Coordenador',          icon: '📅' },
-                { id: 'af-dragonas',         title: '[AF] Postagem de Dragonas',     sub: '',                     icon: '🎖️' },
-            ]
-        },
-    ];
+    /* ── Estado global ── */
+    let CATEGORIAS = [];
+    let ORGAOS_FLAT = [];
+    let isAdmin = false;
 
-    /* Lista plana para busca */
-    const ORGAOS_FLAT = CATEGORIAS.flatMap(c => c.orgaos);
-
+    /* ── Helpers ── */
     function logout() {
-        localStorage.removeItem('dme_username');
-        window.location.href = '/login';
+        fetch('/api/auth/logout', { method: 'POST' }).catch(() => {}).finally(() => {
+            window.location.href = '/login';
+        });
     }
 
     function getOrgaoSelecionado() {
@@ -71,148 +21,284 @@
         localStorage.setItem('dme_orgao_selecionado', JSON.stringify(orgao));
     }
 
-    /* SVG de seta para os cards */
-    const ARROW_SVG = `<svg class="funcao-item-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <polyline points="9 18 15 12 9 6"/>
-    </svg>`;
+    async function apiFetch(url, opts = {}) {
+        const r = await fetch(url, { credentials: 'include', ...opts });
+        if (!r.ok) {
+            const err = await r.json().catch(() => ({}));
+            throw new Error(err.detail || 'Erro ' + r.status);
+        }
+        return r.json();
+    }
 
-    function cardHTML(o, selectedId) {
-        const isSelected = selectedId === o.id;
-        const sub = o.sub ? `<div class="funcao-item-sub">${o.sub}</div>` : '';
-        const badge = `<span class="funcao-item-badge">Ativo</span>`;
-        return `
-            <div class="funcao-item${isSelected ? ' selected' : ''}" data-id="${o.id}" role="button" tabindex="0" aria-label="${o.title}">
-                <div class="funcao-item-icon">${o.icon}</div>
-                <div class="funcao-item-text">
-                    <div class="funcao-item-title">${o.title}</div>
-                    ${sub}
-                </div>
-                ${isSelected ? badge : ARROW_SVG}
-            </div>`;
+    /* ── Carregar dados da API ── */
+    async function carregarDados() {
+        try {
+            const res = await apiFetch('/api/orgaos');
+            const { categorias, orgaos } = res.data;
+            CATEGORIAS = categorias.map(cat => ({
+                ...cat,
+                orgaos: orgaos
+                    .filter(o => o.categoria_slug === cat.slug && o.ativo)
+                    .sort((a, b) => a.ordem - b.ordem || a.nome_oficial.localeCompare(b.nome_oficial))
+            })).filter(cat => cat.orgaos.length > 0);
+            ORGAOS_FLAT = orgaos.filter(o => o.ativo);
+        } catch (e) {
+            CATEGORIAS = _FALLBACK_CATEGORIAS;
+            ORGAOS_FLAT = _FALLBACK_CATEGORIAS.flatMap(c => c.orgaos);
+        }
+        renderList();
+        const statTotal = document.getElementById('statTotalOrgaos');
+        if (statTotal) statTotal.textContent = ORGAOS_FLAT.length;
+    }
+
+    /* ── Fallback estático ── */
+    const _FALLBACK_CATEGORIAS = [
+        { slug: 'centros-operacionais', nome: 'Centros Operacionais', icone: '🛡️', orgaos: [
+            { nick: 'centro-instrucao',   nome_oficial: 'Centro de Instrução',                icone: '🛡️', sub: '' },
+            { nick: 'centro-treinamento', nome_oficial: 'Centro de Treinamento',               icone: '🛡️', sub: '' },
+            { nick: 'centro-supervisao',  nome_oficial: 'Centro de Supervisão',                icone: '🛡️', sub: '' },
+            { nick: 'centro-patrulha',    nome_oficial: 'Centro de Patrulha',                  icone: '🛡️', sub: '' },
+            { nick: 'guerra-selva',       nome_oficial: 'Centro de Instrução Guerra na Selva', icone: '🐆', sub: '' },
+        ]},
+        { slug: 'academias-militares', nome: 'Academias Militares', icone: '🦅', orgaos: [
+            { nick: 'academia-agulhas-negras', nome_oficial: 'Academia Militar das Agulhas Negras', icone: '🦅', sub: '' },
+            { nick: 'academia-publicitaria',   nome_oficial: 'Academia Publicitária Militar',        icone: '📜', sub: '' },
+            { nick: 'instrucao-inicial',        nome_oficial: 'Aplicar Instrução Inicial',            icone: '📖', sub: 'Instrutores' },
+            { nick: 'cadetes',                  nome_oficial: 'Cadetes',                              icone: '🪖', sub: '' },
+        ]},
+        { slug: 'justica-fiscalizacao', nome: 'Justiça & Fiscalização', icone: '⚖️', orgaos: [
+            { nick: 'auditoria-fiscal',    nome_oficial: 'Auditoria Fiscal',          icone: '⚖️', sub: '' },
+            { nick: 'ministerio-publico',  nome_oficial: 'Ministério Público',         icone: '⚖️', sub: '' },
+            { nick: 'corregedoria',        nome_oficial: 'Corregedoria',              icone: '🦅', sub: '' },
+            { nick: 'stm',                 nome_oficial: 'Superior Tribunal Militar', icone: '⚔️', sub: '' },
+        ]},
+        { slug: 'corpos-inteligencia', nome: 'Corpos & Inteligência', icone: '🗡️', orgaos: [
+            { nick: 'corpo-oficiais-gerais', nome_oficial: 'Corpo de Oficiais Generais',          icone: '⭐', sub: '' },
+            { nick: 'corpo-oficiais',        nome_oficial: 'Corpo de Oficiais',                   icone: '🗡️', sub: 'Setor de Inteligência' },
+            { nick: 'abi',                   nome_oficial: 'Agência Brasileira de Inteligência',  icone: '🦅', sub: '' },
+            { nick: 'goe',                   nome_oficial: 'Grupamento de Operações Especiais',   icone: '💀', sub: 'Instrutores' },
+        ]},
+        { slug: 'orgaos-sociais-rh', nome: 'Órgãos Sociais & RH', icone: '👥', orgaos: [
+            { nick: 'centro-rh',           nome_oficial: 'Centro de Recursos Humanos', icone: '👥', sub: '' },
+            { nick: 'portadores-direitos', nome_oficial: 'Portadores de Direitos',      icone: '🤝', sub: '' },
+            { nick: 'comando-feminino',    nome_oficial: 'Comando Feminino',            icone: '♀️', sub: '' },
+        ]},
+    ];
+
+    /* ── Render ── */
+    const ARROW_SVG = '<svg class="funcao-item-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>';
+
+    function getTitle(o) { return o.nome_oficial || o.title || ''; }
+    function getNick(o)  { return o.nick || o.id || ''; }
+    function getIcon(o)  { return o.icone || o.icon || '🏛️'; }
+    function getSub(o)   { return o.sub || ''; }
+
+    function cardHTML(o, selectedNick) {
+        const nick = getNick(o);
+        const isSelected = selectedNick === nick;
+        const sub  = getSub(o) ? '<div class="funcao-item-sub">' + getSub(o) + '</div>' : '';
+        const badge = '<span class="funcao-item-badge">Ativo</span>';
+        return '<div class="funcao-item' + (isSelected ? ' selected' : '') + '" data-id="' + nick + '" role="button" tabindex="0" aria-label="' + getTitle(o) + '">' +
+            '<div class="funcao-item-icon">' + getIcon(o) + '</div>' +
+            '<div class="funcao-item-text"><div class="funcao-item-title">' + getTitle(o) + '</div>' + sub + '</div>' +
+            (isSelected ? badge : ARROW_SVG) +
+        '</div>';
     }
 
     function renderList(filtro) {
         const container = document.getElementById('funcaoList');
         if (!container) return;
         const selected = getOrgaoSelecionado();
-        const selectedId = selected?.id || null;
+        const selectedNick = selected ? (selected.nick || selected.id || null) : null;
 
         if (filtro !== undefined && filtro !== '') {
-            /* Modo busca: grid único sem categorias */
             const termo = filtro.toLowerCase();
             const matches = ORGAOS_FLAT.filter(o =>
-                o.title.toLowerCase().includes(termo) || o.sub.toLowerCase().includes(termo)
+                getTitle(o).toLowerCase().includes(termo) || getSub(o).toLowerCase().includes(termo)
             );
             if (!matches.length) {
-                container.innerHTML = `<div class="funcao-grid">
-                    <div class="funcao-empty">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                        </svg>
-                        Nenhum resultado para "<strong>${filtro}</strong>"
-                    </div>
-                </div>`;
+                container.innerHTML = '<div class="funcao-grid"><div class="funcao-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Nenhum resultado para "<strong>' + filtro + '</strong>"</div></div>';
             } else {
-                container.innerHTML = `<div class="funcao-grid">${matches.map(o => cardHTML(o, selectedId)).join('')}</div>`;
+                container.innerHTML = '<div class="funcao-grid">' + matches.map(o => cardHTML(o, selectedNick)).join('') + '</div>';
                 attachEvents(container);
             }
             return;
         }
 
-        /* Modo normal: categorias */
-        container.innerHTML = CATEGORIAS.map(cat => `
-            <div class="funcao-category">
-                <div class="funcao-category-header">
-                    <div class="funcao-category-dot"></div>
-                    <span class="funcao-category-name">${cat.nome}</span>
-                    <span class="funcao-category-count">${cat.orgaos.length}</span>
-                </div>
-                <div class="funcao-grid">
-                    ${cat.orgaos.map(o => cardHTML(o, selectedId)).join('')}
-                </div>
-            </div>
-        `).join('');
+        container.innerHTML = CATEGORIAS.map(function(cat) {
+            const editBtn = isAdmin
+                ? '<button class="btn-edit-cat" onclick="abrirModalEditCat(\'' + cat.slug + '\',\'' + encodeURIComponent(cat.nome) + '\',\'' + (cat.icone||'🏛️') + '\')" title="Editar categoria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>'
+                : '';
+            return '<div class="funcao-category">' +
+                '<div class="funcao-category-header">' +
+                '<div class="funcao-category-dot"></div>' +
+                '<span class="funcao-category-name">' + cat.nome + '</span>' +
+                '<span class="funcao-category-count">' + cat.orgaos.length + '</span>' +
+                editBtn +
+                '</div>' +
+                '<div class="funcao-grid">' + cat.orgaos.map(o => cardHTML(o, selectedNick)).join('') + '</div>' +
+                '</div>';
+        }).join('');
 
         attachEvents(container);
     }
 
     function attachEvents(container) {
-        container.querySelectorAll('.funcao-item').forEach(el => {
-            el.addEventListener('click', () => selecionarOrgao(el.getAttribute('data-id')));
-            el.addEventListener('keydown', e => {
+        container.querySelectorAll('.funcao-item').forEach(function(el) {
+            el.addEventListener('click', function() { selecionarOrgao(el.getAttribute('data-id')); });
+            el.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selecionarOrgao(el.getAttribute('data-id')); }
             });
         });
     }
 
     function selecionarOrgao(id) {
-        const orgao = ORGAOS_FLAT.find(o => o.id === id);
+        const orgao = ORGAOS_FLAT.find(o => getNick(o) === id);
         if (!orgao) return;
-        setOrgaoSelecionado({ id: orgao.id, title: orgao.title, sub: orgao.sub, icon: orgao.icon });
+        setOrgaoSelecionado({ nick: getNick(orgao), id: getNick(orgao), title: getTitle(orgao), nome_oficial: getTitle(orgao), sub: getSub(orgao), icon: getIcon(orgao), icone: getIcon(orgao) });
         window.location.href = '/centro_detalhe';
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        /* User info */
-        document.getElementById('navUserName').textContent = username;
-        document.getElementById('dropdownName').textContent = username;
-        const avatarHead = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(username)}&headonly=1&size=m&gesture=std&head_direction=2`;
-        const avatarFull = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(username)}&size=m&direction=2&head_direction=2&gesture=std`;
-        document.getElementById('navUserImage').src = avatarHead;
-        document.getElementById('dropdownUserImage').src = avatarFull;
+    /* ── Modais (admin) ── */
+    window.abrirModalEditCat = function(slug, nome, icone) {
+        document.getElementById('editCatSlug').value = slug;
+        document.getElementById('editCatNome').value = decodeURIComponent(nome);
+        document.getElementById('editCatIcone').value = icone;
+        document.getElementById('modalEditCat').classList.add('active');
+    };
 
-        /* Setor selecionado no stat do hero */
+    window.fecharModalEditCat = function() {
+        document.getElementById('modalEditCat').classList.remove('active');
+    };
+
+    window.salvarCategoria = async function() {
+        const slug  = document.getElementById('editCatSlug').value;
+        const nome  = document.getElementById('editCatNome').value.trim();
+        const icone = document.getElementById('editCatIcone').value.trim() || '🏛️';
+        const ordemEl = document.getElementById('editCatOrdem');
+        const ordem = ordemEl ? (parseInt(ordemEl.value) || 99) : 99;
+        if (!nome) return showToast('Informe o nome da categoria.', 'erro');
+        try {
+            await apiFetch('/api/orgaos/categorias', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slug, nome, icone, ordem }) });
+            fecharModalEditCat();
+            showToast('Categoria atualizada!', 'ok');
+            await carregarDados();
+        } catch (e) { showToast(e.message, 'erro'); }
+    };
+
+    window.abrirModalNovaCat = function() {
+        document.getElementById('editCatSlug').value = 'cat-' + Date.now();
+        document.getElementById('editCatNome').value = '';
+        document.getElementById('editCatIcone').value = '🏛️';
+        if (document.getElementById('editCatOrdem')) document.getElementById('editCatOrdem').value = '99';
+        document.getElementById('modalEditCat').classList.add('active');
+    };
+
+    window.abrirModalNovoOrgao = function() {
+        const sel = document.getElementById('novoOrgaoCat');
+        if (sel) sel.innerHTML = CATEGORIAS.map(c => '<option value="' + c.slug + '">' + c.nome + '</option>').join('');
+        document.getElementById('modalNovoOrgao').classList.add('active');
+    };
+
+    window.fecharModalNovoOrgao = function() {
+        document.getElementById('modalNovoOrgao').classList.remove('active');
+        document.getElementById('formNovoOrgao').reset();
+    };
+
+    window.salvarNovoOrgao = async function() {
+        const nick         = document.getElementById('novoOrgaoNick').value.trim();
+        const nome_oficial = document.getElementById('novoOrgaoNome').value.trim();
+        const categoria_slug = document.getElementById('novoOrgaoCat').value;
+        const imagem_url   = document.getElementById('novoOrgaoImagem').value.trim() || null;
+        const ordem        = parseInt(document.getElementById('novoOrgaoOrdem').value) || 99;
+        if (!nick || !nome_oficial) return showToast('Preencha nick e nome.', 'erro');
+        try {
+            await apiFetch('/api/orgaos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nick, nome_oficial, categoria_slug, imagem_url, ordem }) });
+            fecharModalNovoOrgao();
+            showToast('Órgão/Centro criado!', 'ok');
+            await carregarDados();
+        } catch (e) { showToast(e.message, 'erro'); }
+    };
+
+    /* ── Toast ── */
+    function showToast(msg, tipo) {
+        tipo = tipo || 'ok';
+        const t = document.createElement('div');
+        t.className = 'dme-toast dme-toast-' + tipo;
+        t.textContent = msg;
+        document.body.appendChild(t);
+        requestAnimationFrame(function() { t.classList.add('show'); });
+        setTimeout(function() { t.classList.remove('show'); setTimeout(function() { t.remove(); }, 300); }, 3000);
+    }
+
+    /* ── Init ── */
+    document.addEventListener('DOMContentLoaded', async function() {
+
+        try {
+            const me = await apiFetch('/api/auth/me');
+            const username = me.nick || me.sub || '';
+            isAdmin = (me.role === 'admin');
+
+            document.getElementById('navUserName').textContent = username;
+            document.getElementById('dropdownName').textContent = username;
+            document.getElementById('navUserImage').src = 'https://www.habbo.com.br/habbo-imaging/avatarimage?user=' + encodeURIComponent(username) + '&headonly=1&size=m&gesture=std&head_direction=2';
+            document.getElementById('dropdownUserImage').src = 'https://www.habbo.com.br/habbo-imaging/avatarimage?user=' + encodeURIComponent(username) + '&size=m&direction=2&head_direction=2&gesture=std';
+
+            if (isAdmin) {
+                const painel = document.getElementById('dropdownPainel');
+                if (painel) painel.style.display = 'flex';
+                const adminBar = document.getElementById('adminToolbar');
+                if (adminBar) adminBar.style.display = 'flex';
+            }
+
+            const cargoEl = document.getElementById('dropdownCargo');
+            if (cargoEl) {
+                const sel = getOrgaoSelecionado();
+                cargoEl.textContent = (sel && (sel.title || sel.nome_oficial)) ? (sel.title || sel.nome_oficial) : 'Militar DME';
+            }
+        } catch (e) {
+            window.location.href = '/login';
+            return;
+        }
+
         const selected = getOrgaoSelecionado();
         const statSel = document.getElementById('statSelecionado');
-        if (statSel) statSel.textContent = selected?.icon || '—';
+        if (statSel) statSel.textContent = (selected && (selected.icone || selected.icon)) ? (selected.icone || selected.icon) : '—';
 
-        /* Total de órgãos */
-        const statTotal = document.getElementById('statTotalOrgaos');
-        if (statTotal) statTotal.textContent = ORGAOS_FLAT.length;
-
-        /* Cargo no dropdown */
-        const cargoEl = document.getElementById('dropdownCargo');
-        if (cargoEl) {
-            cargoEl.textContent = (selected?.title)
-                ? (selected.sub ? `${selected.title} · ${selected.sub}` : selected.title)
-                : 'Militar DME';
-        }
-
-        /* Admin */
-        const admins = JSON.parse(localStorage.getItem('dme_admins') || 'null') || [];
-        if (admins.includes(username)) {
-            const painel = document.getElementById('dropdownPainel');
-            if (painel) painel.style.display = 'flex';
-        }
+        await carregarDados();
 
         /* Sidebar */
         const hamburger = document.getElementById('hamburger');
-        const sidebar = document.getElementById('mobileSidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        const closeBtn = document.getElementById('sidebarClose');
+        const sidebar   = document.getElementById('mobileSidebar');
+        const overlay   = document.getElementById('sidebarOverlay');
+        const closeBtn  = document.getElementById('sidebarClose');
         if (hamburger && sidebar && overlay) {
-            const toggle = () => { sidebar.classList.toggle('active'); overlay.classList.toggle('active'); };
+            var toggle = function() { sidebar.classList.toggle('active'); overlay.classList.toggle('active'); };
             hamburger.addEventListener('click', toggle);
             if (closeBtn) closeBtn.addEventListener('click', toggle);
             overlay.addEventListener('click', toggle);
         }
 
-        /* Dropdown */
+        /* Dropdown usuário */
         const userProfileBtn = document.getElementById('userProfileBtn');
-        const userDropdown = document.getElementById('userDropdown');
+        const userDropdown   = document.getElementById('userDropdown');
         if (userProfileBtn && userDropdown) {
-            userProfileBtn.addEventListener('click', e => { e.stopPropagation(); userDropdown.classList.toggle('active'); });
-            document.addEventListener('click', () => userDropdown.classList.remove('active'));
+            userProfileBtn.addEventListener('click', function(e) { e.stopPropagation(); userDropdown.classList.toggle('active'); });
+            document.addEventListener('click', function() { userDropdown.classList.remove('active'); });
         }
 
-        renderList();
-
-        /* Busca em tempo real */
+        /* Busca */
         const searchInput = document.getElementById('funcaoSearch');
         if (searchInput) {
-            searchInput.addEventListener('input', function () {
-                renderList(this.value.trim());
-            });
+            searchInput.addEventListener('input', function() { renderList(this.value.trim()); });
         }
+
+        window.logout = logout;
+
+        /* Fechar modais clicando no fundo */
+        document.querySelectorAll('.modal-co-wrap').forEach(function(m) {
+            m.addEventListener('click', function(e) { if (e.target === m) m.classList.remove('active'); });
+        });
     });
+
 })();

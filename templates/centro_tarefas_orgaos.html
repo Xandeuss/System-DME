@@ -12,9 +12,6 @@
 
     <title>DME System - Centros e Órgãos</title>
 
-    <link rel="icon" href="https://www.habbo.com.br/habbo-imaging/badge/b06134s01114s36044s43014s38114570880883f296e5ddc58f2ff858601e6.gif">
-    <link rel="shortcut icon" href="https://www.habbo.com.br/habbo-imaging/badge/b06134s01114s36044s43014s38114570880883f296e5ddc58f2ff858601e6.gif">
-
     <link rel="stylesheet" href="/styles/global.css">
 
     <link rel="stylesheet" href="/styles/centro_tarefas_orgaos.css">
@@ -451,7 +448,7 @@
                 </div>
             </div>
 
-            <!-- Toolbar: busca -->
+            <!-- Toolbar: busca + botão admin -->
             <div class="funcao-toolbar">
                 <div class="funcao-search-wrap">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="funcao-search-icon">
@@ -463,8 +460,108 @@
                 </div>
             </div>
 
+            <!-- Barra admin (visível só para admins) -->
+            <div class="admin-toolbar" id="adminToolbar" style="display:none">
+                <span class="admin-toolbar-label">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                    Modo Administrador
+                </span>
+                <button class="btn-admin-action" onclick="abrirModalNovoOrgao()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14">
+                        <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                    Novo Órgão / Centro
+                </button>
+                <button class="btn-admin-action btn-admin-action--secondary" onclick="abrirModalNovaCat()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14">
+                        <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                    Nova Categoria
+                </button>
+            </div>
+
             <!-- Lista categorizada -->
             <div class="funcao-categories" id="funcaoList"></div>
+
+            <!-- ── MODAL: Editar / Nova Categoria ─────────────────────── -->
+            <div class="modal-co-wrap" id="modalEditCat">
+                <div class="modal-co-content">
+                    <div class="modal-co-header">
+                        <h3 class="modal-co-title">Editar Categoria</h3>
+                        <button class="modal-co-close" onclick="fecharModalEditCat()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18">
+                                <path d="M18 6 6 18M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="modal-co-body">
+                        <input type="hidden" id="editCatSlug">
+                        <div class="form-co-group">
+                            <label class="form-co-label">Nome da Categoria</label>
+                            <input type="text" id="editCatNome" class="form-co-input" placeholder="Ex: Centros Operacionais">
+                        </div>
+                        <div class="form-co-row">
+                            <div class="form-co-group">
+                                <label class="form-co-label">Ícone (emoji)</label>
+                                <input type="text" id="editCatIcone" class="form-co-input" placeholder="🏛️" maxlength="4">
+                            </div>
+                            <div class="form-co-group">
+                                <label class="form-co-label">Ordem</label>
+                                <input type="number" id="editCatOrdem" class="form-co-input" value="99" min="1" max="999">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-co-footer">
+                        <button class="btn-co-cancel" onclick="fecharModalEditCat()">Cancelar</button>
+                        <button class="btn-co-save" onclick="salvarCategoria()">Salvar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── MODAL: Novo Órgão / Centro ─────────────────────────── -->
+            <div class="modal-co-wrap" id="modalNovoOrgao">
+                <div class="modal-co-content">
+                    <div class="modal-co-header">
+                        <h3 class="modal-co-title">Novo Órgão / Centro</h3>
+                        <button class="modal-co-close" onclick="fecharModalNovoOrgao()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18">
+                                <path d="M18 6 6 18M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <form class="modal-co-body" id="formNovoOrgao" onsubmit="return false">
+                        <div class="form-co-group">
+                            <label class="form-co-label">Nick (identificador único)</label>
+                            <input type="text" id="novoOrgaoNick" class="form-co-input" placeholder="Ex: centro-logistica">
+                        </div>
+                        <div class="form-co-group">
+                            <label class="form-co-label">Nome Oficial</label>
+                            <input type="text" id="novoOrgaoNome" class="form-co-input" placeholder="Ex: Centro de Logística Militar">
+                        </div>
+                        <div class="form-co-group">
+                            <label class="form-co-label">Categoria</label>
+                            <select id="novoOrgaoCat" class="form-co-input"></select>
+                        </div>
+                        <div class="form-co-row">
+                            <div class="form-co-group">
+                                <label class="form-co-label">URL da Imagem</label>
+                                <input type="text" id="novoOrgaoImagem" class="form-co-input" placeholder="https://...">
+                            </div>
+                            <div class="form-co-group">
+                                <label class="form-co-label">Ordem</label>
+                                <input type="number" id="novoOrgaoOrdem" class="form-co-input" value="99" min="1" max="999">
+                            </div>
+                        </div>
+                    </form>
+                    <div class="modal-co-footer">
+                        <button class="btn-co-cancel" onclick="fecharModalNovoOrgao()">Cancelar</button>
+                        <button class="btn-co-save" onclick="salvarNovoOrgao()">Criar</button>
+                    </div>
+                </div>
+            </div>
 
         </section>
     </div>

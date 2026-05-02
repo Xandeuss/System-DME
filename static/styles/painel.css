@@ -770,3 +770,25 @@
     .stats-row { grid-template-columns: 1fr 1fr; }
     .page-title { font-size: 1.4rem; }
 }
+/* ── Toast (painel admin) ──────────────────────────────────── */
+.dme-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: .83rem;
+    font-weight: 700;
+    color: #fff;
+    background: #22c55e;
+    box-shadow: 0 8px 24px rgba(0,0,0,.4);
+    z-index: 10000;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity .2s ease, transform .2s ease;
+    max-width: 320px;
+    pointer-events: none;
+}
+
+.dme-toast.dme-toast-erro { background: #ef4444; }
+.dme-toast.show { opacity: 1; transform: translateY(0); }

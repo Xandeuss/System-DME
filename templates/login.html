@@ -1,152 +1,246 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DME System | Acesso</title>
-    <link rel="icon" href="https://www.habbo.com.br/habbo-imaging/badge/b06134s01114s36044s43014s38114570880883f296e5ddc58f2ff858601e6.gif">
-    <link rel="shortcut icon" href="https://www.habbo.com.br/habbo-imaging/badge/b06134s01114s36044s43014s38114570880883f296e5ddc58f2ff858601e6.gif">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles/global.css">
     <link rel="stylesheet" href="/styles/login.css">
+    <script src="/scripts/theme.js"></script>
 </head>
-
 <body>
 
-    <div class="auth-card">
+<!-- ══ LADO ESQUERDO: PAINEL DECORATIVO ══════════════════════════════ -->
+<aside class="auth-panel">
 
-        <!-- BRAND -->
-        <div class="auth-brand">
-            <div class="auth-logo-mark">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                </svg>
-            </div>
-            <div class="auth-brand-name">DME<em>System</em></div>
-            <div class="auth-brand-sub">Sistema de Gestão Militar</div>
+    <!-- Grade tática de fundo -->
+    <div class="panel-grid"></div>
+    <div class="panel-scanlines"></div>
+
+    <!-- Logo + Branding grande -->
+    <div class="panel-brand">
+        <!-- Escudo SVG do DME -->
+        <div class="panel-shield">
+            <svg viewBox="0 0 80 96" fill="none" xmlns="http://www.w3.org/2000/svg" class="shield-svg">
+                <path d="M40 4 L74 16 L74 52 C74 72 58 86 40 92 C22 86 6 72 6 52 L6 16 Z" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.5)" stroke-width="1.5"/>
+                <path d="M40 12 L68 22 L68 52 C68 68 55 80 40 85 C25 80 12 68 12 52 L12 22 Z" fill="rgba(34,197,94,0.05)" stroke="rgba(34,197,94,0.25)" stroke-width="1"/>
+                <!-- Estrelas + detalhes internos -->
+                <text x="40" y="38" text-anchor="middle" font-size="18" fill="rgba(34,197,94,0.9)" font-family="serif">★</text>
+                <line x1="22" y1="46" x2="58" y2="46" stroke="rgba(34,197,94,0.35)" stroke-width="0.8"/>
+                <text x="40" y="62" text-anchor="middle" font-size="8" fill="rgba(34,197,94,0.6)" font-family="Rajdhani, sans-serif" font-weight="700" letter-spacing="2">DME</text>
+                <!-- Cantos decorativos -->
+                <circle cx="40" cy="4" r="2" fill="rgba(34,197,94,0.6)"/>
+                <circle cx="6" cy="16" r="1.5" fill="rgba(34,197,94,0.4)"/>
+                <circle cx="74" cy="16" r="1.5" fill="rgba(34,197,94,0.4)"/>
+            </svg>
         </div>
 
-        <!-- ── SEÇÃO: LOGIN ────────────────────────────── -->
-        <div id="loginSection">
-            <div class="auth-header">
-                <div class="auth-title">Acessar conta</div>
-                <div class="auth-sub">Bem-vindo de volta, soldado.</div>
-            </div>
+        <div class="panel-title">DME<span>System</span></div>
+        <div class="panel-subtitle">Sistema de Gestão Militar</div>
 
-            <form id="loginForm" novalidate>
-                <div class="field">
-                    <label class="field-label" for="loginUsername">Nome de Usuário</label>
-                    <input type="text" id="loginUsername" class="field-input" placeholder="Seu nickname no Habbo"
-                        autocomplete="username" required>
-                    <div class="field-error" id="err-loginUsername"></div>
-                </div>
-
-                <div class="field">
-                    <label class="field-label" for="loginPassword">Senha</label>
-                    <input type="password" id="loginPassword" class="field-input" placeholder="Sua senha"
-                        autocomplete="current-password" required>
-                    <div class="field-error" id="err-loginPassword"></div>
-                </div>
-
-                <button type="submit" class="btn-auth" id="loginBtn">
-                    <span class="btn-text">Entrar</span>
-                    <div class="spinner"></div>
-                </button>
-            </form>
-
-            <div class="auth-sep">ou</div>
-
-            <div class="auth-link-row">
-                Novo por aqui? <a onclick="toggleForm('register')">Criar conta</a>
-            </div>
+        <div class="panel-divider">
+            <span></span><span class="panel-divider-icon">◆</span><span></span>
         </div>
 
-        <!-- ── SEÇÃO: REGISTRO ────────────────────────── -->
-        <div id="registerSection" style="display:none">
-            <div class="auth-header">
-                <div class="auth-title">Criar uma conta</div>
-                <div class="auth-sub">Junte-se ao DME System.</div>
+        <p class="panel-tagline">Plataforma oficial de gestão,<br>controle e operação militar.</p>
+    </div>
+
+    <!-- Avatares decorativos -->
+    <div class="panel-avatars">
+        <div class="avatar-soldier" data-user="Leticinha-_-">
+            <div class="avatar-frame">
+                <img class="avatar-idle"
+                    src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Leticinha-_-&direction=2&head_direction=2&size=l&gesture=std"
+                    alt="Leticinha-_-" loading="lazy">
+                <img class="avatar-wave"
+                    src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Leticinha-_-&direction=2&head_direction=2&size=l&action=wav"
+                    alt="" loading="lazy" aria-hidden="true">
             </div>
-
-            <form id="registerForm" novalidate>
-                <div class="field">
-                    <label class="field-label" for="username">Nome de Usuário</label>
-                    <input type="text" id="username" class="field-input" placeholder="Seu nickname exato do Habbo"
-                        autocomplete="username" required>
-                    <div class="field-error" id="username-error"></div>
-                </div>
-
-                <div class="field">
-                    <label class="field-label" for="email">E-mail</label>
-                    <input type="email" id="email" class="field-input" placeholder="Seu e-mail de contato"
-                        autocomplete="email" required>
-                    <div class="field-error" id="email-error"></div>
-                </div>
-
-                <div class="field">
-                    <label class="field-label" for="password">Senha</label>
-                    <input type="password" id="password" class="field-input" placeholder="Mínimo 6 caracteres"
-                        autocomplete="new-password" required>
-                    <div class="field-error" id="password-error"></div>
-                </div>
-
-                <div class="check-group">
-                    <input type="checkbox" id="terms" class="check-input" required>
-                    <label for="terms" class="check-label">
-                        Aceito os <a href="#">Termos de Serviço</a>
-                    </label>
-                </div>
-
-                <button type="submit" class="btn-auth" id="submitBtn">
-                    <span class="btn-text">Avançar para Verificação</span>
-                    <div class="spinner"></div>
-                </button>
-            </form>
-
-            <div class="auth-sep">ou</div>
-
-            <div class="auth-link-row">
-                Já possui uma conta? <a onclick="toggleForm('login')">Entrar</a>
-            </div>
+            <span class="avatar-name">Leticinha-_-</span>
         </div>
-
-        <!-- Avatares decorativos -->
-        <div class="auth-avatars">
-            <div class="avatar-slot">
-                <div class="avatar-img-wrap">
-                    <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Leticinha-_-&direction=4&head_direction=4&size=l&action=wav"
-                        alt="Leticinha-_-" loading="lazy">
-                </div>
-                <span class="avatar-nick">Leticinha-_-</span>
+        <div class="avatar-soldier" data-user="Jodie-Foster">
+            <div class="avatar-frame">
+                <img class="avatar-idle"
+                    src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Jodie-Foster&direction=2&head_direction=2&size=l&gesture=std"
+                    alt="Jodie-Foster" loading="lazy">
+                <img class="avatar-wave"
+                    src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Jodie-Foster&direction=2&head_direction=2&size=l&action=wav"
+                    alt="" loading="lazy" aria-hidden="true">
             </div>
-            <div class="avatar-slot">
-                <div class="avatar-img-wrap">
-                    <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Jodie-Foster&direction=3&head_direction=3&size=l"
-                        alt="Jodie-Foster" loading="lazy">
-                </div>
-                <span class="avatar-nick">Jodie-Foster</span>
+            <span class="avatar-name">Jodie-Foster</span>
+        </div>
+        <div class="avatar-soldier" data-user="rafacv">
+            <div class="avatar-frame">
+                <img class="avatar-idle"
+                    src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=rafacv&direction=2&head_direction=2&size=l&gesture=std"
+                    alt="rafacv" loading="lazy">
+                <img class="avatar-wave"
+                    src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=rafacv&direction=2&head_direction=2&size=l&action=wav"
+                    alt="" loading="lazy" aria-hidden="true">
             </div>
-            <div class="avatar-slot">
-                <div class="avatar-img-wrap">
-                    <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=rafacv&direction=2&head_direction=2&size=l"
-                        alt="rafacv" loading="lazy">
-                </div>
-                <span class="avatar-nick">rafacv</span>
+            <span class="avatar-name">rafacv</span>
+        </div>
+        <div class="avatar-soldier" data-user="Horcrux-">
+            <div class="avatar-frame">
+                <img class="avatar-idle"
+                    src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Horcrux-&direction=2&head_direction=2&size=l&gesture=std"
+                    alt="Horcrux-" loading="lazy">
+                <img class="avatar-wave"
+                    src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Horcrux-&direction=2&head_direction=2&size=l&action=wav"
+                    alt="" loading="lazy" aria-hidden="true">
             </div>
-            <div class="avatar-slot">
-                <div class="avatar-img-wrap">
-                    <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Horcrux-&direction=4&head_direction=4&size=l&action=wav"
-                        alt="Horcrux-" loading="lazy">
-                </div>
-                <span class="avatar-nick">Horcrux-</span>
-            </div>
+            <span class="avatar-name">Horcrux-</span>
         </div>
     </div>
 
-    <!-- Toast -->
-    <div class="toast" id="toast"></div>
+    <!-- Rodapé do painel -->
+    <div class="panel-footer">
+        <span class="panel-version">v2.0.0</span>
+        <span class="panel-dot">·</span>
+        <span class="panel-status">
+            <span class="status-dot"></span>
+            Sistema Online
+        </span>
+    </div>
+</aside>
 
-    <script src="/scripts/login.js?v=3"></script>
+<!-- ══ LADO DIREITO: FORMULÁRIO ══════════════════════════════════════ -->
+<main class="auth-main">
+
+    <!-- Header mobile (só aparece em telas pequenas) -->
+    <div class="auth-mobile-brand">
+        <div class="mobile-shield">
+            <svg viewBox="0 0 40 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 2 L37 8 L37 26 C37 36 29 43 20 46 C11 43 3 36 3 26 L3 8 Z" fill="rgba(34,197,94,0.1)" stroke="rgba(34,197,94,0.5)" stroke-width="1.2"/>
+                <text x="20" y="20" text-anchor="middle" font-size="9" fill="rgba(34,197,94,0.9)" font-family="serif">★</text>
+                <line x1="10" y1="24" x2="30" y2="24" stroke="rgba(34,197,94,0.3)" stroke-width="0.7"/>
+                <text x="20" y="33" text-anchor="middle" font-size="5" fill="rgba(34,197,94,0.6)" font-family="sans-serif" font-weight="700" letter-spacing="1.5">DME</text>
+            </svg>
+        </div>
+        <span class="mobile-title">DME<em>System</em></span>
+    </div>
+
+    <!-- ── SEÇÃO: LOGIN ────────────────────────────── -->
+    <div class="auth-form-wrap" id="loginSection">
+        <div class="auth-heading">
+            <h1 class="auth-title">Acessar conta</h1>
+            <p class="auth-sub">Bem-vindo de volta, soldado.</p>
+        </div>
+
+        <form id="loginForm" novalidate class="auth-form">
+            <div class="field">
+                <label class="field-label" for="loginUsername">Nome de Usuário</label>
+                <div class="field-input-wrap">
+                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <input type="text" id="loginUsername" class="field-input" placeholder="Seu nickname no Habbo"
+                        autocomplete="username" required>
+                </div>
+                <div class="field-error" id="err-loginUsername"></div>
+            </div>
+
+            <div class="field">
+                <label class="field-label" for="loginPassword">Senha</label>
+                <div class="field-input-wrap">
+                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                    <input type="password" id="loginPassword" class="field-input" placeholder="Sua senha"
+                        autocomplete="current-password" required>
+                </div>
+                <div class="field-error" id="err-loginPassword"></div>
+            </div>
+
+            <button type="submit" class="btn-auth" id="loginBtn">
+                <span class="btn-text">Entrar</span>
+                <div class="spinner"></div>
+            </button>
+        </form>
+
+        <div class="auth-sep"><span></span><em>ou</em><span></span></div>
+
+        <div class="auth-link-row">
+            Novo por aqui? <a onclick="toggleForm('register')">Criar conta</a>
+        </div>
+    </div>
+
+    <!-- ── SEÇÃO: REGISTRO ────────────────────────── -->
+    <div class="auth-form-wrap" id="registerSection" style="display:none">
+        <div class="auth-heading">
+            <h1 class="auth-title">Criar uma conta</h1>
+            <p class="auth-sub">Junte-se ao DME System.</p>
+        </div>
+
+        <form id="registerForm" novalidate class="auth-form">
+            <div class="field">
+                <label class="field-label" for="username">Nome de Usuário</label>
+                <div class="field-input-wrap">
+                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <input type="text" id="username" class="field-input" placeholder="Seu nickname exato do Habbo"
+                        autocomplete="username" required>
+                </div>
+                <div class="field-error" id="username-error"></div>
+            </div>
+
+            <div class="field">
+                <label class="field-label" for="email">E-mail</label>
+                <div class="field-input-wrap">
+                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                        <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                    <input type="email" id="email" class="field-input" placeholder="Seu e-mail de contato"
+                        autocomplete="email" required>
+                </div>
+                <div class="field-error" id="email-error"></div>
+            </div>
+
+            <div class="field">
+                <label class="field-label" for="password">Senha</label>
+                <div class="field-input-wrap">
+                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                    <input type="password" id="password" class="field-input" placeholder="Mínimo 6 caracteres"
+                        autocomplete="new-password" required>
+                </div>
+                <div class="field-error" id="password-error"></div>
+            </div>
+
+            <div class="check-group">
+                <input type="checkbox" id="terms" class="check-input" required>
+                <label for="terms" class="check-label">
+                    Aceito os <a href="#">Termos de Serviço</a>
+                </label>
+            </div>
+
+            <button type="submit" class="btn-auth" id="submitBtn">
+                <span class="btn-text">Avançar para Verificação</span>
+                <div class="spinner"></div>
+            </button>
+        </form>
+
+        <div class="auth-sep"><span></span><em>ou</em><span></span></div>
+
+        <div class="auth-link-row">
+            Já possui uma conta? <a onclick="toggleForm('login')">Entrar</a>
+        </div>
+    </div>
+
+</main>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="/scripts/login.js?v=4"></script>
 </body>
-
 </html>
