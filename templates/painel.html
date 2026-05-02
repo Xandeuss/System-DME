@@ -1,4 +1,4 @@
-??<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="pt-br">
 
@@ -13,8 +13,268 @@
     <title>Painel Admin - DME System</title>
 
     <link rel="stylesheet" href="/styles/global.css">
-
     <link rel="stylesheet" href="/styles/painel.css">
+    <style>
+        /* ── Admin Layout ────────────────────────────── */
+        body { overflow-x: hidden; }
+        .admin-layout {
+            display: flex;
+            min-height: calc(100vh - 60px);
+        }
+        /* ── Sidebar ────────────────────────────────── */
+        .admin-sidebar {
+            width: 230px;
+            min-width: 230px;
+            background: var(--bg-2, #080d0a);
+            border-right: 1px solid var(--b1, #131f15);
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 60px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+            transition: width .22s ease, min-width .22s ease;
+            scrollbar-width: thin;
+        }
+        .admin-sidebar.collapsed {
+            width: 64px;
+            min-width: 64px;
+        }
+        .admin-sidebar.collapsed .admin-brand-name,
+        .admin-sidebar.collapsed .admin-brand-sub,
+        .admin-sidebar.collapsed .admin-sidebar-clock,
+        .admin-sidebar.collapsed .admin-nav-label,
+        .admin-sidebar.collapsed .admin-nav-badge,
+        .admin-sidebar.collapsed .admin-back-btn span,
+        .admin-sidebar.collapsed .admin-version {
+            display: none;
+        }
+        .admin-sidebar.collapsed .admin-nav-item {
+            justify-content: center;
+            padding: 10px;
+        }
+        .admin-sidebar.collapsed .admin-nav-icon { margin: 0; }
+        .admin-sidebar.collapsed .admin-sidebar-brand { justify-content: center; }
+        .admin-sidebar.collapsed .admin-back-btn { justify-content: center; padding: 10px; }
+        /* ── Sidebar Header ────────────────────────── */
+        .admin-sidebar-header {
+            padding: 18px 16px 14px;
+            border-bottom: 1px solid var(--b1, #131f15);
+        }
+        .admin-sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .admin-brand-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: rgba(34,197,94,.12);
+            border: 1px solid rgba(34,197,94,.22);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--green, #22c55e);
+            flex-shrink: 0;
+        }
+        .admin-brand-icon svg { width: 17px; height: 17px; }
+        .admin-brand-name {
+            font-weight: 900;
+            font-size: .88rem;
+            color: var(--t1, #f4f8f4);
+            line-height: 1.2;
+        }
+        .admin-brand-sub {
+            font-size: .65rem;
+            color: var(--t3, #3a5a3a);
+            font-weight: 600;
+        }
+        .admin-sidebar-clock {
+            font-size: .68rem;
+            font-weight: 700;
+            color: var(--t3, #3a5a3a);
+            font-variant-numeric: tabular-nums;
+            text-align: right;
+        }
+        /* ── Nav ────────────────────────────────────── */
+        .admin-nav {
+            flex: 1;
+            padding: 12px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .admin-nav-group { margin-bottom: 6px; }
+        .admin-nav-label {
+            font-size: .58rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: var(--t3, #3a5a3a);
+            padding: 6px 8px 4px;
+        }
+        .admin-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 9px 10px;
+            border-radius: 10px;
+            font-size: .82rem;
+            font-weight: 600;
+            color: var(--t2, #8aaa8a);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            text-decoration: none;
+            font-family: inherit;
+            transition: background .14s ease, color .14s ease;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .admin-nav-item:hover {
+            background: rgba(34,197,94,.06);
+            color: var(--t1, #f4f8f4);
+        }
+        .admin-nav-item.active {
+            background: rgba(34,197,94,.10);
+            color: var(--green, #22c55e);
+            font-weight: 700;
+        }
+        .admin-nav-icon {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .admin-nav-icon svg { width: 16px; height: 16px; }
+        .admin-nav-badge {
+            margin-left: auto;
+            background: #ef4444;
+            color: white;
+            border-radius: 999px;
+            padding: 2px 7px;
+            font-size: .6rem;
+            font-weight: 900;
+        }
+        /* ── Footer ───────────────────────────────── */
+        .admin-sidebar-footer {
+            padding: 12px 10px;
+            border-top: 1px solid var(--b1, #131f15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .admin-back-btn {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: .75rem;
+            font-weight: 700;
+            color: var(--t3, #3a5a3a);
+            text-decoration: none;
+            padding: 7px 8px;
+            border-radius: 8px;
+            transition: color .14s ease, background .14s ease;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .admin-back-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+        .admin-back-btn:hover { color: var(--t1, #f4f8f4); background: rgba(34,197,94,.06); }
+        .admin-version {
+            font-size: .6rem;
+            font-weight: 700;
+            color: var(--t3, #3a5a3a);
+            flex-shrink: 0;
+        }
+        /* ── Main Content ──────────────────────────── */
+        .admin-main {
+            flex: 1;
+            min-width: 0;
+            overflow-x: hidden;
+        }
+        /* Toggle button */
+        .admin-sidebar-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            background: var(--bg-3, #0b110c);
+            border: 1px solid var(--b1, #131f15);
+            border-radius: 9px;
+            color: var(--t2, #8aaa8a);
+            cursor: pointer;
+            transition: all .14s ease;
+        }
+        .admin-sidebar-toggle:hover { color: var(--t1); border-color: var(--b2); }
+        /* Mobile ──────────────────────────────── */
+        @media (max-width: 900px) {
+            .admin-sidebar { display: none; }
+            .admin-sidebar.mobile-open {
+                display: flex;
+                position: fixed;
+                top: 60px;
+                left: 0;
+                z-index: 500;
+                height: calc(100vh - 60px);
+            }
+        }
+        /* ── SVG size guards ──────────────────────────── */
+        .admin-layout svg { overflow: hidden; }
+        .stat-icon { width: 38px !important; height: 38px !important; flex-shrink: 0; }
+        .stat-icon svg { width: 18px !important; height: 18px !important; display: block; }
+        .admin-nav-icon { width: 18px !important; height: 18px !important; flex-shrink: 0; }
+        .admin-nav-icon svg { width: 16px !important; height: 16px !important; display: block; }
+        .admin-brand-icon svg { width: 17px !important; height: 17px !important; display: block; }
+        .admin-back-btn svg { width: 14px !important; height: 14px !important; flex-shrink: 0; }
+        .empty-icon { width: 56px; height: 56px; }
+        .empty-icon svg { width: 28px !important; height: 28px !important; }
+        .ip-duplicado-icon svg { width: 18px !important; height: 18px !important; }
+        /* ── Page Header ──────────────────────────────── */
+        .page-header {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            padding: 22px 28px !important;
+            border-bottom: 1px solid var(--b1, #131f15) !important;
+            margin-bottom: 0 !important;
+            position: relative !important;
+        }
+        .page-header::before { display: none !important; }
+        .page-header-left { display: flex; flex-direction: column; gap: 2px; }
+        .page-title {
+            font-size: 1.4rem !important;
+            font-weight: 900 !important;
+            color: var(--t1, #f4f8f4) !important;
+            letter-spacing: -.03em !important;
+            margin: 0 !important;
+            line-height: 1.2 !important;
+        }
+        .page-subtitle { font-size: .78rem !important; color: var(--t2, #8aaa8a) !important; margin: 0 !important; }
+        /* ── Page Container (reset painel.css defaults) ── */
+        .admin-main .page-container {
+            max-width: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        /* ── Tabs inside admin ────────────────────────── */
+        .admin-main .tab-content { display: none !important; }
+        .admin-main .tab-content.active { display: block !important; animation: tabIn .18s ease; }
+        #tab-geral.active, #tab-usuarios.active, #tab-militares.active,
+        #tab-ips.active, #tab-funcoes.active, #tab-historico.active { display: block !important; }
+        /* ── Content padding inside tabs ─────────────── */
+        .tab-content .stats-row { margin: 24px 28px 0; }
+        .tab-content .panel-card { margin: 24px 28px; }
+        .tab-content .funcoes-grid { padding: 24px 28px; }
+    </style>
+
 
     <script src="/scripts/theme.js"></script>
 
@@ -199,180 +459,206 @@
             </div>
         </div>
     </nav>
-    <!-- -- CONTEÚDO PRINCIPAL ----------------------------- -->
-
-    <main class="page-container">
 
 
+    <!-- ── ADMIN LAYOUT ─────────────────────────────── -->
+    <div class="admin-layout">
 
-        <header class="page-header">
+        <!-- SIDEBAR ADMIN -->
+        <aside class="admin-sidebar" id="adminSidebar">
 
-            <h1 class="page-title">Painel Administrativo</h1>
-
-            <p class="page-subtitle">Gestão centralizada de usuários, acesso e sistema.</p>
-
-        </header>
-
-
-
-        <!-- Estatísticas Rápidas -->
-
-        <div class="stats-row">
-
-            <div class="stat-card" onclick="mudarAba('usuarios'); setFiltroUsuario('todos')">
-
-                <span class="stat-label">Total de Usuários</span>
-
-                <span class="stat-value" id="stat-total-usuarios">0</span>
-
-                <span class="stat-sub">Registrados no sistema</span>
-
+            <div class="admin-sidebar-header">
+                <div class="admin-sidebar-brand">
+                    <div class="admin-brand-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="admin-brand-name">Painel Admin</div>
+                        <div class="admin-brand-sub">DME System</div>
+                    </div>
+                </div>
+                <div class="admin-sidebar-clock" id="adminClockTime">--:--:--</div>
             </div>
 
-            <div class="stat-card" onclick="mudarAba('usuarios'); setFiltroUsuario('pendente')">
+            <nav class="admin-nav">
 
-                <span class="stat-label">Pendentes</span>
+                <div class="admin-nav-group">
+                    <div class="admin-nav-label">Visão Geral</div>
+                    <button class="admin-nav-item active" data-tab="geral" onclick="mudarAba('geral')">
+                        <span class="admin-nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7" rx="1" />
+                                <rect x="14" y="3" width="7" height="7" rx="1" />
+                                <rect x="3" y="14" width="7" height="7" rx="1" />
+                                <rect x="14" y="14" width="7" height="7" rx="1" />
+                            </svg>
+                        </span>
+                        Dashboard
+                    </button>
+                </div>
 
-                <span class="stat-value" id="stat-usuarios-pendentes" style="color:#f59e0b">0</span>
+                <div class="admin-nav-group">
+                    <div class="admin-nav-label">Gestão</div>
+                    <button class="admin-nav-item" data-tab="usuarios" onclick="mudarAba('usuarios')">
+                        <span class="admin-nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>
+                        </span>
+                        Usuários
+                        <span class="admin-nav-badge" id="badge-pendentes" style="display:none">0</span>
+                    </button>
+                    <button class="admin-nav-item" data-tab="militares" onclick="mudarAba('militares')">
+                        <span class="admin-nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                            </svg>
+                        </span>
+                        Militares
+                    </button>
+                </div>
 
-                <span class="stat-sub">Aguardando aprovação</span>
+                <div class="admin-nav-group">
+                    <div class="admin-nav-label">Segurança</div>
+                    <button class="admin-nav-item" data-tab="ips" onclick="mudarAba('ips')">
+                        <span class="admin-nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="9" />
+                                <path d="M5 12h14M12 5c-2 3-2 9 0 14M12 5c2 3 2 9 0 14" />
+                            </svg>
+                        </span>
+                        Verificação de IP
+                    </button>
+                    <button class="admin-nav-item" data-tab="funcoes" onclick="mudarAba('funcoes')">
+                        <span class="admin-nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3" />
+                                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                            </svg>
+                        </span>
+                        Funções &amp; Perm.
+                    </button>
+                </div>
 
+                <div class="admin-nav-group">
+                    <div class="admin-nav-label">Sistema</div>
+                    <button class="admin-nav-item" data-tab="historico" onclick="mudarAba('historico')">
+                        <span class="admin-nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 8v4l3 3" /><circle cx="12" cy="12" r="9" />
+                            </svg>
+                        </span>
+                        Histórico de Ações
+                    </button>
+                    <a href="/configuracao" class="admin-nav-item">
+                        <span class="admin-nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3" />
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                            </svg>
+                        </span>
+                        Configurações
+                    </a>
+                </div>
+
+            </nav>
+
+            <div class="admin-sidebar-footer">
+                <a href="/home" class="admin-back-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                    Voltar ao System
+                </a>
+                <div class="admin-version">v2.0.0</div>
             </div>
 
-            <div class="stat-card" onclick="mudarAba('militares')">
+        </aside>
 
-                <span class="stat-label">Militares Ativos</span>
+        <!-- CONTEÚDO PRINCIPAL -->
+        <main class="admin-main">
 
-                <span class="stat-value" id="stat-militares-ativos">0</span>
+            <div class="page-container">
 
-                <span class="stat-sub">Corpo Militar e Empresarial</span>
+                <header class="page-header">
+                    <div class="page-header-left">
+                        <h1 class="page-title" id="adminPageTitle">Dashboard</h1>
+                        <p class="page-subtitle">Gestão centralizada de usuários, acesso e sistema.</p>
+                    </div>
+                    <button class="admin-sidebar-toggle" id="adminSidebarToggle" title="Recolher sidebar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                            <line x1="3" y1="6" x2="21" y2="6" />
+                            <line x1="3" y1="12" x2="21" y2="12" />
+                            <line x1="3" y1="18" x2="21" y2="18" />
+                        </svg>
+                    </button>
+                </header>
 
+                <!-- ABA: GERAL (Dashboard) -->
+                <div class="tab-content active" id="tab-geral">
+
+                    <!-- Stats Row -->
+                    <div class="stats-row">
+                <div class="stat-card" onclick="mudarAba('usuarios'); setFiltroUsuario('todos')">
+                    <div class="stat-card-top">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>
+                        </div>
+                        <span class="stat-label">Total de<br>Usuários</span>
+                    </div>
+                    <span class="stat-value" id="stat-total-usuarios">0</span>
+                    <span class="stat-sub">Registrados no sistema</span>
+                </div>
+                <div class="stat-card" onclick="mudarAba('usuarios'); setFiltroUsuario('pendente')">
+                    <div class="stat-card-top">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="9" />
+                                <line x1="12" y1="8" x2="12" y2="12" />
+                                <line x1="12" y1="16" x2="12.01" y2="16" />
+                            </svg>
+                        </div>
+                        <span class="stat-label">Aguardando<br>Aprovação</span>
+                    </div>
+                    <span class="stat-value" id="stat-usuarios-pendentes">0</span>
+                    <span class="stat-sub">Cadastros pendentes</span>
+                </div>
+                <div class="stat-card" onclick="mudarAba('militares')">
+                    <div class="stat-card-top">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                            </svg>
+                        </div>
+                        <span class="stat-label">Militares<br>Ativos</span>
+                    </div>
+                    <span class="stat-value" id="stat-militares-ativos">0</span>
+                    <span class="stat-sub">Corpo Militar e Empresarial</span>
+                </div>
+                <div class="stat-card" onclick="mudarAba('historico')">
+                    <div class="stat-card-top">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 8v4l3 3" /><circle cx="12" cy="12" r="9" />
+                            </svg>
+                        </div>
+                        <span class="stat-label">Ações<br>nas 24h</span>
+                    </div>
+                    <span class="stat-value" id="stat-acoes-dia">0</span>
+                    <span class="stat-sub">Registros no histórico</span>
+                </div>
             </div>
-
-            <div class="stat-card" onclick="mudarAba('historico')">
-
-                <span class="stat-label">Ações (24h)</span>
-
-                <span class="stat-value" id="stat-acoes-dia">0</span>
-
-                <span class="stat-sub">Registros no histórico</span>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- Abas de Navegação -->
-
-        <div class="tabs-bar">
-
-            <button class="tab-btn active" data-tab="geral">
-
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16">
-
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-
-                    <path d="M3 9h18" />
-
-                    <path d="M9 21V9" />
-
-                </svg>
-
-                Geral
-
-            </button>
-
-            <button class="tab-btn" data-tab="usuarios">
-
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16">
-
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-
-                    <circle cx="9" cy="7" r="4" />
-
-                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-
-                </svg>
-
-                Gestão de Usuários
-
-                <span class="badge-count" id="badge-pendentes" style="display:none">0</span>
-
-            </button>
-
-            <button class="tab-btn" data-tab="militares">
-
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16">
-
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-
-                </svg>
-
-                Militares Cadastrados
-
-            </button>
-
-            <button class="tab-btn" data-tab="ips">
-
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16">
-
-                    <path d="M5 12h14" />
-
-                    <path d="M12 5v14" />
-
-                    <circle cx="12" cy="12" r="9" />
-
-                </svg>
-
-                Verificação de IP
-
-            </button>
-
-            <button class="tab-btn" data-tab="funcoes">
-
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16">
-
-                    <path
-
-                        d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-
-                    <circle cx="12" cy="12" r="3" />
-
-                </svg>
-
-                Cargos e Funções
-
-            </button>
-
-            <button class="tab-btn" data-tab="historico">
-
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16">
-
-                    <path d="M12 8v4l3 3" />
-
-                    <circle cx="12" cy="12" r="9" />
-
-                </svg>
-
-                Histórico de Ações
-
-            </button>
-
-        </div>
-
-
-
-        <!-- ABA: GERAL -->
-
-        <div class="tab-content active" id="tab-geral">
 
             <div class="panel-card">
-
                 <div class="panel-card-header">
-
                     <h2 class="panel-card-title">Resumo do Sistema</h2>
 
                 </div>
@@ -454,11 +740,14 @@
                 </div>
 
                 <div id="usuariosEmpty" class="empty-state" style="display:none">
-
-                    <div class="empty-icon">??</div>
-
+                    <div class="empty-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <line x1="23" y1="11" x2="17" y2="11" />
+                        </svg>
+                    </div>
                     <div class="empty-text">Nenhum usuário encontrado com estes filtros.</div>
-
                 </div>
 
             </div>
@@ -536,19 +825,18 @@
 
 
                 <div class="ip-duplicado-alerta" id="ips-duplicados-alerta" style="display:none">
-
-                    <div class="ip-duplicado-icon">??</div>
-
-                    <div class="ip-duplicado-info">
-
-                        <h4>Múltiplos Acessos Detectados</h4>
-
-                        <p>Os IPs abaixo foram utilizados por mais de uma conta no sistema.</p>
-
-                        <div class="ips-lista-duplos" id="ips-duplicados-lista"></div>
-
+                    <div class="ip-duplicado-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                            <line x1="12" y1="9" x2="12" y2="13" />
+                            <line x1="12" y1="17" x2="12.01" y2="17" />
+                        </svg>
                     </div>
-
+                    <div class="ip-duplicado-info">
+                        <h4>Múltiplos Acessos Detectados</h4>
+                        <p>Os IPs abaixo foram utilizados por mais de uma conta no sistema.</p>
+                        <div class="ips-lista-duplos" id="ips-duplicados-lista"></div>
+                    </div>
                 </div>
 
 
@@ -582,11 +870,13 @@
                 </div>
 
                 <div id="ipsEmpty" class="empty-state" style="display:none">
-
-                    <div class="empty-icon">??</div>
-
+                    <div class="empty-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="9" />
+                            <path d="M5 12h14M12 5c-2 3-2 9 0 14M12 5c2 3 2 9 0 14" />
+                        </svg>
+                    </div>
                     <div class="empty-text">Nenhum registro de IP encontrado.</div>
-
                 </div>
 
             </div>
@@ -688,20 +978,22 @@
                 </div>
 
                 <div id="historicoEmpty" class="empty-state" style="display:none">
-
-                    <div class="empty-icon">??</div>
-
+                    <div class="empty-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M12 8v4l3 3" /><circle cx="12" cy="12" r="9" />
+                        </svg>
+                    </div>
                     <div class="empty-text">Nenhuma atividade registrada.</div>
-
                 </div>
 
             </div>
 
-        </div>
+            </div><!-- /.page-container -->
+        </main><!-- /.admin-main -->
+
+    </div><!-- /.admin-layout -->
 
 
-
-    </main>
 
 
 
@@ -875,10 +1167,25 @@
 
 
 
-    <!-- -- SCRIPTS ---------------------------------------- -->
-
     <script src="/scripts/notificacoes.js"></script>
+    <script>
+        // Relógio ao vivo
+        function _tickClock() {
+            const el = document.getElementById('adminClockTime');
+            if (el) el.textContent = new Date().toLocaleTimeString('pt-BR');
+        }
+        _tickClock();
+        setInterval(_tickClock, 1000);
 
+        // Toggle collapse/expand da sidebar
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggle = document.getElementById('adminSidebarToggle');
+            const sidebar = document.getElementById('adminSidebar');
+            if (toggle && sidebar) {
+                toggle.onclick = () => sidebar.classList.toggle('collapsed');
+            }
+        });
+    </script>
     <script>
 
         // ── Estado global vindo do backend (/api/auth/me)
@@ -930,23 +1237,32 @@
 
 
 
-        // -- LÓGICA DE ABAS --
+        // -- LÓGICA DE ABAS / SIDEBAR --
+        const _tabTitles = {
+            geral: 'Dashboard',
+            usuarios: 'Usuários',
+            militares: 'Militares',
+            ips: 'Verificação de IP',
+            funcoes: 'Funções & Perm.',
+            historico: 'Histórico de Ações'
+        };
 
         function mudarAba(id) {
-
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-
+            // Oculta todos os conteúdos
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 
-            const btn = document.querySelector(`.tab-btn[data-tab="${id}"]`);
-
+            // Mostra o conteúdo solicitado
             const content = document.getElementById(`tab-${id}`);
-
-            if (btn) btn.classList.add('active');
-
             if (content) content.classList.add('active');
 
+            // Sincroniza sidebar: marca item ativo
+            document.querySelectorAll('.admin-nav-item').forEach(item => {
+                item.classList.toggle('active', item.getAttribute('data-tab') === id);
+            });
 
+            // Atualiza título da página
+            const titleEl = document.getElementById('adminPageTitle');
+            if (titleEl) titleEl.textContent = _tabTitles[id] || id;
 
             if (id === 'usuarios') carregarUsuarios();
 

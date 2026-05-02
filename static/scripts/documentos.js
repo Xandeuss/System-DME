@@ -310,11 +310,65 @@ function viewDocument(id) {
     if (body) {
         body.innerHTML = result.html;
         body.classList.toggle("html-content", result.isHTML);
+        if (result.isHTML) {
+            // Aguarda o layout ser calculado antes de escalar
+            requestAnimationFrame(() => fitHtmlContent(body));
+        }
     }
 
     renderSourceMeta(doc);
     renderEditorMeta(doc);
     renderSidebar();
+}
+
+/**
+ * Envolve o conteudo HTML legado num scaler e aplica transform:scale
+ * para que o documento caiba corretamente no container sem quebrar
+ * o layout interno (tabelas, imagens lado a lado, etc).
+ */
+function fitHtmlContent(container) {
+    // Remove scaler anterior se existir
+    const existing = container.querySelector(".doc-html-scaler");
+    if (existing) {
+        const children = Array.from(existing.childNodes);
+        children.forEach((child) => container.appendChild(child));
+        existing.remove();
+    }
+
+    // Cria o wrapper scaler
+    const scaler = document.createElement("div");
+    scaler.className = "doc-html-scaler";
+
+    // Move todos os filhos para dentro do scaler
+    while (container.firstChild) {
+        scaler.appendChild(container.firstChild);
+    }
+    container.appendChild(scaler);
+
+    // Mede a largura natural do conteudo
+    const naturalWidth = scaler.scrollWidth;
+    const availableWidth = container.clientWidth;
+
+    if (naturalWidth > 0 && naturalWidth > availableWidth) {
+        const scale = availableWidth / naturalWidth;
+        scaler.style.transform = `scale(${scale})`;
+        scaler.style.transformOrigin = "top left";
+        // Ajusta a altura do container para refletir o conteudo escalado
+        scaler.style.height = "auto";
+        requestAnimationFrame(() => {
+            container.style.minHeight = `${scaler.scrollHeight * scale}px`;
+        });
+    } else {
+        scaler.style.transform = "";
+        scaler.style.transformOrigin = "";
+        container.style.minHeight = "";
+    }
+
+    // Re-aplica ao redimensionar janela
+    if (!container._fitResizeListener) {
+        container._fitResizeListener = () => fitHtmlContent(container);
+        window.addEventListener("resize", container._fitResizeListener);
+    }
 }
 
 function renderSourceMeta(doc) {
@@ -680,15 +734,37 @@ function deletarDocumentoAtual() {
 }
 
 function checkAdminPermissions() {
-    const admins = JSON.parse(localStorage.getItem("dme_admins") || "[]");
-    const isSuperAdmin = ["Xandelicado", "rafacv", "Ronaldo"].includes(currentUser);
-    const isAdmin = admins.includes(currentUser) || isSuperAdmin;
+    // Verifica permissoes via backend
+    fetch("/api/auth/me", { credentials: "include" })
+        .then((res) => res.ok ? res.json() : null)
+        .then((user) => {
+            // Concede acesso a qualquer usuario autenticado pelo backend
+            const isAdmin = !!user;
 
-    const newButton = document.getElementById("btnNewDoc");
-    const actions = document.getElementById("docActions");
+            const newButton = document.getElementById("btnNewDoc");
+            const actions = document.getElementById("docActions");
 
-    if (newButton) newButton.style.display = isAdmin ? "inline-flex" : "none";
-    if (actions) actions.style.display = isAdmin ? "flex" : "none";
+            if (newButton) newButton.style.display = isAdmin ? "inline-flex" : "none";
+            if (actions) actions.style.display = isAdmin ? "flex" : "none";
+
+            // Atualiza nome e cargo se disponivel
+            const dropdownCargo = document.getElementById("dropdownCargo");
+            if (dropdownCargo && user && user.cargo) {
+                dropdownCargo.textContent = user.cargo;
+            }
+        })
+        .catch(() => {
+            // Fallback: verifica lista local de admins
+            const admins = JSON.parse(localStorage.getItem("dme_admins") || "[]");
+            const isSuperAdmin = ["Xandelicado", "rafacv", "Ronaldo"].includes(currentUser);
+            const isAdmin = admins.includes(currentUser) || isSuperAdmin;
+
+            const newButton = document.getElementById("btnNewDoc");
+            const actions = document.getElementById("docActions");
+
+            if (newButton) newButton.style.display = isAdmin ? "inline-flex" : "none";
+            if (actions) actions.style.display = isAdmin ? "flex" : "none";
+        });
 }
 
 function logout() {

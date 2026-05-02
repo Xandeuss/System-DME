@@ -833,11 +833,14 @@
     background: #ffffff;
     color: #111111;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
-    overflow-x: auto;
+    overflow-x: hidden;
 }
 
-.doc-body.html-content img {
-    max-width: 100%;
+/* Shell que escala o conteudo HTML legado para caber na tela */
+.doc-html-scaler {
+    width: 100%;
+    overflow: visible;
+    transform-origin: top left;
 }
 
 .doc-editor-modal {

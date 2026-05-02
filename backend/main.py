@@ -24,6 +24,7 @@ from backend.config import get_settings
 from backend.routers.auth import router as auth_router
 from backend.routers.requirements import router as requerimentos_router
 from backend.routers.dashboard import router as dashboard_router
+from backend.routers.documentos import router as documentos_router
 from backend.dependencies import get_current_user, get_current_admin
 from backend.models.auth import UserInfo
 from backend.db import pool as db_pool
@@ -115,6 +116,7 @@ templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 app.include_router(auth_router)
 app.include_router(requerimentos_router)
 app.include_router(dashboard_router)
+app.include_router(documentos_router)
 
 # ── Tratamento global de erros ────────────────────────────────────────────────
 @app.exception_handler(StarletteHTTPException)

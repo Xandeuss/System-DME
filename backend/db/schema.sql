@@ -167,3 +167,20 @@ CREATE TABLE IF NOT EXISTS recrutamentos (
 );
 
 CREATE INDEX IF NOT EXISTS idx_recrutamentos_recrutador ON recrutamentos (recrutador);
+
+
+-- ── Documentos ────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS documentos (
+    id          UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    titulo      VARCHAR(256) NOT NULL,
+    categoria   VARCHAR(64)  NOT NULL DEFAULT 'triplice',
+    conteudo    TEXT         NOT NULL DEFAULT '',
+    source      TEXT         NOT NULL DEFAULT '',
+    autor       VARCHAR(64)  NOT NULL DEFAULT 'Sistema',
+    last_editor VARCHAR(64)  NOT NULL DEFAULT 'Sistema',
+    created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_documentos_categoria ON documentos (categoria);
+CREATE INDEX IF NOT EXISTS idx_documentos_updated   ON documentos (updated_at DESC);
