@@ -18,7 +18,7 @@ let requerimentosCache = []; // historico de requerimentos
 
 /* ── helpers ─────────────────────────────────── */
 const av = nick =>
-    `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(nick)}&headonly=1&size=m`;
+  `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(nick)}&headonly=1&size=m`;
 
 const avFull = (nick, dir = 2, hdir = 2, action = 'std') =>
     `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(nick)}&direction=${dir}&head_direction=${hdir}&size=l&action=${action}`;
@@ -64,7 +64,7 @@ window.logout = logout;
 function initNavbar() {
     const username = currentUser.nick;
     document.getElementById('navUserName').textContent = username;
-    document.getElementById('navUserImage').src = avFull(username);
+    document.getElementById('navUserImage').src = av(username);
     document.getElementById('dropdownUserImage').src = avFull(username);
     document.getElementById('dropdownName').textContent = username;
 

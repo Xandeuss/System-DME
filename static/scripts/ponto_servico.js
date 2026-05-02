@@ -312,9 +312,15 @@ function loadActiveShifts() {
 
         tr.innerHTML = `
             <td>
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=${shift.user}&direction=2&head_direction=2&gesture=sml&action=std&size=s" style="width:30px;">
-                    <div>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:40px;height:60px;overflow:hidden;border-radius:10px;">
+                <img 
+                    src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(shift.user)}&size=l&direction=2&gesture=std"
+                    style="width:70px;transform: translateY(-12px);"
+                    onerror="this.src='https://via.placeholder.com/70'"
+                >
+                </div>
+                </div>
                         <strong>${shift.user}</strong>
                         ${offlineBadge}
                     </div>
@@ -396,9 +402,10 @@ function loadUserProfile() {
     document.getElementById('navUserName').textContent = user;
     document.getElementById('shiftUserName').textContent = user;
 
-    const avatarUrl = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${user}&direction=3&head_direction=3&gesture=sml&action=std`;
+    const avatarUrl = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(user)}&headonly=1&size=m`;
+    const avatarUrlFull = `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(user)}&size=l&direction=3&head_direction=3&gesture=std`;
     document.getElementById('navUserImage').src = avatarUrl;
-    document.getElementById('shiftUserImage').src = avatarUrl;
+    document.getElementById('shiftUserImage').src = avatarUrlFull;
 
     // Dropdown
     document.getElementById('dropdownName').textContent = user;

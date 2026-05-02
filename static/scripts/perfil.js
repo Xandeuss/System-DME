@@ -50,11 +50,11 @@ if (!targetNick || !found) {
 
 /* ── navbar ──────────────────────────────── */
 function initNavbar() {
-    const av = (nick, dir = 2, hdir = 2) =>
-        `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(nick)}&direction=${dir}&head_direction=${hdir}&size=m&action=std`;
+    const av = nick =>
+  `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(nick)}&headonly=1&size=m`;    
     document.getElementById('navUserName').textContent = loggedUser;
     document.getElementById('navUserImage').src = av(loggedUser);
-    document.getElementById('dropdownUserImage').src = av(loggedUser);
+    document.getElementById('dropdownUserImage').src = avFull(loggedUser);
     document.getElementById('dropdownName').textContent = loggedUser;
 
     const admins = JSON.parse(localStorage.getItem('dme_admins')) || [loggedUser];

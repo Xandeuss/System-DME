@@ -18,7 +18,7 @@ const avFull = (nick, dir = 2, hdir = 2) =>
     `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(nick)}&direction=${dir}&head_direction=${hdir}&size=l&action=std`;
 
 const avMedium = (nick, dir = 2, hdir = 2) =>
-    `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(nick)}&direction=${dir}&head_direction=${hdir}&size=m&action=std`;
+    `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(nick)}&headonly=1&size=m`;
 
 function fmt(mins) {
     const h = Math.floor(mins / 60), m = mins % 60;
@@ -81,7 +81,7 @@ if (!found) {
 /* ── navbar ──────────────────────────────── */
 function initNavbar() {
     document.getElementById('navUserName').textContent = userNick;
-    document.getElementById('navUserImage').src = avMedium(userNick);
+    document.getElementById('navUserImage').src = avFull(userNick);
     document.getElementById('dropdownUserImage').src = avMedium(userNick);
     document.getElementById('dropdownName').textContent = userNick;
 
@@ -302,8 +302,8 @@ function buildGratificacoes() {
                 </div>
                 ${g.motivo ? `<p class="feed-desc">${g.motivo}</p>` : ''}
             </div>
-        </div>`;
-    }).join('');
+        </div>`
+    ).join('');
 }
 
 /* ── populate funcoes tab ──────────────────── */
