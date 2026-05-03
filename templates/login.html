@@ -1,204 +1,150 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DME System | Acesso</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles/global.css">
     <link rel="stylesheet" href="/styles/login.css">
-    <script src="/scripts/theme.js"></script>
 </head>
-<body class="auth-body">
 
-<div class="auth-root">
+<body>
 
-    <!-- ══ ESQUERDA ═══════════════════════════════════════ -->
-    <div class="left-pane">
+    <div class="auth-card">
 
-        <!-- Ruído de textura -->
-        <div class="noise" aria-hidden="true"></div>
-
-        <!-- Vinheta de canto -->
-        <div class="corner-vignette" aria-hidden="true"></div>
-
-        <!-- Conteúdo topo -->
-        <header class="left-header">
-            <div class="brand">
-                <img
-                    src="https://www.habbo.com.br/habbo-imaging/badge/b06134s01114s36044s43014s38114570880883f296e5ddc58f2ff858601e6.gif"
-                    alt="DME" class="brand-logo">
-                <div class="brand-txt">
-                    <span class="brand-name">DME<em>System</em></span>
-                    <span class="brand-tagline">Sistema de Gestão Militar</span>
-                </div>
+        <!-- BRAND -->
+        <div class="auth-brand">
+            <div class="auth-logo-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
             </div>
-        </header>
-
-        <!-- Texto central heroico -->
-        <div class="left-hero">
-            <div class="hero-chip">
-                <span class="chip-dot"></span>
-                Sistema Operacional
-            </div>
-            <h1 class="hero-title">
-                Comando<br>
-                <span class="hero-accent">e Controle</span>
-            </h1>
-            <p class="hero-body">
-                A plataforma centralizada para hierarquia,<br>
-                operações e gestão da força militar DME.
-            </p>
+            <div class="auth-brand-name">DME<em>System</em></div>
+            <div class="auth-brand-sub">Sistema de Gestão Militar</div>
         </div>
 
-        <!-- Divisor horizontal -->
-        <div class="left-divider" aria-hidden="true">
-            <span></span>
-            <span class="divider-diamond"></span>
-            <span></span>
-        </div>
-
-        <!-- Avatares -->
-        <div class="soldiers" aria-label="Militares do DME">
-            <div class="soldier" tabindex="-1">
-                <div class="soldier-img-wrap">
-                    <img class="s-idle" src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Leticinha-_-&direction=2&head_direction=2&size=l&gesture=std" alt="Leticinha-_-" loading="lazy">
-                    <img class="s-wave" src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Leticinha-_-&direction=2&head_direction=2&size=l&action=wav" alt="" loading="lazy" aria-hidden="true">
-                </div>
-                <span class="soldier-name">Leticinha-_-</span>
+        <!-- ── SEÇÃO: LOGIN ────────────────────────────── -->
+        <div id="loginSection">
+            <div class="auth-header">
+                <div class="auth-title">Acessar conta</div>
+                <div class="auth-sub">Bem-vindo de volta, soldado.</div>
             </div>
-            <div class="soldier" tabindex="-1">
-                <div class="soldier-img-wrap">
-                    <img class="s-idle" src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Jodie-Foster&direction=2&head_direction=2&size=l&gesture=std" alt="Jodie-Foster" loading="lazy">
-                    <img class="s-wave" src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Jodie-Foster&direction=2&head_direction=2&size=l&action=wav" alt="" loading="lazy" aria-hidden="true">
-                </div>
-                <span class="soldier-name">Jodie-Foster</span>
-            </div>
-            <div class="soldier" tabindex="-1">
-                <div class="soldier-img-wrap">
-                    <img class="s-idle" src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=rafacv&direction=2&head_direction=2&size=l&gesture=std" alt="rafacv" loading="lazy">
-                    <img class="s-wave" src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=rafacv&direction=2&head_direction=2&size=l&action=wav" alt="" loading="lazy" aria-hidden="true">
-                </div>
-                <span class="soldier-name">rafacv</span>
-            </div>
-            <div class="soldier" tabindex="-1">
-                <div class="soldier-img-wrap">
-                    <img class="s-idle" src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Horcrux-&direction=2&head_direction=2&size=l&gesture=std" alt="Horcrux-" loading="lazy">
-                    <img class="s-wave" src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Horcrux-&direction=2&head_direction=2&size=l&action=wav" alt="" loading="lazy" aria-hidden="true">
-                </div>
-                <span class="soldier-name">Horcrux-</span>
-            </div>
-        </div>
 
-        <!-- Status rodapé -->
-        <footer class="left-footer">
-            <span class="status-badge">
-                <span class="status-dot"></span>
-                Online
-            </span>
-            <span class="footer-sep">·</span>
-            <span class="footer-version">v2.0.0</span>
-        </footer>
-    </div>
-
-    <!-- ══ DIREITA ═══════════════════════════════════════ -->
-    <div class="right-pane">
-
-        <!-- ── LOGIN ── -->
-        <section class="form-shell" id="loginSection">
-            <div class="form-eyebrow">Acesso ao Sistema</div>
-            <h2 class="form-heading">Entrar</h2>
-            <p class="form-sub">Bem-vindo de volta, soldado.</p>
-
-            <form id="loginForm" novalidate class="form-body">
-
-                <div class="fld">
-                    <label class="fld-label" for="loginUsername">Usuário</label>
-                    <div class="fld-row">
-                        <svg class="fld-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16.67 17.5v-1.667A3.333 3.333 0 0 0 13.337 12.5H6.67a3.333 3.333 0 0 0-3.333 3.333V17.5"/><circle cx="10.003" cy="6.667" r="3.333"/></svg>
-                        <input class="fld-input" id="loginUsername" type="text" placeholder="Nickname no Habbo" autocomplete="username" required>
-                    </div>
-                    <span class="fld-err" id="err-loginUsername"></span>
+            <form id="loginForm" novalidate>
+                <div class="field">
+                    <label class="field-label" for="loginUsername">Nome de Usuário</label>
+                    <input type="text" id="loginUsername" class="field-input" placeholder="Seu nickname no Habbo"
+                        autocomplete="username" required>
+                    <div class="field-error" id="err-loginUsername"></div>
                 </div>
 
-                <div class="fld">
-                    <label class="fld-label" for="loginPassword">Senha</label>
-                    <div class="fld-row">
-                        <svg class="fld-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.333" y="9.167" width="13.333" height="9.167" rx="1.5"/><path d="M6.667 9.167V6.667a3.333 3.333 0 0 1 6.667 0v2.5"/></svg>
-                        <input class="fld-input" id="loginPassword" type="password" placeholder="Sua senha" autocomplete="current-password" required>
-                    </div>
-                    <span class="fld-err" id="err-loginPassword"></span>
+                <div class="field">
+                    <label class="field-label" for="loginPassword">Senha</label>
+                    <input type="password" id="loginPassword" class="field-input" placeholder="Sua senha"
+                        autocomplete="current-password" required>
+                    <div class="field-error" id="err-loginPassword"></div>
                 </div>
 
-                <button type="submit" class="btn-submit" id="loginBtn">
-                    <span class="btn-label">Entrar</span>
-                    <svg class="btn-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M4.167 10H15.833M10.833 5l5 5-5 5"/></svg>
-                    <span class="btn-loader"></span>
+                <button type="submit" class="btn-auth" id="loginBtn">
+                    <span class="btn-text">Entrar</span>
+                    <div class="spinner"></div>
                 </button>
             </form>
 
-            <div class="form-sep"><span></span><em>ou</em><span></span></div>
-            <p class="form-alt">Novo por aqui? <a class="form-link" onclick="toggleForm('register')">Criar conta</a></p>
-        </section>
+            <div class="auth-sep">ou</div>
 
-        <!-- ── REGISTRO ── -->
-        <section class="form-shell" id="registerSection" style="display:none">
-            <div class="form-eyebrow">Novo Cadastro</div>
-            <h2 class="form-heading">Criar conta</h2>
-            <p class="form-sub">Junte-se ao DME System.</p>
+            <div class="auth-link-row">
+                Novo por aqui? <a onclick="toggleForm('register')">Criar conta</a>
+            </div>
+        </div>
 
-            <form id="registerForm" novalidate class="form-body">
+        <!-- ── SEÇÃO: REGISTRO ────────────────────────── -->
+        <div id="registerSection" style="display:none">
+            <div class="auth-header">
+                <div class="auth-title">Criar uma conta</div>
+                <div class="auth-sub">Junte-se ao DME System.</div>
+            </div>
 
-                <div class="fld">
-                    <label class="fld-label" for="username">Usuário</label>
-                    <div class="fld-row">
-                        <svg class="fld-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16.67 17.5v-1.667A3.333 3.333 0 0 0 13.337 12.5H6.67a3.333 3.333 0 0 0-3.333 3.333V17.5"/><circle cx="10.003" cy="6.667" r="3.333"/></svg>
-                        <input class="fld-input" id="username" type="text" placeholder="Nickname exato do Habbo" autocomplete="username" required>
-                    </div>
-                    <span class="fld-err" id="username-error"></span>
+            <form id="registerForm" novalidate>
+                <div class="field">
+                    <label class="field-label" for="username">Nome de Usuário</label>
+                    <input type="text" id="username" class="field-input" placeholder="Seu nickname exato do Habbo"
+                        autocomplete="username" required>
+                    <div class="field-error" id="username-error"></div>
                 </div>
 
-                <div class="fld">
-                    <label class="fld-label" for="email">E-mail</label>
-                    <div class="fld-row">
-                        <svg class="fld-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.5 5.833A1.667 1.667 0 0 1 4.167 4.167h11.666A1.667 1.667 0 0 1 17.5 5.833v8.334A1.667 1.667 0 0 1 15.833 15.833H4.167A1.667 1.667 0 0 1 2.5 14.167V5.833z"/><path d="m2.5 5.833 7.5 5.417 7.5-5.417"/></svg>
-                        <input class="fld-input" id="email" type="email" placeholder="E-mail de contato" autocomplete="email" required>
-                    </div>
-                    <span class="fld-err" id="email-error"></span>
+                <div class="field">
+                    <label class="field-label" for="email">E-mail</label>
+                    <input type="email" id="email" class="field-input" placeholder="Seu e-mail de contato"
+                        autocomplete="email" required>
+                    <div class="field-error" id="email-error"></div>
                 </div>
 
-                <div class="fld">
-                    <label class="fld-label" for="password">Senha</label>
-                    <div class="fld-row">
-                        <svg class="fld-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.333" y="9.167" width="13.333" height="9.167" rx="1.5"/><path d="M6.667 9.167V6.667a3.333 3.333 0 0 1 6.667 0v2.5"/></svg>
-                        <input class="fld-input" id="password" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" required>
-                    </div>
-                    <span class="fld-err" id="password-error"></span>
+                <div class="field">
+                    <label class="field-label" for="password">Senha</label>
+                    <input type="password" id="password" class="field-input" placeholder="Mínimo 6 caracteres"
+                        autocomplete="new-password" required>
+                    <div class="field-error" id="password-error"></div>
                 </div>
 
-                <label class="terms-row">
-                    <input type="checkbox" class="terms-check" id="terms" required>
-                    <span class="terms-text">Aceito os <a href="#" class="form-link">Termos de Serviço</a></span>
-                </label>
+                <div class="check-group">
+                    <input type="checkbox" id="terms" class="check-input" required>
+                    <label for="terms" class="check-label">
+                        Aceito os <a href="#">Termos de Serviço</a>
+                    </label>
+                </div>
 
-                <button type="submit" class="btn-submit" id="submitBtn">
-                    <span class="btn-label">Avançar para Verificação</span>
-                    <svg class="btn-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M4.167 10H15.833M10.833 5l5 5-5 5"/></svg>
-                    <span class="btn-loader"></span>
+                <button type="submit" class="btn-auth" id="submitBtn">
+                    <span class="btn-text">Avançar para Verificação</span>
+                    <div class="spinner"></div>
                 </button>
             </form>
 
-            <div class="form-sep"><span></span><em>ou</em><span></span></div>
-            <p class="form-alt">Já tem conta? <a class="form-link" onclick="toggleForm('login')">Entrar</a></p>
-        </section>
+            <div class="auth-sep">ou</div>
 
+            <div class="auth-link-row">
+                Já possui uma conta? <a onclick="toggleForm('login')">Entrar</a>
+            </div>
+        </div>
+
+        <!-- Avatares decorativos -->
+        <div class="auth-avatars">
+            <div class="avatar-slot">
+                <div class="avatar-img-wrap">
+                    <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Leticinha-_-&direction=4&head_direction=4&size=l&action=wav"
+                        alt="Leticinha-_-" loading="lazy">
+                </div>
+                <span class="avatar-nick">Leticinha-_-</span>
+            </div>
+            <div class="avatar-slot">
+                <div class="avatar-img-wrap">
+                    <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Jodie-Foster&direction=3&head_direction=3&size=l"
+                        alt="Jodie-Foster" loading="lazy">
+                </div>
+                <span class="avatar-nick">Jodie-Foster</span>
+            </div>
+            <div class="avatar-slot">
+                <div class="avatar-img-wrap">
+                    <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=rafacv&direction=2&head_direction=2&size=l"
+                        alt="rafacv" loading="lazy">
+                </div>
+                <span class="avatar-nick">rafacv</span>
+            </div>
+            <div class="avatar-slot">
+                <div class="avatar-img-wrap">
+                    <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Horcrux-&direction=4&head_direction=4&size=l&action=wav"
+                        alt="Horcrux-" loading="lazy">
+                </div>
+                <span class="avatar-nick">Horcrux-</span>
+            </div>
+        </div>
     </div>
-</div>
 
-<div class="toast-wrap" id="toast"></div>
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
 
-<script src="/scripts/login.js?v=6"></script>
+    <script src="/scripts/login.js?v=3"></script>
 </body>
+
 </html>
