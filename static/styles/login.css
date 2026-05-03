@@ -305,15 +305,16 @@ html,body{height:100%;overflow:hidden}
 /* Botão */
 .btn-submit{
     width:100%;
-    display:flex;align-items:center;justify-content:center;gap:7px;
-    padding:11px 18px;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    padding:12px 18px;
     background:#22c55e;color:#000;
     border:none;border-radius:7px;
-    font-family:'Syne',sans-serif;
-    font-size:.82rem;font-weight:800;letter-spacing:.3px;
+    font-family:'Outfit',system-ui,sans-serif;
+    font-size:.83rem;font-weight:700;letter-spacing:.2px;
     cursor:pointer;position:relative;overflow:hidden;
     transition:background .14s,transform .12s,box-shadow .14s;
-    margin-top:2px;
+    margin-top:4px;
+    line-height:1.2;
 }
 .btn-submit::after{
     content:'';position:absolute;inset:0;
@@ -329,7 +330,7 @@ html,body{height:100%;overflow:hidden}
 .btn-submit:active:not(:disabled){transform:translateY(0);box-shadow:none}
 .btn-submit:disabled{opacity:.38;cursor:not-allowed}
 
-.btn-icon{flex-shrink:0;transition:transform .14s}
+.btn-icon{flex-shrink:0;transition:transform .14s;width:15px;height:15px}
 .btn-submit:hover .btn-icon{transform:translateX(3px)}
 
 .btn-loader{
