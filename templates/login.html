@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DME System | Acesso</title>
     <link rel="stylesheet" href="/styles/global.css">
     <link rel="stylesheet" href="/styles/login.css">
+    <script src="/scripts/theme.js"></script>
 </head>
-
 <body>
 
     <div class="auth-card">
@@ -16,9 +15,8 @@
         <!-- BRAND -->
         <div class="auth-brand">
             <div class="auth-logo-mark">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                </svg>
+                <img src="https://www.habbo.com.br/habbo-imaging/badge/b06134s01114s36044s43014s38114570880883f296e5ddc58f2ff858601e6.gif"
+                     alt="DME" class="auth-logo-img">
             </div>
             <div class="auth-brand-name">DME<em>System</em></div>
             <div class="auth-brand-sub">Sistema de Gestão Militar</div>
@@ -112,39 +110,62 @@
         <div class="auth-avatars">
             <div class="avatar-slot">
                 <div class="avatar-img-wrap">
-                    <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Leticinha-_-&direction=4&head_direction=4&size=l&action=wav"
+                    <img class="av-idle"
+                        src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Leticinha-_-&direction=2&head_direction=2&size=l&gesture=std"
                         alt="Leticinha-_-" loading="lazy">
+                    <img class="av-wave"
+                        src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Leticinha-_-&direction=2&head_direction=2&size=l&action=wav"
+                        alt="" loading="lazy" aria-hidden="true">
                 </div>
                 <span class="avatar-nick">Leticinha-_-</span>
             </div>
             <div class="avatar-slot">
                 <div class="avatar-img-wrap">
-                    <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Jodie-Foster&direction=3&head_direction=3&size=l"
+                    <img class="av-idle"
+                        src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Jodie-Foster&direction=2&head_direction=2&size=l&gesture=std"
                         alt="Jodie-Foster" loading="lazy">
+                    <img class="av-wave"
+                        src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Jodie-Foster&direction=2&head_direction=2&size=l&action=wav"
+                        alt="" loading="lazy" aria-hidden="true">
                 </div>
                 <span class="avatar-nick">Jodie-Foster</span>
             </div>
             <div class="avatar-slot">
                 <div class="avatar-img-wrap">
-                    <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=rafacv&direction=2&head_direction=2&size=l"
+                    <img class="av-idle"
+                        src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=rafacv&direction=2&head_direction=2&size=l&gesture=std"
                         alt="rafacv" loading="lazy">
+                    <img class="av-wave"
+                        src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=rafacv&direction=2&head_direction=2&size=l&action=wav"
+                        alt="" loading="lazy" aria-hidden="true">
                 </div>
                 <span class="avatar-nick">rafacv</span>
             </div>
             <div class="avatar-slot">
                 <div class="avatar-img-wrap">
-                    <img src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Horcrux-&direction=4&head_direction=4&size=l&action=wav"
+                    <img class="av-idle"
+                        src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Horcrux-&direction=2&head_direction=2&size=l&gesture=std"
                         alt="Horcrux-" loading="lazy">
+                    <img class="av-wave"
+                        src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=Horcrux-&direction=2&head_direction=2&size=l&action=wav"
+                        alt="" loading="lazy" aria-hidden="true">
                 </div>
                 <span class="avatar-nick">Horcrux-</span>
             </div>
         </div>
+
+        <!-- Status rodapé -->
+        <div class="auth-footer">
+            <span class="footer-version">v2.0.0</span>
+            <span class="footer-status">
+                <span class="footer-dot"></span>
+                Sistema Online
+            </span>
+        </div>
     </div>
 
-    <!-- Toast -->
     <div class="toast" id="toast"></div>
 
     <script src="/scripts/login.js?v=3"></script>
 </body>
-
 </html>
