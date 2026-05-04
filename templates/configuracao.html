@@ -691,6 +691,8 @@
 
 
 
+    <script src="/scripts/configuracao.js"></script>
+
     <script>
 
         const username = localStorage.getItem('dme_username');
@@ -736,124 +738,6 @@
             document.getElementById('panel-' + s).classList.add('active');
 
             if (s === 'emblemas') renderEmblemas();
-
-        }
-
-
-
-        // -- CONTA --
-
-        function getUser() {
-
-            const users = JSON.parse(localStorage.getItem('dme_users')) || [];
-
-            return users.find(u => u.username === username);
-
-        }
-
-
-
-        function carregarConta() {
-
-            document.getElementById('inputNick').value = username;
-
-            const user = getUser();
-
-            if (!user) return;
-
-            if (user.email) document.getElementById('inputEmail').value = user.email;
-
-            if (user.tag) {
-
-                document.getElementById('inputTag').value = user.tag;
-
-                document.getElementById('tagBadge').textContent = '[' + user.tag + ']';
-
-                document.getElementById('inputTag').disabled = true;
-
-                document.getElementById('tagHint').textContent = 'TAG já definida  permanente e não pode ser alterada.';
-
-            }
-
-        }
-
-
-
-        function salvarConta() {
-
-            const email = document.getElementById('inputEmail').value.trim();
-
-            const tagEl = document.getElementById('inputTag');
-
-            const tag = tagEl.disabled ? null : tagEl.value.trim().toUpperCase();
-
-            const nova = document.getElementById('inputNovaSenha').value;
-
-            const conf = document.getElementById('inputConfirmarSenha').value;
-
-            const atual = document.getElementById('inputSenhaAtual').value;
-
-
-
-            if (!atual) { toast('? Informe sua senha atual para confirmar.', 'err'); return; }
-
-            if (tag !== null && tag.length > 0 && tag.length !== 3) { toast('? A TAG deve ter exatamente 3 letras.', 'err'); return; }
-
-            if (nova && nova !== conf) { toast('? As senhas não coincidem.', 'err'); return; }
-
-            if (nova && nova.length < 6) { toast('? A nova senha precisa ter ao menos 6 caracteres.', 'err'); return; }
-
-
-
-            let users = JSON.parse(localStorage.getItem('dme_users')) || [];
-
-            const idx = users.findIndex(u => u.username === username);
-
-            if (idx === -1) { toast('? Usuário não encontrado.', 'err'); return; }
-
-            if (users[idx].password !== atual) { toast('? Senha atual incorreta.', 'err'); return; }
-
-
-
-            if (email) users[idx].email = email;
-
-            if (tag && tag.length === 3 && !users[idx].tag) {
-
-                users[idx].tag = tag;
-
-                tagEl.disabled = true;
-
-                document.getElementById('tagHint').textContent = 'TAG já definida  permanente e não pode ser alterada.';
-
-            }
-
-            if (nova) users[idx].password = nova;
-
-
-
-            localStorage.setItem('dme_users', JSON.stringify(users));
-
-
-
-            const savedTag = users[idx].tag;
-
-            if (savedTag) {
-
-                document.getElementById('tagBadge').textContent = '[' + savedTag + ']';
-
-                document.getElementById('dropdownTag').textContent = '[' + savedTag + '] Militar DME';
-
-            }
-
-
-
-            document.getElementById('inputSenhaAtual').value = '';
-
-            document.getElementById('inputNovaSenha').value = '';
-
-            document.getElementById('inputConfirmarSenha').value = '';
-
-            toast('? Configurações salvas com sucesso!');
 
         }
 
@@ -1255,7 +1139,7 @@
 
 
 
-            carregarConta();
+            // O carregarDados() já é chamado pelo DOMContentLoaded no configuracao.js
 
         });
 
