@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
     email       VARCHAR(128),
     senha_hash  TEXT         NOT NULL DEFAULT '',
     role        VARCHAR(8)   NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin')),
-    status      VARCHAR(16)  NOT NULL DEFAULT 'ativo'
-                             CHECK (status IN ('ativo', 'pendente', 'desativado', 'banido')),
+    status      VARCHAR(32)  NOT NULL DEFAULT 'pendente_missao'
+                             CHECK (status IN ('ativo', 'pendente', 'pendente_missao', 'pendente_aprovacao', 'desativado', 'banido')),
     banido_ate  TIMESTAMPTZ,
     created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
@@ -41,8 +41,8 @@ CREATE TABLE IF NOT EXISTS militares (
     patente         VARCHAR(64)  NOT NULL,
     patente_ordem   SMALLINT     NOT NULL DEFAULT 99,
     corpo           VARCHAR(16)  NOT NULL CHECK (corpo IN ('militar', 'empresarial', 'alto_comando', 'cadetes')),
-    status          VARCHAR(16)  NOT NULL DEFAULT 'pendente'
-                                 CHECK (status IN ('ativo', 'pendente', 'desativado', 'banido')),
+    status          VARCHAR(32)  NOT NULL DEFAULT 'pendente'
+                                 CHECK (status IN ('ativo', 'pendente', 'pendente_missao', 'pendente_aprovacao', 'desativado', 'banido')),
     role            VARCHAR(8)   NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin')),
     tag             VARCHAR(16)  NOT NULL DEFAULT 'DME',
     banido_ate      TIMESTAMPTZ,

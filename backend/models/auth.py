@@ -53,8 +53,31 @@ class AuthResponse(BaseModel):
 class UserInfo(BaseModel):
     """Dados do usuário retornados pelo GET /api/auth/me."""
     nick: str
+    email: str | None = None
     patente: str = "Recruta"
     corpo: str = "militar"
     status: str = "ativo"
     role: str = "user"
     centros: list[str] = []
+
+
+class VerifyRequest(BaseModel):
+    """Dados para verificação de missão no Habbo."""
+    nick: str
+    code: str
+
+
+class UpdateProfileRequest(BaseModel):
+    """Dados para atualizar e-mail e/ou senha."""
+    email: str | None = None
+    nova_senha: str | None = Field(None, min_length=6, max_length=128)
+    senha_atual: str
+
+    @field_validator("email")
+    @classmethod
+    def email_valido(cls, v: str | None) -> str | None:
+        if v is None: return None
+        v = v.strip().lower()
+        if not re.match(r"^[^\s@]+@[^\s@]+\.[^\s@]+$", v):
+            raise ValueError("E-mail inválido")
+        return v

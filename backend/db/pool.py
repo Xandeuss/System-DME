@@ -32,6 +32,12 @@ async def init_pool() -> None:
 # Migrações idempotentes — rodam a cada boot, seguras de re-executar.
 _MIGRATIONS = [
     "ALTER TABLE militares ADD COLUMN IF NOT EXISTS patente_anterior VARCHAR(64)",
+    "ALTER TABLE usuarios ALTER COLUMN status TYPE VARCHAR(32)",
+    "ALTER TABLE militares ALTER COLUMN status TYPE VARCHAR(32)",
+    "ALTER TABLE usuarios DROP CONSTRAINT IF EXISTS usuarios_status_check",
+    "ALTER TABLE usuarios ADD CONSTRAINT usuarios_status_check CHECK (status IN ('ativo', 'pendente', 'pendente_missao', 'pendente_aprovacao', 'desativado', 'banido'))",
+    "ALTER TABLE militares DROP CONSTRAINT IF EXISTS militares_status_check",
+    "ALTER TABLE militares ADD CONSTRAINT militares_status_check CHECK (status IN ('ativo', 'pendente', 'pendente_missao', 'pendente_aprovacao', 'desativado', 'banido'))",
 ]
 
 
